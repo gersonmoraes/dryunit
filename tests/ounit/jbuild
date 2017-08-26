@@ -1,4 +1,4 @@
 (executables
  ((names (main))
-  (libraries (alcotest))
+  (libraries (oUnit))
   (preprocess (pps (ppx_dryunit)))))
