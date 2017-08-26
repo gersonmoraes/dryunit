@@ -47,14 +47,14 @@ let rewriter _config _cookies =
       { e with pexp_desc = Pexp_constant (Pconst_string (output, None)) }
 
     (* dryunit_alcotest *)
-    | Pexp_extension ({ txt = "dryunit_alcotest"; _ }, PStr []) ->
+    | Pexp_extension ({ txt = "alcotest"; _ }, PStr []) ->
       let filename = !Location.input_name in
       let name = title_from_no_padding @@
          Filename.(basename (chop_suffix filename ".ml")) in
       bootstrap_alcotest name (extract_from ~filename)
 
     (* dryunit_ounit *)
-    | Pexp_extension ({ txt = "dryunit_ounit"; _ }, PStr []) ->
+    | Pexp_extension ({ txt = "ounit"; _ }, PStr []) ->
       let filename = !Location.input_name in
       let name = title_from_no_padding @@
          Filename.(basename (chop_suffix filename ".ml")) in

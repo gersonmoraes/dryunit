@@ -9,4 +9,4 @@ let test_capit () =
 let test_plus () =
   Alcotest.(check int) "same ints" 7 (To_test.plus [1;1;2;3])
 
-let () = [%dryunit_alcotest]
+let () = [%alcotest]

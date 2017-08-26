@@ -59,7 +59,7 @@ let is_possible_test_entry (line:string) =
     if get line 7 == ' ' then
       if get line 10 == 'P' then
         if get line 15 == 'v' then
-          (sub line 20 5) = "test_"
+          (sub line 20 4) = "test"
         else false
       else false
     else false
@@ -176,11 +176,11 @@ let tests_from path =
    Extracts a human friendly name from the test function.
    Ex: format "test_it_works" outputs "It works"
 *)
-let title_from ?(padding_start=4) name =
+let title_from name =
   let name = Bytes.of_string name in
   let len = Bytes.length name in
-  let name = Bytes.sub name 4 (len-4) in
-  let i, len = ref 0, len-4 in
+  let name = Bytes.sub name 3 (len-3) in
+  let i, len = ref 0, len-3 in
   while !i < len do
     try
       i := Bytes.index_from name !i '_';
