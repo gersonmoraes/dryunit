@@ -2,5 +2,5 @@
 let test_execution () =
   print_endline "action executed"
 
-let () =
-  test_execution ()
+let _ =
+  [%dryunit_debug_run]
