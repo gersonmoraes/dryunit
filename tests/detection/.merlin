@@ -1,3 +1,0 @@
-B ../../_build/default/tests/detection
-FLG -ppx "../../_build/default/.ppx/ppx_dryunit/ppx.exe --as-ppx --cookie 'plop="Chocolate"'"
-FLG -w -40
