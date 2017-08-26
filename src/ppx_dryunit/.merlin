@@ -1,0 +1,8 @@
+B ../../_build/default/src/dryunit_core
+B ../../_build/default/src/ppx_dryunit
+FLG -w -40
+PKG compiler-libs
+PKG compiler-libs.common
+PKG ocaml-migrate-parsetree
+PKG result
+S ../dryunit_core

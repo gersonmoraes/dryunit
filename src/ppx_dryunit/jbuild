@@ -1,0 +1,4 @@
+(library
+ ((name ppx_dryunit)
+  (kind ppx_rewriter)
+  (libraries (ocaml-migrate-parsetree dryunit_core))))

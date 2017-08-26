@@ -1,0 +1,2 @@
+B ../../_build/default/src/dryunit_core
+FLG -open Dryunit_core__ -w -40
