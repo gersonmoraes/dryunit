@@ -118,7 +118,12 @@ let probation_pass ~probation line =
     ( if is_substring line "construct \"()\"" then
       let () = reset_probation ~probation () in
       Some true
-      else None
+      else
+      ( if is_substring line "_var \"" then (* ounit ctx's param *)
+       let () = reset_probation ~probation () in
+       Some true
+       else None
+      )
     )
     else None
   )
@@ -171,11 +176,27 @@ let tests_from path =
    Extracts a human friendly name from the test function.
    Ex: format "test_it_works" outputs "It works"
 *)
-let title_from_function name =
+let title_from ?(padding_start=4) name =
   let name = Bytes.of_string name in
   let len = Bytes.length name in
   let name = Bytes.sub name 4 (len-4) in
   let i, len = ref 0, len-4 in
+  while !i < len do
+    try
+      i := Bytes.index_from name !i '_';
+      Bytes.set name !i ' ';
+      i := !i + 1;
+    with
+      _ -> i := len;
+  done;
+  name |> Bytes.trim |> Bytes.to_string
+  |> String.capitalize_ascii
+
+
+let title_from_filename name =
+  let name = Bytes.of_string name in
+  let len = Bytes.length name in
+  let i, len = ref 0, len in
   while !i < len do
     try
       i := Bytes.index_from name !i '_';

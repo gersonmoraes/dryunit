@@ -6,11 +6,14 @@ type test = {
   test_title: string;
 }
 
+let title_from = title_from
+let title_from_no_padding = title_from_filename
+
 let extract_from ~filename : test list =
   tests_from filename
   |> List.map
     (fun test_name ->
-       { test_name; test_title = title_from_function test_name }
+       { test_name; test_title = title_from test_name }
     )
 
 let pp name tests =
@@ -26,3 +29,6 @@ module Test = struct
   let name (t:test) = t.test_name
   let title (t:test) = t.test_title
 end
+
+let extract_name_from_file ~filename =
+  String.capitalize_ascii
