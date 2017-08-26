@@ -1,15 +1,6 @@
 (executables
  ((names (main))
+  (libraries (alcotest))
   (preprocess (pps (ppx_dryunit
                     ;; (-message "Hello, world!")
                     (--cookie "plop=\"Chocolate\""))))))
-
-(rule
- ((targets (main.output))
-  (deps    (main.exe))
-  (action  (with-stdout-to ${@} (run ${<})))))
-
-(alias
- ((name   runtest)
-  (deps   (main.expected main.output))
-  (action (run diff -u main.expected main.output))))
