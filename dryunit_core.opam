@@ -1,9 +1,9 @@
 opam-version: "1.2"
 maintainer: "gerson.xp@gmail.com"
 authors: ["Gerson Moraes"]
-homepage: "https://bitbucket.org/gsmoraes/dryunit"
-bug-reports: "https://bitbucket.org/gsmoraes/dryunit"
-dev-repo: "https://bitbucket.org/gsmoraes/dryunit"
+homepage: "https://bitbucket.org/gsmoraes/ppx_dryunit"
+bug-reports: "https://bitbucket.org/gsmoraes/ppx_dryunit"
+dev-repo: "https://bitbucket.org/gsmoraes/ppx_dryunit"
 available: [ ocaml-version >= "4.03.0"]
 build: [
   ["jbuilder" "build" "-p" name "-j" jobs]
