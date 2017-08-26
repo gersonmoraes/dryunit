@@ -7,7 +7,7 @@ let is_substring string substring =
     let rec check pos =
       pos <= max && (
         Bytes.blit string pos clone 0 ssl ; clone = substring
-                                            || check (Bytes.index_from string (succ pos) (Bytes.get substring 0))
+        || check (Bytes.index_from string (succ pos) (Bytes.get substring 0))
       )
     in
     try check (Bytes.index string (Bytes.get substring 0))
@@ -49,10 +49,10 @@ let ends_with s1 s2 =
     close_in chan;
     List.rev !lines *)
 
-    (*
-      Hardcore filter to let bindings starting with "test_"
-      It does not recognizes test functions inside nested modules
-    *)
+(*
+  Hardcore filter to let bindings starting with "test_"
+  It does not recognizes test functions inside nested modules
+*)
 let is_possible_test_entry (line:string) =
   let open String in
   if length line > 20 then

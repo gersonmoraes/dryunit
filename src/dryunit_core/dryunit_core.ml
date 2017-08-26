@@ -18,8 +18,6 @@ let pp name tests =
   List.iter (fun t -> Printf.printf " - %s [%s]\n" t.title t.f) tests
 
 let debug ~filename : string =
-  let name = "Dryunit debugger" in
-  let titles =
-    extract_from ~filename |>
-    List.map (fun v -> sprintf " %s" v.title) in
-  sprintf "%s\n%s" name (String.concat "\n" titles)
+  extract_from ~filename
+  |> List.map (fun v -> v.title)
+  |> String.concat "\n"

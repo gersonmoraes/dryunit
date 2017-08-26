@@ -1,5 +1,6 @@
-MAIN_EXECUTABLE = tests/sample/foo.exe
-MAIN_EXECUTABLE = tests/detection/main.exe
+#MAIN_EXECUTABLE = tests/sample/foo.exe
+#MAIN_EXECUTABLE = tests/detection/main.exe
+MAIN_EXECUTABLE = tests/activation/main.exe
 
 default:
 	jbuilder build $(MAIN_EXECUTABLE)
