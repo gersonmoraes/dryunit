@@ -1,4 +1,4 @@
-B ../../_build/default/tests/activation
+B ../../_build/default/tests/alcotest
 FLG -ppx "../../_build/default/.ppx/ppx_dryunit/ppx.exe --as-ppx --cookie 'plop="Chocolate"'"
 FLG -w -40
 PKG alcotest
