@@ -133,20 +133,13 @@ let feed_with ~chan =
       let line = input_line chan in
       if !(probation.active) then
       ( match probation_pass ~probation line with
-        | Some true ->
-          ( Printf.printf "'%s' is indeed a test\n" (List.hd !lines)
-
-          )
-        | Some false ->
-          ( Printf.printf "Removing '%s' as false positive\n" (List.hd !lines);
-            lines := List.tl !lines
-          )
+        | Some true -> ()
+        | Some false -> lines := List.tl !lines
         | _ -> ()
       )
       else
       ( if is_possible_test_entry line then
         ( lines := (fun_name line) :: !lines;
-          print_endline (">> Starting probation for " ^ line);
           start_probation ~probation ()
         );
       )
