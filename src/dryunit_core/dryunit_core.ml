@@ -16,6 +16,9 @@ type testsuite = {
 let title_from = title_from
 let title_from_no_padding = title_from_filename
 
+let in_build_dir () =
+  is_substring (Sys.getcwd ()) "_build"
+
 let extract_from ~filename : test list =
   tests_from filename
   |> List.map
