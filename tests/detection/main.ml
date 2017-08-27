@@ -7,3 +7,6 @@ let test3 () = ()
 let () =
   Printf.printf "%s\n"
     [%dryunit_debug]
+
+(* let () =
+  [%dryunit_debug2] *)

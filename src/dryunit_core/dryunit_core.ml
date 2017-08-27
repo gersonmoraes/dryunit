@@ -32,12 +32,10 @@ let extract_from ~filename : test list =
   tests_from filename
   |> List.map
     (fun test_name ->
-        let () = Printf.printf "  (found: %s)\n" test_name in
        { test_name; test_title = title_from test_name }
     )
 
 let suite_from ~dir filename : testsuite =
-  let () = Printf.printf "checking %s [dir = %s]\n" dir filename in
   let name = (Filename.basename filename) in
   { suite_name = name;
     suite_title = title_from_no_padding (Filename.chop_suffix name ".ml");

@@ -100,7 +100,7 @@ let probation_pass ~probation line =
     let () = reset_probation ~probation () in
     Some false
   else
-  ( if !(probation.time) > 5 then
+  ( if !(probation.time) > 3 then
     ( if is_substring line "construct \"()\"" then
       let () = reset_probation ~probation () in
       Some true
@@ -123,9 +123,10 @@ let feed_with ~chan =
     while true; do
       let line = input_line chan in
       if !(probation.active) then
-      ( match probation_pass ~probation line with
+      (match probation_pass ~probation line with
         | Some true -> ()
-        | Some false -> lines := List.tl !lines
+        | Some false ->
+            lines := List.tl !lines
         | _ -> ()
       )
       else

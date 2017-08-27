@@ -42,22 +42,7 @@ let bootstrap_alcotest suites =
   )
 
 
-
-(* let bootstrap_ounit suite =
-  let test_set =
-    suite.tests |>
-    List.map
-     ( fun t ->
-       app (evar ">::") [ str t.test_name; evar t.test_name ]
-     ) in
-   let set_list = list test_set in
-   app (evar "OUnit2.run_test_tt_main") [ app (evar ">:::") [str suite.suite_name; set_list] ] *)
-
-
 let bootstrap_ounit suites =
-  let () = Printf.printf "bootstrapping ounit from \n - dir: %s\n - filename: %s\n"
-    (Sys.getcwd ())
-    !(Location.input_name) in
   suites |>
   List.map
   ( fun suite ->
@@ -84,6 +69,10 @@ let rewriter _config _cookies =
     | Pexp_extension ({ txt = "dryunit_debug"; _ }, PStr []) ->
       let output = Dryunit_core.debug ~filename:!Location.input_name in
       { e with pexp_desc = Pexp_constant (Pconst_string (output, None)) }
+
+    (* debug just returns a string with detected tests *)
+    | Pexp_extension ({ txt = "dryunit_debug2"; _ }, PStr []) ->
+      app (evar "Printf.printf") [str "%s %s"; str "Hello"; str "World!" ]
 
     (* alcotest *)
     | Pexp_extension ({ txt = "alcotest"; _ }, PStr []) ->

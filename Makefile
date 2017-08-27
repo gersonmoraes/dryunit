@@ -1,5 +1,5 @@
 
-MAIN_EXECUTABLE = tests/ounit/normlize.exe
+MAIN_EXECUTABLE = tests/detection/main.exe
 # MAIN_EXECUTABLE = tests/alcotest/main.exe
 # MAIN_EXECUTABLE = tests/ounit/main.exe
 
@@ -15,21 +15,17 @@ clean:
 
 run:
 	@jbuilder build $(MAIN_EXECUTABLE) && _build/default/$(MAIN_EXECUTABLE)
-	@echo
 
 run_ounit:
 	@jbuilder build $(EXECUTABLE_OUNIT) && _build/default/$(EXECUTABLE_OUNIT)
-	@echo
 
 run_alcotest:
 	@jbuilder build $(EXECUTABLE_ALCOTEST) && _build/default/$(EXECUTABLE_ALCOTEST)
-	@echo
 
-run_core:
+test_core:
 	@jbuilder build $(EXECUTABLE_CORE) && _build/default/$(EXECUTABLE_CORE)
-	@echo
 
-test: clean run_core
+test: clean test_core
 	@jbuilder runtest
 
 
