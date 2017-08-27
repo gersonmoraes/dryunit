@@ -3,5 +3,6 @@
 (library
  ((name        dryunit_core)
   (public_name dryunit_core)
-    (libraries (unix))
+  (preprocess (action (run ${bin:cppo} -V OCAML:${ocaml_version} ${<})))
+  (libraries (unix))
 ))

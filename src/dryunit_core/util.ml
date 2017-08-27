@@ -192,7 +192,6 @@ let title_from name =
       _ -> i := len;
   done;
   name |> Bytes.trim |> Bytes.to_string
-  |> String.capitalize_ascii
 
 
 let title_from_filename name =
@@ -208,4 +207,3 @@ let title_from_filename name =
       _ -> i := len;
   done;
   name |> Bytes.trim |> Bytes.to_string
-  |> String.capitalize_ascii

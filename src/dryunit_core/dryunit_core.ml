@@ -1,6 +1,14 @@
 open Util
 open Printf
 
+
+#if OCAML_VERSION < (4, 03, 0)
+  let capitalize_ascii = String.capitalize
+#else
+  let capitalize_ascii = String.capitalize_ascii
+#endif
+
+
 type test = {
   test_name: string;
   test_title: string;
@@ -13,11 +21,11 @@ type testsuite = {
   tests: test list;
 }
 
-let title_from = title_from
-let title_from_no_padding = title_from_filename
+let title_from v = capitalize_ascii @@ title_from v
+let title_from_no_padding v = capitalize_ascii @@ title_from_filename v
 
 let in_build_dir () =
-  is_substring (Sys.getcwd ()) "_build"
+  is_substring (Sys.getcwd ()) "build/"
 
 let extract_from ~filename : test list =
   tests_from filename
@@ -68,4 +76,4 @@ module Test = struct
 end
 
 let extract_name_from_file ~filename =
-  String.capitalize_ascii
+  capitalize_ascii

@@ -1,4 +1,5 @@
 (library
  ((name ppx_dryunit)
+  (preprocess (action (run ${bin:cppo} -V OCAML:${ocaml_version} ${<})))
   (kind ppx_rewriter)
   (libraries (ocaml-migrate-parsetree dryunit_core ppx_tools))))
