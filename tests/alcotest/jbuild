@@ -8,7 +8,6 @@
   (deps    (main.exe))
   (action  (with-stdout-to ${@} (run ${<} --json)))))
 
-
 (rule
  ((targets (main.normalized))
   (deps    (normalize.exe main.output))
@@ -16,5 +15,5 @@
 
 (alias
  ((name   runtest)
-  (deps   (main.expected main.output main.normalized))
+  (deps   (main.expected main.normalized))
   (action (run diff -u main.expected main.normalized))))

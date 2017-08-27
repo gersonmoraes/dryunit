@@ -2,7 +2,7 @@
 
 
 let out =
-  let c = open_in "main.expected" in
+  let c = open_in "main.output" in
   let line = input_line c in
   close_in c;
   line
