@@ -1,8 +1,10 @@
-MAIN_EXECUTABLE = tests/alcotest/main.exe
+MAIN_EXECUTABLE = tests/multi/main.exe
+# MAIN_EXECUTABLE = tests/alcotest/main.exe
 # MAIN_EXECUTABLE = tests/ounit/main.exe
 
 EXECUTABLE_1 = tests/ounit/main.exe
 EXECUTABLE_2 = tests/alcotest/main.exe
+EXECUTABLE_3 = tests/multi/main.exe
 
 default:
 	jbuilder build $(MAIN_EXECUTABLE)
@@ -18,7 +20,7 @@ run1:
 run2:
 	@jbuilder build $(EXECUTABLE_2) && _build/default/$(EXECUTABLE_2)
 
-test:
+test: clean
 	@jbuilder runtest
 
 
