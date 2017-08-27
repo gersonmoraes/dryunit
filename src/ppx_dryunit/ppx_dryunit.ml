@@ -1,10 +1,22 @@
-(* Rewrite [%fourty_two] as 42 *)
+#if OCAML_VERSION < (4, 03, 0)
+#define Pconst_string Const_string
+#define OCaml_OMP OCaml_402
+#elif OCAML_VERSION < (4, 04, 0)
+#define OCaml_OMP OCaml_403
+#elif OCAML_VERSION < (4, 05, 0)
+#define OCaml_OMP OCaml_404
+#elif OCAML_VERSION < (4, 06, 0)
+#define OCaml_OMP OCaml_405
+#elif OCAML_VERSION < (4, 07, 0)
+#define OCaml_OMP OCaml_406
+#endif
+
 
 open Migrate_parsetree
-open OCaml_404.Ast
+open OCaml_OMP.Ast
 open Parsetree
-open Ast_helper
 open Ast_convenience
+open Ast_helper
 open Dryunit_core
 
 
@@ -87,5 +99,5 @@ let rewriter _config _cookies =
 
 let () =
   Driver.register ~name:"ppx_dryunit"
-    (module OCaml_404)
+    (module OCaml_OMP)
     rewriter
