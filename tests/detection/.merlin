@@ -1,6 +1,3 @@
-B ../../_build/default/tests/ounit
+B ../../_build/default/tests/detection
 FLG -ppx "../../_build/default/.ppx/ppx_dryunit/ppx.exe --as-ppx"
 FLG -w -40
-PKG oUnit
-PKG oUnit.advanced
-PKG unix

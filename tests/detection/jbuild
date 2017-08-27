@@ -1,8 +1,6 @@
 (executables
  ((names (main))
-  (preprocess (pps (ppx_dryunit
-                    ;; (-message "Hello, world!")
-                    (--cookie "plop=\"Chocolate\""))))))
+  (preprocess (pps (ppx_dryunit)))))
 
 (rule
  ((targets (main.output))

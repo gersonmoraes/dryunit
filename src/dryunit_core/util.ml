@@ -178,9 +178,11 @@ let tests_from path =
 *)
 let title_from name =
   let name = Bytes.of_string name in
-  let len = Bytes.length name in
-  let name = Bytes.sub name 3 (len-3) in
-  let i, len = ref 0, len-3 in
+  let name =
+    if (Bytes.get name 4) = '_' then
+      Bytes.sub name 4 ((Bytes.length name) - 4)
+    else name in
+  let i, len = ref 0, Bytes.length name in
   while !i < len do
     try
       i := Bytes.index_from name !i '_';
