@@ -1,7 +1,7 @@
 (* This scripts validates the output of alcotest *)
 
-(*
-let get_lines filename
+
+let get_lines filename =
   let lines = ref [] in
   let chan = open_in filename in
   try
@@ -14,16 +14,14 @@ let get_lines filename
 
 
 let out =
-  let lines = get_lines "main.output"
-  let line = input_line c in
-  close_in c;
-  line
+  let lines = get_lines "main.output" in
+  List.nth lines 1
 
 open String
 
 let format s =
   let s : string = trim s in
-  let s : string = sub s 0 25 in
-  s ^ "}"
+  sub s 0 ((index_from s 5 ':') -3)
 
-let () = print_endline (format out) *)
+
+let () = print_endline (format out)
