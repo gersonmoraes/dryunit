@@ -1,0 +1,14 @@
+B ../../_build/default/src/dryunit_core
+B ../../_build/default/tests/core
+FLG -w -40
+PKG alcotest
+PKG astring
+PKG bytes
+PKG cmdliner
+PKG fmt
+PKG fmt.cli
+PKG fmt.tty
+PKG result
+PKG uchar
+PKG unix
+S ../../src/dryunit_core

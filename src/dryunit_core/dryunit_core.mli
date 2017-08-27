@@ -1,4 +1,10 @@
 
+module Util : sig
+  val is_substring: string -> string -> bool
+  val starts_with: string -> string -> bool
+  val ends_with: string -> string -> bool
+end
+
 type test = {
   test_name: string;
   test_title: string;

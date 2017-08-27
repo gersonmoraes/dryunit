@@ -55,6 +55,9 @@ let bootstrap_alcotest suites =
 
 
 let bootstrap_ounit suites =
+  let () = Printf.printf "bootstrapping ounit from \n - dir: %s\n - filename: %s\n"
+    (Sys.getcwd ())
+    !(Location.input_name) in
   suites |>
   List.map
   ( fun suite ->
@@ -73,7 +76,7 @@ let bootstrap_ounit suites =
 let rewriter _config _cookies =
   let super = Ast_mapper.default_mapper in
   if not (in_build_dir ()) then
-    super
+    { super with expr = fun _ _ -> unit () }
   else
   let expr self e =
     match e.pexp_desc with
@@ -84,13 +87,11 @@ let rewriter _config _cookies =
 
     (* alcotest *)
     | Pexp_extension ({ txt = "alcotest"; _ }, PStr []) ->
-      let filename = !Location.input_name in
-      bootstrap_alcotest (detect_suites ~filename)
+      bootstrap_alcotest (detect_suites ~filename:!Location.input_name)
 
     (* ounit *)
     | Pexp_extension ({ txt = "ounit"; _ }, PStr []) ->
-      let filename = !Location.input_name in
-      bootstrap_ounit (detect_suites ~filename)
+      bootstrap_ounit (detect_suites ~filename:!Location.input_name)
 
     (* anything else *)
     | _ -> super.expr self e
