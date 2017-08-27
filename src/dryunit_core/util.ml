@@ -35,20 +35,6 @@ let ends_with s1 s2 =
     (sub s1 (len1 - len2) len2) = s2
   end
 
-
-
-(* let read_with ~chan ~filter ~f =
-  let lines = ref [] in
-  try
-    while true; do
-      let l = input_line chan in
-      if filter l then
-        lines := f l :: !lines;
-    done; !lines
-  with End_of_file ->
-    close_in chan;
-    List.rev !lines *)
-
 (*
   Hardcore filter to let bindings starting with "test_"
   It does not recognizes test functions inside nested modules
