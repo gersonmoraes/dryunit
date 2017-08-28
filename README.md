@@ -1,26 +1,32 @@
 # Redefining OCaml story on Unit Testing
 
-If you've ever written unit tests in virtually any language other than OCaml you can understand how I felt whenever I wrote my OCaml tests. If you are familiar to this, you can skip ahead to [Dryunit](#Dryunit) section.
+If you've ever written unit tests in virtually any language other than OCaml you can understand how I felt whenever I wrote my OCaml tests: *Odd*. Constantly reminded of the limitations of design choices and sometimes even the ecossystem. Usually feeling that there should propbably be a better way to define this. *If only OCaml was more be like other languages*...
+
+*The simpler way to do things* I've always wanted would be making test code as trivial as good ol' OCaml. The same compilation process. Integrate test code with whatever tools I use for the project - that includes Merlin, since I usually want autocompletion everywhere. Dont make tests a special thing - they are not. Dont change the syntax. Don't show me boiler plate. Don't *make me* write boiler plate. Stay far away from my beautiful clean source code, *thank you very much*.
+
+If you are familiar all of this, you may want to skip ahead to the [Dryunit](#dryunit) section.
 
 
 
 ## The workflow problem
 
-As you probably know, OCaml doesn't have reflections. This means there's no way a testing framework coud, for example, inspect the names of all available testing functions at runtime. As a result, *developers need to write bootstrapping code manually*, and keep this section synchronized at all times, since it gets easily out-dated.
+As you probably know, OCaml doesn't have reflections. This means that the fact most frameworks require you to *redeclare* every test is because OCaml doesnt let anyone inspect things like module structrue and function names at runtime. So the job falls on the developer: *you need to write reflection related code yourself*, in order to frameworks like OUnit and Alcotest show you proper error messages.
 
-Considering the scenario where we have our source code as a library and our tests in a diferent folder as an executable using that library, this is what a tipical workflow looks like when you write unit test:
+You can still rely on some sort of witchcraft, like writing test code in comments, or putting some test code inlined with source code, using some special syntax and conventions.
 
-  1. Write your tests as normal functions, using the conventions of the choosen test framework.
-  2. Describe all your previously written tests to the test framework, *so it knows what to test, and how to name each test, so it can provide meaningful error messages*.
-  3. Compile and run the executable
+In here, we're only considering the scenario where we have our source code as a library and our tests in a diferent folder as an executable using that library. Usually related to this workflow:
 
-The frustrating point is `#2`. It's really clear why: anytime you update your test code, you have to be aware of the its effect in the bootstrapping. Worst, havens forbid, if you add tons of tests and forget to add one of the corresponding lines in the bootstrap. That test will never run and you will never get a warning. There was no way around it. *Until now*.
+    1. Write your tests as normal functions, using the conventions of a popular test framework.
+    2. Describe all your previously written tests to the framework, giving even a name to the current suite, since module name will be lost at compile.
+    3. Compile and run the executable
+
+The frustrating is `#2`. A really annoying point: anytime you update your test code, you have to be aware of the its effect in the bootstrapping area. Worst, havens forbid, if you add tons of tests and forget to add some of the corresponding lines in the bootstrap. Those tests will never run and you will never get a warning. There was no elegant way around it. *Until now*.
 
 
 
 ## The story behind the project
 
-I have been wanting to write an OCaml test framework for sometime now. There is, until I gave a good look at Mirage's [Alcotest](https://github.com/mirage/alcotest) project. I realized then that, no matter how good a new test library could be, there was still the underlining bootstrap problem.
+I have been wanting to write an OCaml test framework for sometime now. There is, until I gave a good look at Mirage's [Alcotest](https://github.com/mirage/alcotest) project, and then realized that, no matter how good a new test library could be, there was still the underlining bootstrapping problem.
 
 I was toying with the idea of a non-pervasive, nearly invisible test framework. Something to make unit tests *DRY* and allow *Convention over Configuration* for what gets to be active or ignored, without bypassing compilation. To be truly *DRY*, I shouldn't even consider migrating existing tests from the most popular libraries, like OUnit or Alcotest. I wanted to create a tool that would allow you to, basically, ***cutt bootstapping off your test code***.
 
@@ -85,7 +91,7 @@ When processing the extension, the following happens:
 
 ## The future of Dryunit
 
-One of the big advantages of the project is that is *framework independent*. It changes the AST to write the code a developer would, filling in the framework conventions for bootstrapping. It relies on the user building system to provide the apropriate dependencies, so the project itself is *light*. It's fairly easy to add new test frameworks that support similar workflows. The only dependency is the `unix` library, shipped with OCaml, to run the OCaml parser.
+One of the big advantages of the project is that is *framework independent*. It changes the AST to write the code a developer would, filling in the framework conventions for bootstrapping. It relies on the user building system to provide the apropriate dependencies, so the project itself is *light*. It's fairly easy to add new test frameworks that support similar workflows.
 
 This feels like an ambitious project, but is actually *low maintanance*. Thanks to the amazing work developed in the [OCaml-Migrate-Parsetree](https://github.com/ocaml-ppx/ocaml-migrate-parsetree) project, this ppx already works on all major OCaml versions, since 4.02.3.
 
