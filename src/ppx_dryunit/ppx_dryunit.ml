@@ -24,13 +24,14 @@ let bootstrap_alcotest suites =
   suites |>
   List.map
   ( fun suite ->
+    let current_module = (suite.suite_path = Filename.basename !Location.input_name) in
     suite.tests |>
     List.map
     ( fun t ->
       tuple
       [ str t.test_title
       ; Exp.variant "Quick" None
-      ; evar t.test_name
+      ; evar (test_name ~current_module suite t)
       ]
     ) |>
     ( fun test_set ->
@@ -46,10 +47,11 @@ let bootstrap_ounit suites =
   suites |>
   List.map
   ( fun suite ->
+    let current_module = (suite.suite_path = Filename.basename !Location.input_name) in
     suite.tests |>
     List.map
     ( fun t ->
-      app (evar ">::") [ str (suite.suite_title ^ "." ^ t.test_name); evar t.test_name ]
+      app (evar ">::") [ str (suite.suite_title ^ "." ^ t.test_name); evar (test_name ~current_module suite t) ]
     )
   ) |>
   List.flatten |>

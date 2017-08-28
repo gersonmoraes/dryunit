@@ -18,7 +18,8 @@ type test = {
 type testsuite = {
   suite_title: string;
   suite_name: string;
-  (* suite_path: string; *)
+  (* module_name: string; *)
+  suite_path: string;
   tests: test list;
 }
 
@@ -37,11 +38,17 @@ let extract_from ~filename : test list =
 
 let suite_from ~dir filename : testsuite =
   let name = (Filename.basename filename) in
-  { suite_name = name;
+  { suite_name = capitalize_ascii (Filename.chop_suffix name ".ml");
     suite_title = title_from_no_padding (Filename.chop_suffix name ".ml");
-    (* suite_path = filename; *)
+    suite_path = filename;
     tests = extract_from ~filename:(sprintf "%s%s%s" dir Filename.dir_sep name)
   }
+
+let test_name ~current_module suite test =
+  if current_module then
+    test.test_name
+  else
+    (suite.suite_name ^ "." ^ test.test_name)
 
 let detect_suites ~filename : testsuite list =
   let dir = Filename.dirname filename in

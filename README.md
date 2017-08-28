@@ -30,7 +30,7 @@ Dryunit is the result of that effort. In the future, maybe it will have its own 
 
 ## Dryunit
 
-`ppx_dryunit` is an extension that automates boilerplate creation for the main OCaml unit test frameworks.  It uses a few conventions to detect and setup the suites, and that is it.
+`ppx_dryunit` is an OCaml extension that automates boilerplate creation at build time, for the main unit test frameworks in OCaml ecosystem.  It uses a few conventions to detect and setup the testsuites, and that is it.
 
 
 ### How DRY can you be?
@@ -44,10 +44,10 @@ module MyLib = struct
 end
 
 let test_capit () =
-  Alcotest.(check char) "same chars"  'A' (MyLib.capit 'a')
+  Alcotest.(check char) "same chars"  'A' (Mylib.capit 'a')
 
 let test_plus () =
-  Alcotest.(check int) "same ints" 7 (MyLib.plus [1;1;2;3])
+  Alcotest.(check int) "same ints" 7 (Mylib.plus [1;1;2;3])
 ````
 
 
@@ -58,12 +58,10 @@ As you can see, all bootstrapping code is absent. To run this, create a new file
 let () = [%alcotest]
 ```
 
-This is your main test executable. It replaces whatever you used to setup your tests before. From now on, any test function in any OCaml file in the same dir will be recognized and sent to Alcotest. 
-
-***The same conventions apply to OUnit***. *Neat!*
+This is your main test executable. It replaces whatever you used to setup your tests before. From now on, any test function in any OCaml file in the same dir will be recognized and sent to Alcotest. The same thing works for OUnit. *Neat!*
 
 
-That's it. No special syntax for tests, no need to change testing library, not even a new command line integrate. You can leverage the same workflow and existing test code. No learning curve. Just the same building system you already use, a one line code, activating the ppx and your done.
+That's it. No special syntax for tests, no need to migrate existing test code, not even a new command line to integrate. You can leverage the same workflow and existing test code. No learning curve. Just the same building system you already use - *one line of code to activate the ppx and your done*.
 
 The only convention here is that all unit tests must start with the name "test". So if you need to disable a test `test_feature_works`, you can just rename it to `_test_feature_works`.
 
@@ -73,9 +71,9 @@ The only convention here is that all unit tests must start with the name "test".
 
 When processing the extension, the following happens:
 
-- Dryunit checks if it's running from a `"*build `/" directory, and exits otherwise. *This matters because when interacting with Merlin in your editor, you don't benefit from the generation of metadata*.
+- Dryunit checks if it's running from a `*build/*` directory, and exits otherwise. *This matters because when interacting with Merlin in your editor, you don't benefit from the generation of metadata*.
 
-- List all ocaml files in the same dir, including the current file. *Each file will generate a corresponding test suite*.
+- Look the directory where the extension was declared and find all `*.ml` files. Each one will represent a corresponding testsuite.
 
 - Extract a structured representation of each file, using OCaml parser. This is fast, but produce boilerplate files.
 
