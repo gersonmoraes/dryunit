@@ -65,7 +65,7 @@ let debug ~filename : string =
     detect_suites ~filename
     |> List.iter
        ( fun suite ->
-         tests := suite.tests @ !tests
+         tests := !tests @ suite.tests
       )
   in
   String.concat "\n" (List.map (fun test -> test.test_title) !tests)
