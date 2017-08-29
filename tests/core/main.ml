@@ -1,4 +1,4 @@
-open Dryunit_core
+open Ppx_dryunit_runtime
 
 let test_is_substring () =
   let b = Util.is_substring "hello world" "world" in
@@ -40,6 +40,6 @@ let test_set = [
 
 (* Run it *)
 let () =
-  Alcotest.run "Dryunit_core.Util tests" [
+  Alcotest.run "Ppx_dryunit_runtime.Util tests" [
     "all tests", test_set;
   ]
