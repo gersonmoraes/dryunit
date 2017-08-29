@@ -1,8 +1,8 @@
 (jbuild_version 1)
 
 (library
- ((name        dryunit_core)
-  (public_name dryunit_core)
+ ((name        ppx_dryunit_runtime)
+  (public_name ppx_dryunit_runtime)
   (preprocess (action (run ${bin:cppo} -V OCAML:${ocaml_version} ${<})))
   (libraries (unix))
 ))
