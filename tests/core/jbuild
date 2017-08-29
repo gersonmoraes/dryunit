@@ -1,4 +1,4 @@
 (executables
  ((names (main))
-  (libraries (alcotest dryunit_core))
+  (libraries (alcotest ppx_dryunit_runtime))
 ))
