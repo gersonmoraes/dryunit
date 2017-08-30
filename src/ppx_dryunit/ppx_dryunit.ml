@@ -17,7 +17,7 @@ open OCaml_OMP.Ast
 open Parsetree
 open Ast_convenience
 open Ast_helper
-open Dryunit_core
+open Ppx_dryunit_runtime
 
 
 let bootstrap_alcotest suites =
@@ -69,7 +69,7 @@ let rewriter _config _cookies =
     match e.pexp_desc with
     (* debug just returns a string with detected tests *)
     | Pexp_extension ({ txt = "dryunit_debug"; _ }, PStr []) ->
-      let output = Dryunit_core.debug ~filename:!Location.input_name in
+      let output = Ppx_dryunit_runtime.debug ~filename:!Location.input_name in
       { e with pexp_desc = Pexp_constant (Pconst_string (output, None)) }
 
     (* debug just returns a string with detected tests *)
