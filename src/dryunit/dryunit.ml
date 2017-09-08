@@ -18,6 +18,16 @@ let generate_testsuite_exe framework =
     message id "%" framework
 
 let () =
+  if ( (Array.length Sys.argv = 2) && (param 1 = "clean") ) then
+  ( if Sys.file_exists ".dryunit" then
+    ( Sys.readdir ".dryunit" |>
+      Array.iter (fun f -> Sys.remove(".dryunit" ^ Filename.dir_sep ^ f));
+      Unix.rmdir ".dryunit"
+    );
+    exit 0
+  )
+
+let () =
   Random.self_init ();
   if ( (Array.length Sys.argv != 3)
        || (not(param 1 = "--gen"))) then

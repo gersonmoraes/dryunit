@@ -1,3 +1,4 @@
 (executables
  ((names (dryunit))
+ (libraries (unix))
 ))
