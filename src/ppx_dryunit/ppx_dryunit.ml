@@ -1,21 +1,35 @@
 #if OCAML_VERSION < (4, 03, 0)
 #define Pconst_string Const_string
 #define OCaml_OMP OCaml_402
+#define Ast_OMP Ast_402
+#define Ppx_tools_OMP Ppx_tools_402
 #elif OCAML_VERSION < (4, 04, 0)
 #define OCaml_OMP OCaml_403
+#define Ast_OMP Ast_403
+#define Ppx_tools_OMP Ppx_tools_403
 #elif OCAML_VERSION < (4, 05, 0)
 #define OCaml_OMP OCaml_404
+#define Ast_OMP Ast_404
+#define Ppx_tools_OMP Ppx_tools_404
 #elif OCAML_VERSION < (4, 06, 0)
 #define OCaml_OMP OCaml_405
+#define Ast_OMP Ast_405
+#define Ppx_tools_OMP Ppx_tools_405
 #elif OCAML_VERSION < (4, 07, 0)
 #define OCaml_OMP OCaml_406
+#define Ast_OMP Ast_406
+#define Ppx_tools_OMP Ppx_tools_406
 #endif
 
 
 open Migrate_parsetree
 open OCaml_OMP.Ast
 open Parsetree
+
+open Ast_OMP
+open Ppx_tools_OMP
 open Ast_convenience
+
 open Ast_helper
 open Ppx_dryunit_runtime
 

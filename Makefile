@@ -9,6 +9,7 @@ default:
 	jbuilder build $(MAIN_EXECUTABLE)
 
 clean:
+	@rm -rf .dryunit
 	jbuilder clean
 
 run:
