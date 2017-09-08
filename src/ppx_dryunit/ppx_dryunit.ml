@@ -51,12 +51,12 @@ let bootstrap_ounit suites =
     suite.tests |>
     List.map
     ( fun t ->
-      app (evar ">::") [ str (suite.suite_title ^ "." ^ t.test_name); evar (test_name ~current_module suite t) ]
+      app (evar "OUnit2.>::") [ str (suite.suite_title ^ "." ^ t.test_name); evar (test_name ~current_module suite t) ]
     )
   ) |>
   List.flatten |>
   ( fun tests ->
-    app (evar "OUnit2.run_test_tt_main") [ app (evar ">:::") [str "Default"; list tests] ]
+    app (evar "OUnit2.run_test_tt_main") [ app (evar "OUnit2.>:::") [str "Default"; list tests] ]
   )
 
 
