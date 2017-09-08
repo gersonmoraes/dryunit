@@ -14,6 +14,7 @@ type testsuite = {
   suite_title: string;
   suite_name: string;
   suite_path: string;
+  timestamp: float;
   tests: test list;
 }
 

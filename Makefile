@@ -1,7 +1,5 @@
 
-MAIN_EXECUTABLE = tests/detection/main.exe
-# MAIN_EXECUTABLE = tests/alcotest/main.exe
-# MAIN_EXECUTABLE = tests/ounit/main.exe
+MAIN_EXECUTABLE = src/dryunit/dryunit.exe
 
 EXECUTABLE_OUNIT = tests/ounit/main.exe
 EXECUTABLE_ALCOTEST = tests/alcotest/main.exe
@@ -20,7 +18,8 @@ run_ounit:
 	@jbuilder build $(EXECUTABLE_OUNIT) && _build/default/$(EXECUTABLE_OUNIT)
 
 run_alcotest:
-	@jbuilder build $(EXECUTABLE_ALCOTEST) && _build/default/$(EXECUTABLE_ALCOTEST)
+	# jbuilder build @tests/alcotest/dryunit && jbuilder build $(EXECUTABLE_ALCOTEST) && _build/default/$(EXECUTABLE_ALCOTEST)
+	rm -f _build/default/tests/alcotest/main.ml && jbuilder build $(EXECUTABLE_ALCOTEST) && _build/default/$(EXECUTABLE_ALCOTEST)
 
 test_core:
 	@jbuilder build $(EXECUTABLE_CORE) && _build/default/$(EXECUTABLE_CORE)

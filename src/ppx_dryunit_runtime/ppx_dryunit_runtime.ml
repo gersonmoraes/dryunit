@@ -9,6 +9,7 @@ module Util = Util
   let capitalize_ascii = String.capitalize_ascii
 #endif
 
+let sep = Filename.dir_sep
 
 type test = {
   test_name: string;
@@ -20,6 +21,7 @@ type testsuite = {
   suite_name: string;
   (* module_name: string; *)
   suite_path: string;
+  timestamp: float;
   tests: test list;
 }
 
@@ -37,11 +39,13 @@ let extract_from ~filename : test list =
     )
 
 let suite_from ~dir filename : testsuite =
+  let () = Printf.printf ">> Analysing %s\n" filename in
   let name = (Filename.basename filename) in
   { suite_name = capitalize_ascii (Filename.chop_suffix name ".ml");
     suite_title = title_from_no_padding (Filename.chop_suffix name ".ml");
     suite_path = filename;
-    tests = extract_from ~filename:(sprintf "%s%s%s" dir Filename.dir_sep name)
+    timestamp = Unix.((stat (dir ^ sep ^ filename)).st_mtime);
+    tests = extract_from ~filename:(sprintf "%s%s%s" dir sep name)
   }
 
 let test_name ~current_module suite test =
@@ -50,7 +54,65 @@ let test_name ~current_module suite test =
   else
     (suite.suite_name ^ "." ^ test.test_name)
 
+let cache_dir () =
+  let flag_ref = ref false in
+    Str.split (Str.regexp sep) (Sys.getcwd ()) |>
+    List.rev |>
+    List.filter
+    ( fun dir ->
+      if !flag_ref then
+        true
+      else
+      ( if (dir = "_build") || (dir = "build") then
+          flag_ref := true;
+        false
+      )
+    ) |>
+  List.rev |>
+  function
+  | []  -> failwith "Dryunit is not being preprocessed from build directory"
+  | l -> sep ^ (String.concat sep l) ^ sep ^ ".dryunit"
+
+
+let cache_file ~main =
+  let dir = cache_dir () in
+  if not @@ Sys.file_exists dir then
+    Unix.mkdir dir 0o755;
+  let hash = Digest.(to_hex @@ bytes main) in
+  dir ^ sep ^ hash
+
+
+let save_cache ~main suites =
+  let path = cache_file ~main in
+  if Sys.file_exists path then
+    Sys.remove path;
+  let c = open_out_bin path in
+  Marshal.to_channel c suites [];
+  flush c;
+  close_out c;
+  ()
+
+
+let load_cache ~main =
+  let path = cache_file ~main in
+  print_endline ("checking cache from " ^ path);
+  if Sys.file_exists path then
+  ( let c = open_in_bin path in
+    let suites : testsuite list = Marshal.from_channel c in
+    close_in c;
+    Some suites
+  )
+  else
+  ( print_endline ("File does not exists: " ^ path);
+    None
+  )
+
+
 let detect_suites ~filename : testsuite list =
+  ( match load_cache ~main:filename with
+    | Some suites -> print_endline ">> Found some cache!"
+    | None -> print_endline ">> No cache yet, sorry."
+  );
   let dir = Filename.dirname filename in
   Sys.readdir dir
   |> Array.to_list
@@ -61,6 +123,10 @@ let detect_suites ~filename : testsuite list =
         (ends_with v ".ml") && (Bytes.index basename '.' == (len - 3))
      )
   |> List.map (suite_from ~dir)
+  |> fun suites ->
+  let () = save_cache ~main:filename suites in
+  suites
+
 
 let pp name tests =
   print_endline ("Tests in `" ^ name ^ "`");
