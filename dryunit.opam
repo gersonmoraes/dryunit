@@ -1,11 +1,11 @@
 opam-version: "1.2"
-version: "0.0.1"
+version: "0.1.0"
 maintainer: "gerson.xp@gmail.com"
 authors: ["Gerson Moraes"]
 homepage: "https://bitbucket.org/gsmoraes/ppx_dryunit"
 bug-reports: "https://bitbucket.org/gsmoraes/ppx_dryunit"
 dev-repo: "https://bitbucket.org/gsmoraes/ppx_dryunit"
-available: [ ocaml-version >= "4.02.0"]
+available: [ ocaml-version >= "4.02.3"]
 build: [
   ["jbuilder" "build" "-p" name "-j" jobs]
 ]
@@ -16,5 +16,4 @@ build-test: [
 
 depends: [
   "jbuilder" {build}
-  "cppo" {build}
 ]
