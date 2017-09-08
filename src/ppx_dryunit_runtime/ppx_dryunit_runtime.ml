@@ -11,6 +11,7 @@ module Util = Util
 
 let sep = Filename.dir_sep
 
+
 type test = {
   test_name: string;
   test_title: string;
@@ -38,13 +39,15 @@ let extract_from ~filename : test list =
        { test_name; test_title = title_from test_name }
     )
 
+let timestamp_from filename =
+  Unix.((stat filename).st_mtime)
+
 let suite_from ~dir filename : testsuite =
-  let () = Printf.printf ">> Analysing %s\n" filename in
   let name = (Filename.basename filename) in
   { suite_name = capitalize_ascii (Filename.chop_suffix name ".ml");
     suite_title = title_from_no_padding (Filename.chop_suffix name ".ml");
-    suite_path = filename;
-    timestamp = Unix.((stat (dir ^ sep ^ filename)).st_mtime);
+    suite_path = dir ^ sep ^ filename;
+    timestamp = timestamp_from (dir ^ sep ^ filename);
     tests = extract_from ~filename:(sprintf "%s%s%s" dir sep name)
   }
 
@@ -81,7 +84,6 @@ let cache_file ~main =
   let hash = Digest.(to_hex @@ bytes main) in
   dir ^ sep ^ hash
 
-
 let save_cache ~main suites =
   let path = cache_file ~main in
   if Sys.file_exists path then
@@ -95,36 +97,62 @@ let save_cache ~main suites =
 
 let load_cache ~main =
   let path = cache_file ~main in
-  print_endline ("checking cache from " ^ path);
   if Sys.file_exists path then
   ( let c = open_in_bin path in
     let suites : testsuite list = Marshal.from_channel c in
     close_in c;
-    Some suites
+    suites
   )
-  else
-  ( print_endline ("File does not exists: " ^ path);
-    None
-  )
+  else []
 
+let get_from_cache ~cache ~dir filename : testsuite option =
+  try
+    let filename = dir ^ sep ^ filename in
+    List.find
+    ( fun s ->
+      if s.suite_path = filename  then
+        if timestamp_from s.suite_path = s.timestamp then
+          true
+        else false
+      else false
+    )
+    cache |>
+    fun s ->
+    Some s
+  with
+    Not_found -> None
 
 let detect_suites ~filename : testsuite list =
-  ( match load_cache ~main:filename with
-    | Some suites -> print_endline ">> Found some cache!"
-    | None -> print_endline ">> No cache yet, sorry."
-  );
+  let cache = load_cache ~main:filename in
+  let cache_dirty = ref false in
   let dir = Filename.dirname filename in
-  Sys.readdir dir
-  |> Array.to_list
-  |> List.filter
-     ( fun v ->
-        let basename = Filename.basename v in
-        let len = String.length basename in
-        (ends_with v ".ml") && (Bytes.index basename '.' == (len - 3))
-     )
-  |> List.map (suite_from ~dir)
-  |> fun suites ->
-  let () = save_cache ~main:filename suites in
+  let main_basename = Filename.basename filename in
+  Sys.readdir dir |>
+  Array.to_list |>
+  List.filter
+  ( fun v ->
+    if v = main_basename then
+      false
+    else
+    ( let basename = Filename.basename v in
+      let len = String.length basename in
+      (ends_with v ".ml") && (Bytes.index basename '.' == (len - 3))
+    )
+  ) |>
+  (* filter over records already in cache, invalidating the cache if needed *)
+  List.map
+  ( fun filename ->
+    ( match get_from_cache ~dir ~cache filename with
+      | Some suite -> suite
+      | None ->
+        ( cache_dirty := true;
+          suite_from ~dir filename
+        )
+    )
+  ) |>
+  fun suites ->
+  if !cache_dirty then
+    save_cache ~main:filename suites;
   suites
 
 

@@ -9,5 +9,5 @@ let test_capit_in_secondary () =
 let test_capit_in_secondary2 () =
   Alcotest.(check string) "same chars"  "a" (To_test.escape 'a')
 
-(* let test_capit_in_secondary3 () =
-  Alcotest.(check string) "same chars"  "a" (To_test.escape 'a') *)
+let test_capit_in_secondary3 () =
+  Alcotest.(check string) "same chars"  "a" (To_test.escape 'a')
