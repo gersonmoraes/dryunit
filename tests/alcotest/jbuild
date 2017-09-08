@@ -18,13 +18,6 @@
   (deps   (main.expected main.normalized))
   (action (run diff -u main.expected main.normalized))))
 
-
-(alias
- ((name dryunit)
-  (deps (*.ml))
-  (action (run echo "Dryunit updated"))
-))
-
 (rule
 ((targets (main.ml))
  (deps    (../../src/dryunit/dryunit.exe))

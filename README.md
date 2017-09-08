@@ -53,7 +53,3 @@ When processing the extension, the following happens:
 This project is *framework independent*. It changes the AST, but relies on the user environment to provide and validate the appropriate dependencies. The project itself remains *light*, even if support for new test frameworks supporting similar workflows is added in the future.
 
 This is project is *low maintenance*. Thanks to OCaml's parser and the [Migrate-Parsetree](https://github.com/ocaml-ppx/ocaml-migrate-parsetree) project, this ppx  knows very little about the actual source syntax and already works on all major OCaml versions supporting ppx.
-
-New features like timestamp based caching and configuration for the detection profiles are things to be desired. Maybe even per suite hooks like *before* and *after*, activated explicitly with an extension parameter. Time and user base motivation will tell.
-
-

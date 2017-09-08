@@ -1,0 +1,10 @@
+lib: [
+  "_build/install/default/lib/dryunit/META" {"META"}
+  "_build/install/default/lib/dryunit/opam" {"opam"}
+]
+bin: [
+  "_build/install/default/bin/dryunit" {"dryunit"}
+]
+doc: [
+  "_build/install/default/doc/dryunit/README.md"
+]

@@ -1,4 +1,5 @@
-(executables
- ((names (dryunit))
- (libraries (unix))
-))
+(executable
+ ((name dryunit)
+  (package dryunit)
+  (public_name dryunit)
+  (libraries (unix))))
