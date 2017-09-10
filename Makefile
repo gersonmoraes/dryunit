@@ -1,7 +1,7 @@
 
 EXECUTABLE_OUNIT = tests/ounit/main.exe
 EXECUTABLE_ALCOTEST = tests/alcotest/main.exe
-EXECUTABLE_CORE = tests/core/main.exe
+MAIN_EXECUTABLE = src/dryunit/dryunit.exe
 
 default:
 	jbuilder build $(MAIN_EXECUTABLE)
@@ -9,6 +9,10 @@ default:
 clean:
 	@rm -rf .dryunit
 	jbuilder clean
+
+run:
+	@#jbuilder build $(MAIN_EXECUTABLE) && _build/default/$(MAIN_EXECUTABLE)
+	@jbuilder build $(MAIN_EXECUTABLE)
 
 run_ounit:
 	@jbuilder build $(EXECUTABLE_OUNIT) && _build/default/$(EXECUTABLE_OUNIT)

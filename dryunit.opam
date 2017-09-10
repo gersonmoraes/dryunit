@@ -1,3 +1,4 @@
+version: "89c076e-dirty"
 opam-version: "1.2"
 name: "dryunit"
 version: "0.1.3"

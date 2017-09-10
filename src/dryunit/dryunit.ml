@@ -1,61 +1,116 @@
-open Printf
+open Action
+open Cmdliner
 
+(* Help sections common to all commands *)
 
-let param n =
-  try
-    Array.get Sys.argv n
-  with
-  | _ -> "unknown"
+let help_secs = [
+ `S Manpage.s_common_options;
+ `P "These options are common to all commands.";
+ `S "MORE HELP";
+ `P "Use `$(mname) $(i,COMMAND) --help' for help on a single command.";`Noblank;
+ `P "Use `$(mname) help patterns' for help on patch matching."; `Noblank;
+ `P "Use `$(mname) help environment' for help on environment variables.";
+ `S Manpage.s_bugs; `P "Check bug reports at http://bugs.example.org.";]
 
-let get_int () =
-  (Random.int 9999) + 1
+(* Options common to all commands *)
 
+(* unstable *)
+let common_opts debug verb prehook = { debug; verb; prehook }
+let common_opts_t =
+  let docs = Manpage.s_common_options in
+  let debug =
+    let doc = "Give only debug output." in
+    Arg.(value & flag & info ["debug"] ~docs ~doc)
+  in
+  let verb =
+    let doc = "Suppress informational output." in
+    let quiet = Quiet, Arg.info ["q"; "quiet"] ~docs ~doc in
+    let doc = "Give verbose output." in
+    let verbose = Verbose, Arg.info ["v"; "verbose"] ~docs ~doc in
+    Arg.(last & vflag_all [Normal] [quiet; verbose])
+  in
+  let prehook =
+    let doc = "Specify command to run before this $(mname) command." in
+    Arg.(value & opt (some string) None & info ["prehook"] ~docs ~doc)
+  in
+  Term.(const common_opts $ debug $ verb $ prehook)
 
-let help_message () =
-  [ "gen alcotest        - Generate bootstrap for Alcotest in stdout."
-  ; "                      To setup a destination, use:"
-  ; "                      --output _build/default/tests/main.ml"
-  ; ""
-  ; "gen ounit           - Generate bootstrap for OUnit2"
-  ; ""
-  ; "clean               - Remove cache. You can remove the `.dryunit` directory"
-  ; "                      directly"
-  ; ""
-  ; "--version           - Cli version"
-  ; "--help              - Show this message"
-  ] |>
-  List.map (sprintf "  %s\n") |>
-  String.concat "\n" |>
-  sprintf "USAGE:\n  %s  subcommand [options] %s\n" (Array.get Sys.argv 0)
+(* Commands *)
 
+(* unstable *)
+let init_cmd =
+  let repodir =
+    let doc = "Initialize configuration for tests in the project with source root in $(docv)." in
+    Arg.(value & opt file Filename.current_dir_name & info ["repodir"]
+           ~docv:"DIR" ~doc)
+  in
+  let doc = "initialize test configuration" in
+  let exits = Term.default_exits in
+  let man = [
+    `S Manpage.s_description;
+    `P "Creates a dryunit.toml configuration file";
+    `Blocks help_secs; ]
+  in
+  Term.(const initialize $ common_opts_t $ repodir),
+  Term.info "init" ~doc ~sdocs:Manpage.s_common_options ~exits ~man
 
-let generate_testsuite_exe framework =
-  let id = sprintf "%d%d%d" (get_int ()) (get_int ()) (get_int ()) in
-  let message = "This file is supposed to be generated before build automatically with a " ^
-    "random `ID`.\n  Do not include it in your source control." in
-  printf "(*\n  %s\n\n  ID = %s\n*)\n\nlet () = [%s%s]\n"
-    message id "%" framework
+(* not_used, just an example *)
+let _record_cmd =
+  let pname =
+    let doc = "Name of the patch." in
+    Arg.(value & opt (some string) None & info ["m"; "patch-name"] ~docv:"NAME"
+           ~doc)
+  in
+  let author =
+    let doc = "Specifies the author's identity." in
+    Arg.(value & opt (some string) None & info ["A"; "author"] ~docv:"EMAIL"
+           ~doc)
+  in
+  let all =
+    let doc = "Answer yes to all patches." in
+    Arg.(value & flag & info ["a"; "all"] ~doc)
+  in
+  let ask_deps =
+    let doc = "Ask for extra dependencies." in
+    Arg.(value & flag & info ["ask-deps"] ~doc)
+  in
+  let files = Arg.(value & (pos_all file) [] & info [] ~docv:"FILE or DIR") in
+  let doc = "create a patch from unrecorded changes" in
+  let exits = Term.default_exits in
+  let man =
+    [`S Manpage.s_description;
+     `P "Creates a patch from changes in the working tree. If you specify
+         a set of files ...";
+     `Blocks help_secs; ]
+  in
+  Term.(const record $ common_opts_t $ pname $ author $ all $ ask_deps $ files),
+  Term.info "record" ~doc ~sdocs:Manpage.s_common_options ~exits ~man
 
-let () =
-  if ( (Array.length Sys.argv = 2) && (param 1 = "clean") ) then
-  ( if Sys.file_exists ".dryunit" then
-    ( Sys.readdir ".dryunit" |>
-      Array.iter (fun f -> Sys.remove(".dryunit" ^ Filename.dir_sep ^ f));
-      Unix.rmdir ".dryunit"
-    );
-    exit 0
-  )
+(* stable *)
+let help_cmd =
+  let topic =
+    let doc = "The topic to get help on. `topics' lists the topics." in
+    Arg.(value & pos 0 (some string) None & info [] ~docv:"TOPIC" ~doc)
+  in
+  let doc = "display help about darcs and darcs commands" in
+  let man =
+    [`S Manpage.s_description;
+     `P "Prints help about darcs commands and other subjects...";
+     `Blocks help_secs; ]
+  in
+  Term.(ret
+          (const help $ common_opts_t $ Arg.man_format $ Term.choice_names $topic)),
+  Term.info "help" ~doc ~exits:Term.default_exits ~man
 
-let () =
-  Random.self_init ();
-  if ( (Array.length Sys.argv < 3)
-       || (not(param 1 = "--gen"))) then
-  ( Printf.eprintf "%s" (help_message ());
-    exit 1;
-  );
-  let framework = param 2 in
-  if not (framework = "alcotest") && not (framework = "ounit") then
-  ( eprintf "Unknown test framework: %s" framework;
-    exit 1;
-  );
-  generate_testsuite_exe framework
+(* stable *)
+let default_cmd =
+  let doc = "the nearly invisible test framework for OCaml" in
+  let sdocs = Manpage.s_common_options in
+  let exits = Term.default_exits in
+  let man = help_secs in
+  Term.(ret (const (fun _ -> `Help (`Pager, None)) $ common_opts_t)),
+  Term.info "dryunit" ~version:"%%VERSION%%" ~doc ~sdocs ~exits ~man
+
+let cmds = [init_cmd; help_cmd]
+
+let () = Term.(exit @@ eval_choice default_cmd cmds)

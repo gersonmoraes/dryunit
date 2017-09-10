@@ -1,0 +1,26 @@
+# Dryunit configuration file
+#
+# Some information about this file and a link to get help will be defined here.
+# This is just a sample configuration
+
+[meta]
+name = "A Custom Name"
+description = "A group-level description for the detected tests"
+profile = "jbuilder"
+framework = "alcotest"
+
+[cache]
+active = true
+dir = ".dryunit"
+
+[detection]
+watch = "tests"
+main = "${dirname}.ml"
+targets = [
+  "tests/suite1/main.ml",
+  "tests/suite2/main.ml",
+]
+
+[ignore]
+directories = [ "tests/legacy_code" ]
+query = [ "keyword1", "keyword2" ]
