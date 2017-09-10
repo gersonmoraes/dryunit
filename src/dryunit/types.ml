@@ -17,7 +17,7 @@ type cache =
   }
 
 type detection =
-  { watch: (string option) list
+  { watch: (string list) option
   ; main: string
   ; targets: (string list) option
   }
@@ -29,7 +29,7 @@ type ignore =
 
 (* A manageable project *)
 type project =
-  { meta: meta
+  { meta: meta option
   ; cache: cache option
   ; detection: detection option
   ; ignore: ignore option

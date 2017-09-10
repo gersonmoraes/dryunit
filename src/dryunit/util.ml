@@ -23,6 +23,9 @@ module Config = struct
   let get_string k toml_table =
     TomlLenses.(get toml_table (key k |-- string)) |> force_opt ~k
 
+  let get_string_opt k toml_table =
+    TomlLenses.(get toml_table (key k |-- string))
+
   let get_int k toml_table =
     TomlLenses.(get toml_table (key k |-- int)) |> force_opt ~k
 
@@ -34,6 +37,12 @@ module Config = struct
 
   let get_bool_array k toml_table =
     TomlLenses.(get toml_table (key k |-- array |-- bools)) |> force_opt ~k
+
+  let get_string_array k toml_table =
+    TomlLenses.(get toml_table (key k |-- array |-- strings)) |> force_opt ~k
+
+  let get_string_array_opt k toml_table =
+    TomlLenses.(get toml_table (key k |-- array |-- strings))
 
   let get_table k toml_table =
     TomlLenses.(get toml_table (key k |-- table)) |> force_opt ~k
