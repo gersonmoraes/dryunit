@@ -29,7 +29,7 @@ type ignore =
 
 (* A manageable project *)
 type project =
-  { meta: meta option
+  { meta: meta
   ; cache: cache option
   ; detection: detection option
   ; ignore: ignore option

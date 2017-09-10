@@ -1,4 +1,9 @@
-
+let _ =
+  let open Util in
+  let open Spec in
+  let open App in
+  let open Action in
+  ()
 
 let () =
   Random.self_init ();

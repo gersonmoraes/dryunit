@@ -3,4 +3,4 @@
 *)
 
 open Util
-open Types
+open Config
