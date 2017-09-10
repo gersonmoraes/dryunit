@@ -23,4 +23,7 @@ targets = [
 
 [ignore]
 directories = [ "tests/legacy_code" ]
-query = [ "keyword1", "keyword2" ]
+query = [
+  "keyword1",
+  "keyword2",
+]
