@@ -4,7 +4,7 @@ let _ =
     { cache_dir = ".dryunit"
     ; cache     = true
     ; framework = "alcotest"
-    ; ignore    = "ignored words"
-    (* ; filter    = "" *)
+    ; ignore    = "capita"
+    ; filter    = "something capit"
     }
   ]
