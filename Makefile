@@ -18,7 +18,7 @@ run:
 run_ounit:
 	@jbuilder build $(EXECUTABLE_OUNIT) && _build/default/$(EXECUTABLE_OUNIT)
 
-run_args:
+run_args: clean
 	@jbuilder build $(EXECUTABLE_ARGS) && _build/default/$(EXECUTABLE_ARGS)
 
 build_args: clean

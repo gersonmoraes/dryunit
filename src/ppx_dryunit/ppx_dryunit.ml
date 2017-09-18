@@ -32,14 +32,15 @@ module Ppx_dryunit_runtime = struct
 
   type record_fields = (Longident.t Asttypes.loc *  Parsetree.expression) list
 
-  let validate_params  ~loc (current: record_fields) expected_fields =
+  let validate_params ~loc (current: record_fields) expected_fields =
+    let param n =
+      ( match fst @@ List.nth current n with
+        | {txt = Lident current} -> current
+        | _ -> throw ~loc ("Unexpected structure")
+      ) in
     let check_param n expected =
       let current =
-        ( try
-            match fst @@ List.nth current n with
-            | {txt = Lident current} -> current
-            | _ -> throw ~loc ("Unexpected structure")
-          with
+        ( try param n with
           | _ -> throw ~loc ("Missing configuration: " ^ expected)
         ) in
       if not (current = expected) then
@@ -49,7 +50,11 @@ module Ppx_dryunit_runtime = struct
       ( fun i name ->
         check_param i name
       )
-      expected_fields
+      expected_fields;
+    let expected_len = List.length expected_fields in
+    if List.length current > expected_len then
+      throw ~loc (format "Unknown configuration field: `%s`." (param expected_len))
+
 
   module Util = struct
     let is_substring string substring =

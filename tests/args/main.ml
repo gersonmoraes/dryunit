@@ -5,5 +5,6 @@ let _ =
     ; cache     = true
     ; framework = "alcotest"
     ; ignore    = "ignored words"
+    (* ; filter    = "" *)
     }
   ]
