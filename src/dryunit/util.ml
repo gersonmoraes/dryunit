@@ -1,23 +1,26 @@
-open Printf
-
 let not_implemented () =
   failwith "not implemented yet"
 
+let unwrap_or default = function
+  | Some v -> v
+  | None -> default
+
+let format = Printf.sprintf
 
 let generate_testsuite_exe framework =
   let get_int () =
     (Random.int 9999) + 1 in
-  let id = sprintf "%d%d%d" (get_int ()) (get_int ()) (get_int ()) in
+  let id = format "%d%d%d" (get_int ()) (get_int ()) (get_int ()) in
   let message = "This file is supposed to be generated before build automatically with a " ^
     "random `ID`.\n  Do not include it in your source control." in
-  sprintf "(*\n  %s\n\n  ID = %s\n*)\n\nlet () = [%s%s]\n"
+  format "(*\n  %s\n\n  ID = %s\n*)\n\nlet () = [%s%s]\n"
     message id "%" framework
 
 
 module Config = struct
 
   let force_opt ~k = function
-    | None -> invalid_arg @@ sprintf "could not get %s from config" k
+    | None -> invalid_arg @@ format "could not get %s from config" k
     | Some v -> v
 
   let get_string k toml_table =

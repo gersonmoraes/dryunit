@@ -23,12 +23,6 @@ let pp_common_opts oc common_opts = Printf.fprintf oc
 let init common_opts repodir = Printf.printf
     "%arepodir = %s\n" pp_common_opts common_opts repodir
 
-(* not_used, just an example *)
-let record common_opts name email all ask_deps files = Printf.printf
-    "%aname = %s\nemail = %s\nall = %b\nask-deps = %b\nfiles = %s\n"
-    pp_common_opts common_opts (opt_str_str name) (opt_str_str email) all ask_deps
-    (String.concat ", " files)
-
 
 let help common_opts man_format cmds topic =
   match topic with
@@ -48,13 +42,20 @@ let help common_opts man_format cmds topic =
 
 
 type gen_opts =
-  { nocache   = bool
-  ; framework = string
-  ; cache_dir = string option
-  ; ignore    = string option
-  ; filter    = string option
-  ; targets   = string list
+  { nocache   : bool
+  ; framework : string
+  ; cache_dir : string option
+  ; ignore    : string option
+  ; filter    : string option
+  ; targets   : string list
   }
+
+
+let gen { nocache; framework; cache_dir; ignore; filter; targets} =
+  let cache_dir = unwrap_or ".dryunit" cache_dir in
+  let ignore = unwrap_or "" ignore in
+  let filter = unwrap_or "" filter in
+  App.gen ~nocache ~framework ~cache_dir ~ignore ~filter ~targets
 
 
 let clean _common_opts _repodir =

@@ -60,7 +60,7 @@ let gen_opts_t =
     let doc = "Space separated list of words used to filter tests." in
     Arg.(value & opt (some string) None & info ["filter"] ~docs ~doc)
   in
-  let targets = Arg.(non_empty & pos_all file [] & info [] ~docv:"TARGET") in
+  let targets = Arg.(value & pos_all string [] & info [] ~docv:"TARGET") in
   Term.(const gen_opts $ nocache $ framework $ cache_dir $ ignore $ filter $ targets)
 
 
@@ -85,6 +85,19 @@ let init_cmd =
 
 
 (* unstable *)
+let gen_cmd =
+  let doc = "generate dryunit initialization code" in
+  let exits = Term.default_exits in
+  let man = [
+    `S Manpage.s_description;
+    `P "Creates the code to activate dryunit before building the tests";
+    `Blocks help_secs; ]
+  in
+  Term.(const Action.gen $ gen_opts_t),
+  Term.info "gen" ~doc ~sdocs:Manpage.s_common_options ~exits ~man
+
+
+(* unstable *)
 let clean_cmd =
   let repodir =
     let doc = "Initialize configuration for tests in the project with source root in $(docv)." in
@@ -100,39 +113,6 @@ let clean_cmd =
   in
   Term.(const Action.clean $ common_opts_t $ repodir),
   Term.info "clean" ~doc ~sdocs:Manpage.s_common_options ~exits ~man
-
-
-(* not_used, just an example *)
-let _record_cmd =
-  let pname =
-    let doc = "Name of the patch." in
-    Arg.(value & opt (some string) None & info ["m"; "patch-name"] ~docv:"NAME"
-           ~doc)
-  in
-  let author =
-    let doc = "Specifies the author's identity." in
-    Arg.(value & opt (some string) None & info ["A"; "author"] ~docv:"EMAIL"
-           ~doc)
-  in
-  let all =
-    let doc = "Answer yes to all patches." in
-    Arg.(value & flag & info ["a"; "all"] ~doc)
-  in
-  let ask_deps =
-    let doc = "Ask for extra dependencies." in
-    Arg.(value & flag & info ["ask-deps"] ~doc)
-  in
-  let files = Arg.(value & (pos_all file) [] & info [] ~docv:"FILE or DIR") in
-  let doc = "create a patch from unrecorded changes" in
-  let exits = Term.default_exits in
-  let man =
-    [`S Manpage.s_description;
-     `P "Creates a patch from changes in the working tree. If you specify
-         a set of files ...";
-     `Blocks help_secs; ]
-  in
-  Term.(const Action.record $ common_opts_t $ pname $ author $ all $ ask_deps $ files),
-  Term.info "record" ~doc ~sdocs:Manpage.s_common_options ~exits ~man
 
 
 (* stable *)
@@ -161,4 +141,4 @@ let default_cmd ~version =
   Term.(ret (const (fun _ -> `Help (`Pager, None)) $ common_opts_t)),
   Term.info "dryunit" ~version ~doc ~sdocs ~exits ~man
 
-let cmds = [init_cmd; clean_cmd; help_cmd]
+let cmds = [init_cmd; gen_cmd; clean_cmd; help_cmd]
