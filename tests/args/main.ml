@@ -4,6 +4,6 @@ let _ =
     { cache_dir = ".dryunit"
     ; cache     = true
     ; framework = "alcotest"
-    ; ignore    = "query1 query2"
+    ; ignore    = "test"
     }
   ]
