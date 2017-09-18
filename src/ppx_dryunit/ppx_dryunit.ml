@@ -460,7 +460,7 @@ let bootstrap_alcotest suites =
   suites |>
   List.map
   ( fun suite ->
-    let current_module = (suite.suite_path = Filename.basename !Location.input_name) in
+    let current_module = (suite.suite_path = !Location.input_name) in
     suite.tests |>
     List.map
     ( fun t ->
@@ -483,7 +483,7 @@ let bootstrap_ounit suites =
   suites |>
   List.map
   ( fun suite ->
-    let current_module = (suite.suite_path = Filename.basename !Location.input_name) in
+    let current_module = (suite.suite_path = !Location.input_name) in
     suite.tests |>
     List.map
     ( fun t ->
@@ -591,7 +591,7 @@ let boot ~loc ~cache_dir ~cache_active ~framework ~ignore ~filter ~detection =
     let filename = !Location.input_name in
     ( match detection with
       | "dir" -> detect_suites ~filename ~custom_dir ~cache_active
-      | "file" -> suite_from ~dir:(Filename.dirname filename) (File.basename filename) 
+      | "file" -> [ suite_from ~dir:(Filename.dirname filename) (Filename.basename filename) ]
       | _ -> throw ~loc "The field `detection` only accepts \"dir\" or \"file\"."
     ) in
   validate_filters ~loc ~ignore ~filter;
