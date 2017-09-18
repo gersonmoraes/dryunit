@@ -30,6 +30,27 @@ module Ppx_dryunit_runtime = struct
   let throw ~loc msg =
     raise (Location.Error (Location.error ~loc msg))
 
+  type record_fields = (Longident.t Asttypes.loc *  Parsetree.expression) list
+
+  let validate_params  ~loc (current: record_fields) expected_fields =
+    let check_param n expected =
+      let current =
+        ( try
+            match fst @@ List.nth current n with
+            | {txt = Lident current} -> current
+            | _ -> throw ~loc ("Unexpected structure")
+          with
+          | _ -> throw ~loc ("Missing configuration: " ^ expected)
+        ) in
+      if not (current = expected) then
+        throw ~loc (Printf.sprintf "I was expecting `%s`, but found `%s`." expected current)
+    in
+    List.iteri
+      ( fun i name ->
+        check_param i name
+      )
+      expected_fields
+
   module Util = struct
     let is_substring string substring =
       let string, substring = Bytes.of_string string, Bytes.of_string substring in
@@ -476,7 +497,7 @@ let rewriter _config _cookies =
 
     (* new-interface *)
     | Pexp_extension ({ txt = "dryunit"; _ },
-        PStr [ {pstr_desc = (Pstr_eval ({pexp_desc = Pexp_record (configs, None); _}, attr)); _} ]) ->
+        PStr [ {pstr_desc = (Pstr_eval ({pexp_desc = Pexp_record (configs, None); pexp_loc; _}, attr)); _} ]) ->
       (* bootstrap_alcotest (detect_suites ~filename:!Location.input_name) *)
 
       ( match configs with
@@ -490,8 +511,13 @@ let rewriter _config _cookies =
             {pexp_desc = Pexp_constant (Pconst_string (queries, None))})]
           when cache_active = "true" || cache_active = "false"
            -> unit ()
-       | _ -> throw ~loc:e.pexp_loc "Configuration for ppx_dryunit is invalid"
+       | _ ->
+        validate_params ~loc:e.pexp_loc configs
+          ["cache_dir"; "cache"; "framework"; "ignore" ];
+        throw ~loc:e.pexp_loc "Configuration for ppx_dryunit is invalid."
       )
+    | Pexp_extension ({ txt = "dryunit"; _ }, _ ) ->
+        throw ~loc:e.pexp_loc "Dryunit confuration should defined as a record."
 
     (* anything else *)
     | _ -> super.expr self e
