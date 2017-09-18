@@ -333,11 +333,11 @@ module Ppx_dryunit_runtime = struct
     (* let dir = cache_dir () in *)
     if not @@ Sys.file_exists dir then
       Unix.mkdir dir 0o755;
-    let hash = Digest.(to_hex @@ bytes main) in
+    let hash = Digest.(to_hex @@ bytes (main ^ Sys.ocaml_version)) in
     dir ^ sep ^ hash
 
   let save_cache ~main ~custom_dir ~cache_active suites =
-    if cache_active then ()
+    if not cache_active then ()
     else
     ( let path = cache_file ~main ~custom_dir in
       if Sys.file_exists path then
@@ -494,6 +494,18 @@ let bootstrap_ounit suites =
     app (evar "OUnit2.run_test_tt_main") [ app (evar "OUnit2.>:::") [str "Default"; list tests] ]
   )
 
+let mkdir_p dir =
+  split sep dir |>
+  List.fold_left
+  ( fun acc basename ->
+    let path = acc ^ sep ^ basename in
+    if not (Sys.file_exists path) then
+      Unix.mkdir path 0o755;
+    path
+  )
+  "" |>
+  ignore
+
 
 let boot ~loc ~cache_dir ~cache_active ~framework ~ignore =
   let f =
@@ -506,6 +518,7 @@ let boot ~loc ~cache_dir ~cache_active ~framework ~ignore =
     if cache_dir = ".dryunit" then None
     else
     ( if Util.starts_with cache_dir Filename.dir_sep then
+        let () = mkdir_p cache_dir in
         Some cache_dir
       else
         throw ~loc "Cache directory must be \".dryunit\" or a full custom path.";
