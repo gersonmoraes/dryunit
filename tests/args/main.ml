@@ -1,9 +1,9 @@
 
 let _ =
   [%dryunit
-    { cache_dir = "/path/to/directory"
+    { cache_dir = ".dryunit"
     ; cache     = true
     ; framework = "alcotest"
-    ; ignore    = "query1|query2"
+    ; ignore    = "query1 query2"
     }
   ]

@@ -22,7 +22,7 @@
 #endif
 
 
-
+let format = Printf.sprintf
 
 module Ppx_dryunit_runtime = struct
   open Printf
@@ -43,7 +43,7 @@ module Ppx_dryunit_runtime = struct
           | _ -> throw ~loc ("Missing configuration: " ^ expected)
         ) in
       if not (current = expected) then
-        throw ~loc (Printf.sprintf "I was expecting `%s`, but found `%s`." expected current)
+        throw ~loc (format "I was expecting `%s`, but found `%s`." expected current)
     in
     List.iteri
       ( fun i name ->
@@ -196,7 +196,7 @@ module Ppx_dryunit_runtime = struct
 
 
     let tests_from path =
-      let cmd = Printf.sprintf "ocamlopt -dparsetree %s 2>&1 >/dev/null" path in
+      let cmd = format "ocamlopt -dparsetree %s 2>&1 >/dev/null" path in
       let chan = Unix.open_process_in cmd in
       feed_with ~chan
 
@@ -282,7 +282,7 @@ module Ppx_dryunit_runtime = struct
       suite_title = title_from_no_padding (Filename.chop_suffix name ".ml");
       suite_path = dir ^ sep ^ filename;
       timestamp = timestamp_from (dir ^ sep ^ filename);
-      tests = extract_from ~filename:(sprintf "%s%s%s" dir sep name)
+      tests = extract_from ~filename:(format "%s%s%s" dir sep name)
     }
 
   let test_name ~current_module suite test =
@@ -311,27 +311,34 @@ module Ppx_dryunit_runtime = struct
     | l -> sep ^ (String.concat sep l) ^ sep ^ ".dryunit"
 
 
-  let cache_file ~main =
-    let dir = cache_dir () in
+  let cache_file ~main ~custom_dir =
+    let dir =
+      ( match custom_dir with
+        | None -> cache_dir ()
+        | Some dir -> dir
+      ) in
+    (* let dir = cache_dir () in *)
     if not @@ Sys.file_exists dir then
       Unix.mkdir dir 0o755;
     let hash = Digest.(to_hex @@ bytes main) in
     dir ^ sep ^ hash
 
-  let save_cache ~main suites =
-    let path = cache_file ~main in
-    if Sys.file_exists path then
-      Sys.remove path;
-    let c = open_out_bin path in
-    Marshal.to_channel c suites [];
-    flush c;
-    close_out c;
-    ()
+  let save_cache ~main ~custom_dir ~cache_active suites =
+    if cache_active then ()
+    else
+    ( let path = cache_file ~main ~custom_dir in
+      if Sys.file_exists path then
+        Sys.remove path;
+      let c = open_out_bin path in
+      Marshal.to_channel c suites [];
+      flush c;
+      close_out c
+    )
 
 
-  let load_cache ~main =
-    let path = cache_file ~main in
-    if Sys.file_exists path then
+  let load_cache ~main ~custom_dir ~cache_active =
+    let path = cache_file ~main ~custom_dir in
+    if cache_active && Sys.file_exists path then
     ( let c = open_in_bin path in
       let suites : testsuite list = Marshal.from_channel c in
       close_in c;
@@ -356,8 +363,8 @@ module Ppx_dryunit_runtime = struct
     with
       Not_found -> None
 
-  let detect_suites ~filename : testsuite list =
-    let cache = load_cache ~main:filename in
+  let detect_suites ~filename ~custom_dir ~cache_active : testsuite list =
+    let cache = load_cache ~main:filename ~custom_dir ~cache_active in
     let cache_dirty = ref false in
     let dir = Filename.dirname filename in
     let main_basename = Filename.basename filename in
@@ -386,7 +393,7 @@ module Ppx_dryunit_runtime = struct
     ) |>
     fun suites ->
     if !cache_dirty then
-      save_cache ~main:filename suites;
+      save_cache ~main:filename ~custom_dir ~cache_active suites;
     suites
 
   let pp name tests =
@@ -396,7 +403,7 @@ module Ppx_dryunit_runtime = struct
   let debug ~filename : string =
     let tests = ref [] in
     let _ : unit =
-      detect_suites ~filename
+      detect_suites ~filename ~custom_dir:None ~cache_active:true
       |> List.iter
          ( fun suite ->
            tests := !tests @ suite.tests
@@ -471,6 +478,25 @@ let bootstrap_ounit suites =
   )
 
 
+let gen ~loc ~cache_dir ~cache_active ~framework ~ignore =
+  let boot =
+    ( match framework with
+      | "alcotest" -> bootstrap_alcotest
+      | "ounit" -> bootstrap_ounit
+      | _ -> throw ~loc (format "Test framework not recognized: `%s`" framework)
+    ) in
+  let custom_dir =
+    if cache_dir = ".dryunit" then None
+    else
+    ( if Util.starts_with cache_dir Filename.dir_sep then
+        Some cache_dir
+      else
+        throw ~loc "Cache directory must be \".dryunit\" or a full custom path.";
+    ) in
+  let suites = detect_suites ~filename:!Location.input_name ~custom_dir ~cache_active in
+  boot suites
+
+
 let rewriter _config _cookies =
   let super = Ast_mapper.default_mapper in
   if not (in_build_dir ()) then
@@ -489,35 +515,34 @@ let rewriter _config _cookies =
 
     (* alcotest *)
     | Pexp_extension ({ txt = "alcotest"; _ }, PStr []) ->
-      bootstrap_alcotest (detect_suites ~filename:!Location.input_name)
+      bootstrap_alcotest (detect_suites ~filename:!Location.input_name ~custom_dir:None ~cache_active:true)
 
     (* ounit *)
     | Pexp_extension ({ txt = "ounit"; _ }, PStr []) ->
-      bootstrap_ounit (detect_suites ~filename:!Location.input_name)
+      bootstrap_ounit (detect_suites ~filename:!Location.input_name ~custom_dir:None ~cache_active:true)
 
     (* new-interface *)
     | Pexp_extension ({ txt = "dryunit"; _ },
         PStr [ {pstr_desc = (Pstr_eval ({pexp_desc = Pexp_record (configs, None); pexp_loc; _}, attr)); _} ]) ->
-      (* bootstrap_alcotest (detect_suites ~filename:!Location.input_name) *)
-
       ( match configs with
         | [({txt = Lident "cache_dir"},
             {pexp_desc = Pexp_constant (Pconst_string (cache_dir, None))});
            ({txt = Lident "cache"},
-            {pexp_desc = Pexp_construct ({txt = Lident cache_active}, None)});
+            {pexp_desc = Pexp_construct ({txt = Lident cache}, None)});
            ({txt = Lident "framework"},
             {pexp_desc = Pexp_constant (Pconst_string (framework, None))});
            ({txt = Lident "ignore"},
             {pexp_desc = Pexp_constant (Pconst_string (queries, None))})]
-          when cache_active = "true" || cache_active = "false"
-           -> unit ()
+          when cache = "true" || cache = "false" ->
+            let cache_active = (cache = "true") in
+            gen ~loc:pexp_loc ~cache_dir ~cache_active ~framework ~ignore
        | _ ->
         validate_params ~loc:e.pexp_loc configs
           ["cache_dir"; "cache"; "framework"; "ignore" ];
         throw ~loc:e.pexp_loc "Configuration for ppx_dryunit is invalid."
       )
     | Pexp_extension ({ txt = "dryunit"; _ }, _ ) ->
-        throw ~loc:e.pexp_loc "Dryunit confuration should defined as a record."
+        throw ~loc:e.pexp_loc "Dryunit configuration should defined as a record."
 
     (* anything else *)
     | _ -> super.expr self e

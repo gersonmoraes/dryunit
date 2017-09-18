@@ -21,7 +21,7 @@ run_ounit:
 run_args:
 	@jbuilder build $(EXECUTABLE_ARGS) && _build/default/$(EXECUTABLE_ARGS)
 
-build_args:
+build_args: clean
 	@jbuilder build $(EXECUTABLE_ARGS)
 
 run_alcotest:
