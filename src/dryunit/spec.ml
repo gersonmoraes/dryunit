@@ -35,6 +35,33 @@ let common_opts_t =
   in
   Term.(const common_opts $ debug $ verb $ prehook)
 
+(* unstable *)
+let gen_opts nocache framework cache_dir ignore filter =
+  Action.({ nocache; framework; cache_dir; ignore; filter })
+let gen_opts_t =
+  let docs = Manpage.s_common_options in
+  let nocache =
+    let doc = "Do not use cache." in
+    Arg.(value & flag & info ["nocache"] ~docs ~doc)
+  in
+  let framework =
+    let doc = "Select a test framework." in
+    Arg.(required & opt (some string) None & info ["framework"] ~docs ~doc)
+  in
+  let cache_dir =
+    let doc = "Select a custom cache dir." in
+    Arg.(value & opt (some string) None & info ["cache-dir"] ~docs ~doc)
+  in
+  let ignore =
+    let doc = "Space separated list of words used to ignore tests." in
+    Arg.(value & opt (some string) None & info ["ignore"] ~docs ~doc)
+  in
+  let filter =
+    let doc = "Space separated list of words used to filter tests." in
+    Arg.(value & opt (some string) None & info ["filter"] ~docs ~doc)
+  in
+  Term.(const gen_opts $ nocache $ framework $ cache_dir $ ignore $ filter )
+
 
 (* Commands *)
 
