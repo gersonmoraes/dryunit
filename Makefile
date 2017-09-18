@@ -1,6 +1,7 @@
 
 EXECUTABLE_OUNIT = tests/ounit/main.exe
 EXECUTABLE_ALCOTEST = tests/alcotest/main.exe
+EXECUTABLE_ARGS = tests/args/main.exe
 MAIN_EXECUTABLE = src/dryunit/dryunit.exe
 
 default:
@@ -16,6 +17,12 @@ run:
 
 run_ounit:
 	@jbuilder build $(EXECUTABLE_OUNIT) && _build/default/$(EXECUTABLE_OUNIT)
+
+run_args:
+	@jbuilder build $(EXECUTABLE_ARGS) && _build/default/$(EXECUTABLE_ARGS)
+
+build_args:
+	@jbuilder build $(EXECUTABLE_ARGS)
 
 run_alcotest:
 	@rm -f _build/default/tests/alcotest/main.ml && jbuilder build $(EXECUTABLE_ALCOTEST) && _build/default/$(EXECUTABLE_ALCOTEST)

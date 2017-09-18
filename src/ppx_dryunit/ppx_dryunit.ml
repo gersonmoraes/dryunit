@@ -27,6 +27,9 @@
 module Ppx_dryunit_runtime = struct
   open Printf
 
+  let throw ~loc msg =
+    raise (Location.Error (Location.error ~loc msg))
+
   module Util = struct
     let is_substring string substring =
       let string, substring = Bytes.of_string string, Bytes.of_string substring in
@@ -394,6 +397,7 @@ end
 
 
 
+
 open Migrate_parsetree
 open OCaml_OMP.Ast
 open Parsetree
@@ -469,6 +473,25 @@ let rewriter _config _cookies =
     (* ounit *)
     | Pexp_extension ({ txt = "ounit"; _ }, PStr []) ->
       bootstrap_ounit (detect_suites ~filename:!Location.input_name)
+
+    (* new-interface *)
+    | Pexp_extension ({ txt = "dryunit"; _ },
+        PStr [ {pstr_desc = (Pstr_eval ({pexp_desc = Pexp_record (configs, None); _}, attr)); _} ]) ->
+      (* bootstrap_alcotest (detect_suites ~filename:!Location.input_name) *)
+
+      ( match configs with
+        | [({txt = Lident "cache_dir"},
+            {pexp_desc = Pexp_constant (Pconst_string (cache_dir, None))});
+           ({txt = Lident "cache"},
+            {pexp_desc = Pexp_construct ({txt = Lident cache_active}, None)});
+           ({txt = Lident "framework"},
+            {pexp_desc = Pexp_constant (Pconst_string (framework, None))});
+           ({txt = Lident "ignore"},
+            {pexp_desc = Pexp_constant (Pconst_string (queries, None))})]
+          when cache_active = "true" || cache_active = "false"
+           -> unit ()
+       | _ -> throw ~loc:e.pexp_loc "Configuration for ppx_dryunit is invalid"
+      )
 
     (* anything else *)
     | _ -> super.expr self e

@@ -4,10 +4,14 @@
 # This is just a sample configuration
 
 [meta]
-name = "A Custom Name"
-description = "A group-level description for the detected tests"
 profile = "jbuilder"
 framework = "alcotest"
+name = "A Custom Name"
+description = """
+Some insightful message about these tests would be placed here.
+Although completly optional, I still question myself if this is useful.
+It seems like a nice feature to have and tests fail.
+"""
 
 [cache]
 active = true
@@ -22,7 +26,9 @@ targets = [
 ]
 
 [ignore]
-directories = [ "tests/legacy_code" ]
+directories = [
+ "tests/legacy_code",
+]
 query = [
   "keyword1",
   "keyword2",
