@@ -36,8 +36,8 @@ let common_opts_t =
   Term.(const common_opts $ debug $ verb $ prehook)
 
 (* unstable *)
-let gen_opts nocache framework cache_dir ignore filter =
-  Action.({ nocache; framework; cache_dir; ignore; filter })
+let gen_opts nocache framework cache_dir ignore filter targets =
+  Action.({ nocache; framework; cache_dir; ignore; filter; targets })
 let gen_opts_t =
   let docs = Manpage.s_common_options in
   let nocache =
@@ -60,7 +60,8 @@ let gen_opts_t =
     let doc = "Space separated list of words used to filter tests." in
     Arg.(value & opt (some string) None & info ["filter"] ~docs ~doc)
   in
-  Term.(const gen_opts $ nocache $ framework $ cache_dir $ ignore $ filter )
+  let targets = Arg.(non_empty & pos_all file [] & info [] ~docv:"TARGET") in
+  Term.(const gen_opts $ nocache $ framework $ cache_dir $ ignore $ filter $ targets)
 
 
 (* Commands *)

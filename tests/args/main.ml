@@ -6,5 +6,6 @@ let _ =
     ; framework = "alcotest"
     ; ignore    = "capita"
     ; filter    = "something capit"
+    ; detection = "dir"
     }
   ]

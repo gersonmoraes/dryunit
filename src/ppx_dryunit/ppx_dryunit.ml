@@ -569,7 +569,7 @@ let validate_filters ~loc ~ignore ~filter =
       filter
 
 
-let boot ~loc ~cache_dir ~cache_active ~framework ~ignore ~filter =
+let boot ~loc ~cache_dir ~cache_active ~framework ~ignore ~filter ~detection =
   let f =
     ( match framework with
       | "alcotest" -> bootstrap_alcotest
@@ -587,8 +587,13 @@ let boot ~loc ~cache_dir ~cache_active ~framework ~ignore ~filter =
     ) in
   let ignore = filter_from ~loc ~name:"ignore" ignore in
   let filter = filter_from ~loc ~name:"filter" filter in
-  let suites = detect_suites ~filename:!Location.input_name ~custom_dir
-    ~cache_active in
+  let suites =
+    let filename = !Location.input_name in
+    ( match detection with
+      | "dir" -> detect_suites ~filename ~custom_dir ~cache_active
+      | "file" -> suite_from ~dir:(Filename.dirname filename) (File.basename filename) 
+      | _ -> throw ~loc "The field `detection` only accepts \"dir\" or \"file\"."
+    ) in
   validate_filters ~loc ~ignore ~filter;
   f (apply_filters ~loc ~filter ~ignore suites)
 
@@ -633,13 +638,15 @@ let rewriter _config _cookies =
              ({txt = Lident "ignore"},
               {pexp_desc = Pexp_constant (Pconst_string (ignore, None))});
              ({txt = Lident "filter"},
-              {pexp_desc = Pexp_constant (Pconst_string (filter, None))})]
+              {pexp_desc = Pexp_constant (Pconst_string (filter, None))});
+             ({txt = Lident "detection"},
+              {pexp_desc = Pexp_constant (Pconst_string (detection, None))})]
             when cache = "true" || cache = "false" ->
               let cache_active = (cache = "true") in
-              boot ~loc:e.pexp_loc ~cache_dir ~cache_active ~framework ~ignore ~filter
+              boot ~loc:e.pexp_loc ~cache_dir ~cache_active ~framework ~ignore ~filter ~detection
          | _ ->
           validate_params ~loc:e.pexp_loc configs
-            ["cache_dir"; "cache"; "framework"; "ignore"; "filter" ];
+            ["cache_dir"; "cache"; "framework"; "ignore"; "filter"; "detection" ];
           throw ~loc:e.pexp_loc "Configuration for ppx_dryunit is invalid."
         )
     | Pexp_extension ({ txt = "dryunit"; _ }, _ ) ->

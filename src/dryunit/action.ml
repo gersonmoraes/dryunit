@@ -47,5 +47,15 @@ let help common_opts man_format cmds topic =
       )
 
 
+type gen_opts =
+  { nocache   = bool
+  ; framework = string
+  ; cache_dir = string option
+  ; ignore    = string option
+  ; filter    = string option
+  ; targets   = string list
+  }
+
+
 let clean _common_opts _repodir =
   not_implemented ()
