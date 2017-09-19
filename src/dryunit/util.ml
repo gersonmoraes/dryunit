@@ -7,6 +7,9 @@ let unwrap_or default = function
 
 let format = Printf.sprintf
 
+let split pattern value =
+  Str.split (Str.regexp pattern) value
+
 let generate_testsuite_exe framework =
   let get_int () =
     (Random.int 9999) + 1 in
