@@ -61,7 +61,6 @@ let build () =
   let
     { meta =
       { name
-      ; description
       ; framework
       ; profile
       }

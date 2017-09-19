@@ -8,9 +8,12 @@ let string_of_framework = function
 (* Bulding profiles *)
 type profile = Jbuilder | Custom
 
+let string_of_profile = function
+  | Jbuilder -> "jbuilder"
+  | Custom -> "custom"
+
 type meta =
   { name: string
-  ; description: string option
   ; profile: profile
   ; framework: framework
   }
