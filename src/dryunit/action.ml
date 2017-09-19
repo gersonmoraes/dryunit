@@ -58,5 +58,40 @@ let gen { nocache; framework; cache_dir; ignore; filter; targets} =
   App.gen ~nocache ~framework ~cache_dir ~ignore ~filter ~targets
 
 
+let build () =
+  let filename =
+    if Sys.file_exists "files/dryunit.toml" then
+      "files/dryunit.toml"
+    else
+    ( if Sys.file_exists "dryunit.toml" then
+        "dryunit.toml"
+      else
+        failwith "Configuration file not found. Try `dryunit init`."
+    ) in
+  let project = Config.parse ~filename in
+  let 
+    { meta =
+      { name
+      ; description
+      ; framework
+      ; profile
+      }
+    ; cache =
+      { active
+      ; dir 
+      }
+    ; detection = 
+      { watch
+      ; main
+      ; targets
+      }
+    ; ignore =
+      { directories
+      ; query
+      }
+    } = project in
+  App.gen ~nocache ~framework ~cache_dir ~ignore ~filter ~targets
+
+
 let clean _common_opts _repodir =
   not_implemented ()

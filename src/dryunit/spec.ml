@@ -96,6 +96,21 @@ let gen_cmd =
   Term.(const Action.gen $ gen_opts_t),
   Term.info "gen" ~doc ~sdocs:Manpage.s_common_options ~exits ~man
 
+let build_cmd =
+  let doc = "same as gen, but uses the configuration file" in
+  let exits = Term.default_exits in
+  let man = [
+    `S Manpage.s_description;
+    `P ( "Creates the code to activate dryunit before building the tests. " ^
+         "Very similar to the subcommand `gen`, but `build` takes all info " ^
+         "from the configuration file." );
+    `Blocks help_secs; ]
+  in
+  Term.(const Action.build $ const ()),
+  Term.info "build" ~doc ~sdocs:Manpage.s_common_options ~exits ~man
+
+
+
 
 (* unstable *)
 let clean_cmd =
