@@ -5,7 +5,7 @@ EXECUTABLE_ARGS = tests/args/main.exe
 MAIN_EXECUTABLE = src/dryunit/dryunit.exe
 
 default:
-	jbuilder build $(MAIN_EXECUTABLE)
+	@jbuilder build $(MAIN_EXECUTABLE)
 
 clean:
 	@rm -rf .dryunit

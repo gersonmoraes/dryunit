@@ -1,5 +1,8 @@
 open Cmdliner
 
+
+
+
 (* Help sections common to all commands *)
 
 let help_secs = [
@@ -68,11 +71,6 @@ let gen_opts_t =
 
 (* unstable *)
 let init_cmd =
-  let repodir =
-    let doc = "Initialize configuration for tests in the project with source root in $(docv)." in
-    Arg.(value & opt file Filename.current_dir_name & info ["repodir"]
-           ~docv:"DIR" ~doc)
-  in
   let doc = "initialize test configuration" in
   let exits = Term.default_exits in
   let man = [
@@ -80,7 +78,7 @@ let init_cmd =
     `P "Creates a dryunit.toml configuration file";
     `Blocks help_secs; ]
   in
-  Term.(const Action.init $ common_opts_t $ repodir),
+  Term.(ret (const Action.(catch init) $ const ())),
   Term.info "init" ~doc ~sdocs:Manpage.s_common_options ~exits ~man
 
 
@@ -93,7 +91,7 @@ let gen_cmd =
     `P "Creates the code to activate dryunit before building the tests";
     `Blocks help_secs; ]
   in
-  Term.(const Action.gen $ gen_opts_t),
+  Term.(ret (const Action.gen $ gen_opts_t)),
   Term.info "gen" ~doc ~sdocs:Manpage.s_common_options ~exits ~man
 
 let build_cmd =
@@ -106,7 +104,7 @@ let build_cmd =
          "from the configuration file." );
     `Blocks help_secs; ]
   in
-  Term.(const Action.build $ const ()),
+  Term.(ret (const Action.(catch App.build) $ const ())),
   Term.info "build" ~doc ~sdocs:Manpage.s_common_options ~exits ~man
 
 
@@ -156,4 +154,4 @@ let default_cmd ~version =
   Term.(ret (const (fun _ -> `Help (`Pager, None)) $ common_opts_t)),
   Term.info "dryunit" ~version ~doc ~sdocs ~exits ~man
 
-let cmds = [init_cmd; gen_cmd; clean_cmd; help_cmd]
+let cmds = [init_cmd; gen_cmd; build_cmd; clean_cmd; help_cmd]

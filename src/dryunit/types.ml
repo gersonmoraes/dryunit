@@ -1,6 +1,10 @@
 (* Supported frameworks *)
 type framework = Alcotest | OUnit
 
+let string_of_framework = function
+  | Alcotest -> "alcotest"
+  | OUnit -> "ounit"
+
 (* Bulding profiles *)
 type profile = Jbuilder | Custom
 
@@ -19,7 +23,8 @@ type cache =
 type detection =
   { watch: (string list) option
   ; main: string
-  ; targets: (string list) option
+  ; targets: string list
+  ; filter: string
   }
 
 type ignore =
@@ -29,8 +34,8 @@ type ignore =
 
 (* A manageable project *)
 type project =
-  { meta: meta option
-  ; cache: cache option
-  ; detection: detection option
-  ; ignore: ignore option
+  { meta: meta
+  ; cache: cache
+  ; detection: detection
+  ; ignore: ignore
   }

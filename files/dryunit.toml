@@ -18,11 +18,12 @@ active = true
 dir = ".dryunit"
 
 [detection]
+filter = ""
 watch = "tests"
 main = "${dirname}.ml"
 targets = [
-  "tests/suite1/main.ml",
-  "tests/suite2/main.ml",
+  "tmp/tests/suite1/main.ml",
+  "tmp/tests/suite2/main.ml",
 ]
 
 [ignore]

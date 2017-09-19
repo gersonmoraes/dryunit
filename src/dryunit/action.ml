@@ -20,8 +20,8 @@ let pp_common_opts oc common_opts = Printf.fprintf oc
     common_opts.debug (verb_str common_opts.verb) (opt_str_str common_opts.prehook)
 
 
-let init common_opts repodir = Printf.printf
-    "%arepodir = %s\n" pp_common_opts common_opts repodir
+let init () =
+    not_implemented "init"
 
 
 let help common_opts man_format cmds topic =
@@ -50,48 +50,19 @@ type gen_opts =
   ; targets   : string list
   }
 
+let catch f () =
+  try
+    f ();
+    `Ok ()
+  with
+   Failure e -> `Error (false, e)
 
 let gen { nocache; framework; cache_dir; ignore; filter; targets} =
   let cache_dir = unwrap_or ".dryunit" cache_dir in
   let ignore = unwrap_or "" ignore in
   let filter = unwrap_or "" filter in
-  App.gen ~nocache ~framework ~cache_dir ~ignore ~filter ~targets
-
-
-let build () =
-  let filename =
-    if Sys.file_exists "files/dryunit.toml" then
-      "files/dryunit.toml"
-    else
-    ( if Sys.file_exists "dryunit.toml" then
-        "dryunit.toml"
-      else
-        failwith "Configuration file not found. Try `dryunit init`."
-    ) in
-  let project = Config.parse ~filename in
-  let 
-    { meta =
-      { name
-      ; description
-      ; framework
-      ; profile
-      }
-    ; cache =
-      { active
-      ; dir 
-      }
-    ; detection = 
-      { watch
-      ; main
-      ; targets
-      }
-    ; ignore =
-      { directories
-      ; query
-      }
-    } = project in
-  App.gen ~nocache ~framework ~cache_dir ~ignore ~filter ~targets
+  catch  (fun () -> App.gen ~nocache ~framework ~cache_dir ~ignore ~filter ~targets) ()
 
 
 let clean _common_opts _repodir =
-  not_implemented ()
+  not_implemented "clean"

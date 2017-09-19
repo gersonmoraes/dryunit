@@ -1,13 +1,14 @@
 open Util
-open Util.Config
+open Util.Config_helpers
 open Types
 
-let noop = { meta = None;  cache = None; detection = None; ignore = None }
+(* let noop = { meta = None;  cache = None; detection = None; ignore = None } *)
 
 let framework_from = function
   | "alcotest" -> Alcotest
   | "ounit" -> OUnit
   | other -> failwith @@ "invalid framework: " ^ other
+
 
 let profile_from = function
   | "jbuilder" -> Jbuilder
@@ -21,22 +22,23 @@ let parse ~filename : project =
   let cache_t = get_table "cache" toml in
   let detection_t = get_table "detection" toml in
   let ignore_t = get_table "ignore" toml in
-  { meta = Some
+  { meta =
     { name        = get_string "name" meta_t
     ; description = get_string_opt "description" meta_t
     ; framework   = framework_from @@ get_string "framework" meta_t
     ; profile     = profile_from @@ get_string "profile" meta_t
     }
-  ; cache = Some
+  ; cache =
     { active = get_bool "active" cache_t
     ; dir    = get_string "dir" cache_t
     }
-  ; detection = Some
+  ; detection =
     { watch   = get_string_array_opt "watch" detection_t
+    ; filter  = get_string "filter" detection_t
     ; main    = get_string "main" detection_t
-    ; targets = get_string_array_opt "targets" detection_t
+    ; targets = get_string_array "targets" detection_t
     }
-  ; ignore = Some
+  ; ignore =
     { directories = get_string_array "directories" ignore_t
     ; query       = get_string_array "query" ignore_t
     }

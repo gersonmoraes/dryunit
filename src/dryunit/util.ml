@@ -1,5 +1,5 @@
-let not_implemented () =
-  failwith "not implemented yet"
+let not_implemented feature =
+  failwith ("feature `" ^ feature ^ "` is not implemented yet")
 
 let unwrap_or default = function
   | Some v -> v
@@ -20,7 +20,7 @@ let generate_testsuite_exe framework =
     message id "%" framework
 
 
-module Config = struct
+module Config_helpers = struct
 
   let force_opt ~k = function
     | None -> invalid_arg @@ format "could not get %s from config" k

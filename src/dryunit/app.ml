@@ -43,3 +43,39 @@ let gen ~nocache ~framework ~cache_dir ~ignore ~filter ~targets =
       )
       targets
     )
+
+
+
+let build () =
+  let filename =
+    if Sys.file_exists "files/dryunit.toml" then
+      "files/dryunit.toml"
+    else
+    ( if Sys.file_exists "dryunit.toml" then
+        "dryunit.toml"
+      else
+        failwith "Configuration file not found. Try `dryunit init`."
+    ) in
+  let project = Config.parse ~filename in
+  let open Types in
+  let
+    { meta =
+      { name
+      ; description
+      ; framework
+      ; profile
+      }
+    ; cache
+    ; detection =
+      { watch
+      ; filter
+      ; main
+      ; targets
+      }
+    ; ignore
+    } = project in
+  let cache_dir = cache.dir in
+  let framework = string_of_framework framework in
+  let ignore = String.concat " " ignore.query in
+  let nocache = not cache.active in
+  gen ~nocache ~framework ~cache_dir ~ignore ~filter ~targets
