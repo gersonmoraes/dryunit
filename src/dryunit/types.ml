@@ -42,3 +42,14 @@ type project =
   ; detection: detection
   ; ignore: ignore
   }
+
+let framework_from = function
+  | "alcotest" -> Alcotest
+  | "ounit" -> OUnit
+  | other -> failwith @@ "invalid framework: " ^ other
+
+
+let profile_from = function
+  | "jbuilder" -> Jbuilder
+  | "custom" -> Custom
+  | other -> failwith @@ "invalid building profile: " ^ other

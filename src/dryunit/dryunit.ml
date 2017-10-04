@@ -1,7 +1,6 @@
 let _ =
   let open Util in
   let open Types in
-  let open Config in
   let open Spec in
   let open App in
   let open Action in

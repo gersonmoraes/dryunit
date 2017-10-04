@@ -21,7 +21,8 @@ let pp_common_opts oc common_opts = Printf.fprintf oc
 
 
 let init () =
-    Config.export Config.default
+    (* Config.export Config.default *)
+    not_implemented "init"
 
 
 let help common_opts man_format cmds topic =

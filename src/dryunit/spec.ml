@@ -94,7 +94,7 @@ let gen_cmd =
   Term.(ret (const Action.gen $ gen_opts_t)),
   Term.info "gen" ~doc ~sdocs:Manpage.s_common_options ~exits ~man
 
-let build_cmd =
+(* let build_cmd =
   let doc = "same as gen, but uses the configuration file" in
   let exits = Term.default_exits in
   let man = [
@@ -105,7 +105,7 @@ let build_cmd =
     `Blocks help_secs; ]
   in
   Term.(ret (const Action.(catch App.build) $ const ())),
-  Term.info "build" ~doc ~sdocs:Manpage.s_common_options ~exits ~man
+  Term.info "build" ~doc ~sdocs:Manpage.s_common_options ~exits ~man *)
 
 
 
@@ -154,4 +154,4 @@ let default_cmd ~version =
   Term.(ret (const (fun _ -> `Help (`Pager, None)) $ common_opts_t)),
   Term.info "dryunit" ~version ~doc ~sdocs ~exits ~man
 
-let cmds = [init_cmd; gen_cmd; build_cmd; clean_cmd; help_cmd]
+let cmds = [init_cmd; gen_cmd; clean_cmd; help_cmd]
