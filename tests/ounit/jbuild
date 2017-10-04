@@ -17,3 +17,8 @@
  ((name   runtest)
   (deps   (main.expected main.normalized))
   (action (run diff -u main.expected main.normalized))))
+
+(rule
+ ((targets (main.ml))
+  (deps    ((glob_files [!{main.ml}])))
+  (action  (with-stdout-to ${@} (run dryunit gen --framework ounit)))))
