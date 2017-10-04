@@ -1,9 +1,45 @@
 # Dryunit
 
-`ppx_dryunit` is an OCaml extension that automates bootstrapping code at build time for the main unit test frameworks in ecosystem. Currently, it supports both OUnit and Alcotest.  It uses a few conventions to detect and setup the testsuites, that can be written in good ol' OCaml, hassle-free.
+Dryunit is a small tool that detects your unit tests and autogenerate the correspondent bootstrapping code on the fly in your build directory.
+
+As a result, you get to use plain old OCaml and all the tooling you already use. It currently works with Alcotest and OUnit and has a template to simplify jbuild integration.
+
+## Quickstart
+
+Install the project in your system:
+
+```
+opam install dryunit
+```
+
+If you use jbuilder, you can use the command  `dryunit init` to generate a jbuild template config. For example, the commands below will generate the executable `tests/main.exe` for tests based on alcotest:
+
+```
+mkdir tests
+dryunit init > tests/jbuild
+```
+
+That will make jbuilder generate the file "tests/main.ml" in your build directory. To add tests, just write a function with a name stating with "test" in any file inside the tests directory.
+
+## How it works
+
+The project has two main components:
+
+  - The command line `dryunit`: the main user interface, responsible for the configuration and the pluggable workflow.
+  - The extension `ppx_dryunit`: it does all the *"heavy lifting"*, including test detection, caching and Ast rewriting.
 
 
-### How DRY can you be?
+### Caching
+
+The **caching** is important because the main executable needs to be re generated with some random modification at build time.
+
+More importantly, the detection is done by calling a shell instance to ask OCaml parser to generate a structured representation of each test file. This adds an extra cost and should not be done for unmodified files. That's why the extension will dump the memory representation of the detected test suites in a cache file.
+
+The primary form to detect changes is the timestamp of the test files. The cache is also aware of the version of the compiler used at each build, so executing `opam switch` doesn't affects nor removes your previous cache.
+
+###  How DRY can you be?
+
+The initial idea for the project was to create a nearly invisible test framework that would require no bootstrap code whatsoever. But to be truly dry you shouldn't need to change existing test code, build system nor frameworks.
 
 This is a simplified version of Alcotest's sample test at the time of writing.
 
@@ -18,11 +54,9 @@ let test_capit () =
 
 let test_plus () =
   Alcotest.(check int) "same ints" 7 (Mylib.plus [1;1;2;3])
-````
+```
 
-
-
-To run this, create a new file in the same directory with this line:
+All functions starts with test and must be in the same directory of the file used to activate `ppx_dryunit`. If you want to create it manually, it looks like :
 
 ```ocaml
 let () = [%alcotest]
