@@ -2,4 +2,4 @@
  ((name dryunit)
   (package dryunit)
   (public_name dryunit)
-  (libraries (cmdliner toml str unix))))
+  (libraries (cmdliner str unix))))
