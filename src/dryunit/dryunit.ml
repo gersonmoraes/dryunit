@@ -1,3 +1,5 @@
+let version = "0.2"
+
 let _ =
   let open Util in
   let open Types in
@@ -8,5 +10,4 @@ let _ =
 
 let () =
   Random.self_init ();
-  let version = Version.version in
   Cmdliner.Term.(exit @@ eval_choice (Spec.default_cmd ~version) Spec.cmds)
