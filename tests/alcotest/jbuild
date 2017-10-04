@@ -19,6 +19,6 @@
   (action (run diff -u main.expected main.normalized))))
 
 (rule
-((targets (main.ml))
- (deps    (../../src/dryunit/dryunit.exe))
- (action  (with-stdout-to ${@} (run ${<} --gen alcotest)))))
+ ((targets (main.ml))
+  (deps    ((glob_files [!{main.ml}])))
+  (action  (with-stdout-to ${@} (run dryunit gen --framework alcotest)))))

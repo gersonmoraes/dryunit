@@ -8,3 +8,6 @@ let test_capit () =
 
 let test_plus () =
   Alcotest.(check int) "same ints" 7 (To_test.plus [1;1;2;3])
+
+let test_capit_another () =
+  Alcotest.(check string) "same chars"  "a" (To_test.escape 'a')

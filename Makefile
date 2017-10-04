@@ -3,6 +3,8 @@ EXECUTABLE_OUNIT = tests/ounit/main.exe
 EXECUTABLE_ALCOTEST = tests/alcotest/main.exe
 EXECUTABLE_ARGS = tests/args/main.exe
 MAIN_EXECUTABLE = src/dryunit/dryunit.exe
+BUILD_DIR = _build/default
+
 
 default:
 	@jbuilder build $(MAIN_EXECUTABLE)
@@ -10,10 +12,6 @@ default:
 clean:
 	@rm -rf .dryunit
 	jbuilder clean
-
-run:
-	@#jbuilder build $(MAIN_EXECUTABLE) && _build/default/$(MAIN_EXECUTABLE)
-	@jbuilder build $(MAIN_EXECUTABLE)
 
 run_ounit:
 	@jbuilder build $(EXECUTABLE_OUNIT) && _build/default/$(EXECUTABLE_OUNIT)
@@ -38,5 +36,10 @@ uninstall:
 
 reinstall: uninstall install
 
+run: default
+	@$(BUILD_DIR)/$(MAIN_EXECUTABLE) $(filter-out $@,$(MAKECMDGOALS))
+
+%:
+	@:
 
 .PHONY: default install uninstall reinstall clean examples
