@@ -3,3 +3,17 @@
   (package dryunit)
   (public_name dryunit)
   (libraries (cmdliner str unix))))
+
+
+
+(rule
+ ((targets (version.ml))
+  ;; (deps    ((glob_files *.ml)))
+  (action
+    (with-stdout-to ${@}
+    ( progn
+      (echo "let version = String.trim \"")
+      (run git describe --abbrev=0 --tags)
+      (echo "\"\n")
+
+  )))))
