@@ -35,7 +35,9 @@ The **caching** is important because the main executable needs to be re generate
 
 More importantly, the detection is done by calling a shell instance to ask OCaml parser to generate a structured representation of each test file. This adds an extra cost and should not be done for unmodified files. That's why the extension will dump the memory representation of the detected test suites in a cache file.
 
-The primary form to detect changes is the timestamp of the test files. The cache is also aware of the version of the compiler used at each build, so executing `opam switch` doesn't affects nor removes your previous cache.
+The primary form to detect changes is the timestamp of the test file. This is why by default, you can't detect tests from the file that activates the extension.
+
+The cache is also aware of the version of the compiler used at each build, so executing `opam switch` doesn't break nor removes existing cache.
 
 ###  How DRY can you be?
 
@@ -59,26 +61,37 @@ let test_plus () =
 All functions starts with test and must be in the same directory of the file used to activate `ppx_dryunit`. If you want to create it manually, it looks like :
 
 ```ocaml
-let () = [%alcotest]
+(*
+  This file is supposed to be generated before build with a random ID.
+  ID = 597588864186
+*)
+let () =
+  [%dryunit
+    { cache_dir = ".dryunit"
+    ; cache     = true
+    ; framework = "alcotest"
+    ; ignore    = ""
+    ; filter    = ""
+    ; detection = "dir"
+    }
+  ]
 ```
 
-The only convention here is that all unit tests must start with the name "test". So if you need to disable a test `test_feature_works`, you can just rename it to `_test_feature_works`.
-
-
+If you just need to detect tests from one file, you can skip the command line and add the code above at the end of your main executable, with a slight change: `detection = "file".
 
 ### Under the hood
 
 When processing the extension, the following happens:
 
-- Dryunit checks if it's running from a `*build/*` directory, and returns `()` otherwise.
+- Dryunit checks if it's running from a `*build/*` directory, and returns `()` otherwise. 
 
-- Look at the directory where the extension was declared and find all `*.ml` files.
+- Look at the directory where the extension was declared and find all `*.ml` files other than the current file.
 
-- Extract a structured representation of each file, using OCaml's parser. This is fast, but produce boilerplate files.
+- Extract a structured representation of each file, using OCaml's parser. This is fast, but produce boilerplate.
 
 - Create a test suite with all module-level functions starting with `"test"`.
 
-- Replace `[%alcotest]` in the AST with the apropriate code to bootstrap Alcotest.
+- Replace `[%dryunit... ]` in the AST with the apropriate code to bootstrap Alcotest.
 
 
 
