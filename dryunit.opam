@@ -19,5 +19,5 @@ build-test: [
 depends: [
   "jbuilder" {build}
   "ppx_dryunit"
-  "cmdliner"
+  "cmdliner" {>= "1.0.2"}
 ]

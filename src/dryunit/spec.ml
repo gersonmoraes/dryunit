@@ -4,12 +4,14 @@ open Cmdliner
 (* Help sections common to all commands *)
 
 let help_secs = [
+ `S Manpage.s_common_options;
  `P "These options are common to all commands.";
  `S "MORE HELP";
  `P "Use `$(mname) $(i,COMMAND) --help' for help on a single command.";`Noblank;
  `P "Use `$(mname) help patterns' for help on patch matching."; `Noblank;
  `P "Use `$(mname) help environment' for help on environment variables.";
- ]
+ `S Manpage.s_bugs; `P "Check bug reports at http://bugs.example.org.";
+]
 
 
 (* Options common to all commands *)
