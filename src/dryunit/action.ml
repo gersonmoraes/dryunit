@@ -1,31 +1,10 @@
 open Util
 
-type verbosity = Normal | Quiet | Verbose
-
-type common_opts =
-  { debug   : bool
-  ; verb    : verbosity
-  ; prehook : string option
-  }
-
-let str = Printf.sprintf
-let opt_str sv = function None -> "None" | Some v -> str "Some(%s)" (sv v)
-let opt_str_str = opt_str (fun s -> s)
-let verb_str = function
-  | Normal -> "normal" | Quiet -> "quiet" | Verbose -> "verbose"
-
-
-let pp_common_opts oc common_opts = Printf.fprintf oc
-    "debug = %b\nverbosity = %s\nprehook = %s\n"
-    common_opts.debug (verb_str common_opts.verb) (opt_str_str common_opts.prehook)
-
-
 let init () =
     App.init ();
     `Ok ()
 
-
-let help common_opts man_format cmds topic =
+let help man_format cmds topic =
   match topic with
   | None -> `Help (`Pager, None) (* help about the program. *)
   | Some topic ->

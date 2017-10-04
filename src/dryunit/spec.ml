@@ -16,27 +16,6 @@ let help_secs = [
 (* Options common to all commands *)
 
 (* unstable *)
-let common_opts debug verb prehook = Action.({ debug; verb; prehook })
-let common_opts_t =
-  let docs = Manpage.s_common_options in
-  let debug =
-    let doc = "Give only debug output." in
-    Arg.(value & flag & info ["debug"] ~docs ~doc)
-  in
-  let verb =
-    let doc = "Suppress informational output." in
-    let quiet = Action.Quiet, Arg.info ["q"; "quiet"] ~docs ~doc in
-    let doc = "Give verbose output." in
-    let verbose = Action.Verbose, Arg.info ["v"; "verbose"] ~docs ~doc in
-    Arg.(last & vflag_all [Action.Normal] [quiet; verbose])
-  in
-  let prehook =
-    let doc = "Specify command to run before this $(mname) command." in
-    Arg.(value & opt (some string) None & info ["prehook"] ~docs ~doc)
-  in
-  Term.(const common_opts $ debug $ verb $ prehook)
-
-(* unstable *)
 let gen_opts nocache framework cache_dir ignore filter targets =
   Action.({ nocache; framework; cache_dir; ignore; filter; targets })
 let gen_opts_t =
@@ -69,7 +48,7 @@ let gen_opts_t =
 
 (* unstable *)
 let init_cmd =
-  let doc = "initialize test configuration" in
+  let doc = "shows a template configuration" in
   let exits = Term.default_exits in
   let man = [
     `S Manpage.s_description;
@@ -92,29 +71,14 @@ let gen_cmd =
   Term.(ret (const Action.gen $ gen_opts_t)),
   Term.info "gen" ~doc ~sdocs:Manpage.s_common_options ~exits ~man
 
-(* let build_cmd =
-  let doc = "same as gen, but uses the configuration file" in
-  let exits = Term.default_exits in
-  let man = [
-    `S Manpage.s_description;
-    `P ( "Creates the code to activate dryunit before building the tests. " ^
-         "Very similar to the subcommand `gen`, but `build` takes all info " ^
-         "from the configuration file." );
-    `Blocks help_secs; ]
-  in
-  Term.(ret (const Action.(catch App.build) $ const ())),
-  Term.info "build" ~doc ~sdocs:Manpage.s_common_options ~exits ~man *)
-
-
-
 
 (* unstable *)
 let clean_cmd =
-  let doc = "initialize test configuration" in
+  let doc = "clean cache" in
   let exits = Term.default_exits in
   let man = [
     `S Manpage.s_description;
-    `P "Creates a dryunit.toml configuration file";
+    `P "Use to clean dryunit cache";
     `Blocks help_secs; ]
   in
   Term.(const App.clean $ const ()),
@@ -127,14 +91,14 @@ let help_cmd =
     let doc = "The topic to get help on. `topics' lists the topics." in
     Arg.(value & pos 0 (some string) None & info [] ~docv:"TOPIC" ~doc)
   in
-  let doc = "display help about darcs and darcs commands" in
+  let doc = "show help" in
   let man =
     [`S Manpage.s_description;
      `P "Prints help about darcs commands and other subjects...";
      `Blocks help_secs; ]
   in
   Term.(ret
-    (const Action.help $ common_opts_t $ Arg.man_format $ Term.choice_names $topic)),
+    (const Action.help $ Arg.man_format $ Term.choice_names $ topic)),
   Term.info "help" ~doc ~exits:Term.default_exits ~man
 
 
@@ -144,7 +108,7 @@ let default_cmd ~version =
   let sdocs = Manpage.s_common_options in
   let exits = Term.default_exits in
   let man = help_secs in
-  Term.(ret (const (fun _ -> `Help (`Pager, None)) $ common_opts_t)),
+  Term.(ret (const (fun _ -> `Help (`Pager, None)) $ const ())),
   Term.info "dryunit" ~version ~doc ~sdocs ~exits ~man
 
 let cmds = [init_cmd; gen_cmd; clean_cmd; help_cmd]
