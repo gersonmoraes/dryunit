@@ -4,13 +4,12 @@ open Cmdliner
 (* Help sections common to all commands *)
 
 let help_secs = [
- `S Manpage.s_common_options;
  `P "These options are common to all commands.";
  `S "MORE HELP";
  `P "Use `$(mname) $(i,COMMAND) --help' for help on a single command.";`Noblank;
  `P "Use `$(mname) help patterns' for help on patch matching."; `Noblank;
  `P "Use `$(mname) help environment' for help on environment variables.";
- `S Manpage.s_bugs; `P "Check bug reports at http://bugs.example.org.";]
+ ]
 
 
 (* Options common to all commands *)
@@ -19,7 +18,7 @@ let help_secs = [
 let gen_opts nocache framework cache_dir ignore filter targets =
   Action.({ nocache; framework; cache_dir; ignore; filter; targets })
 let gen_opts_t =
-  let docs = Manpage.s_common_options in
+  let docs = "Generate bootstrap code" in
   let nocache =
     let doc = "Do not use cache." in
     Arg.(value & flag & info ["nocache"] ~docs ~doc)

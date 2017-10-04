@@ -4,8 +4,6 @@
   (public_name dryunit)
   (libraries (cmdliner str unix))))
 
-
-
 (rule
  ((targets (version.ml))
   ;; (deps    ((glob_files *.ml)))
