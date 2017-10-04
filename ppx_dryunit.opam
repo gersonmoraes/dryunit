@@ -18,4 +18,6 @@ build-test: [
 depends: [
   "jbuilder" {build}
   "cppo" {build}
+  "ocaml-migrate-parsetree" {build}
+  "ppx_tools_versioned" {build}
 ]
