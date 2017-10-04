@@ -21,8 +21,8 @@ let pp_common_opts oc common_opts = Printf.fprintf oc
 
 
 let init () =
-    (* Config.export Config.default *)
-    not_implemented "init"
+    App.init ();
+    `Ok ()
 
 
 let help common_opts man_format cmds topic =
@@ -63,7 +63,3 @@ let gen { nocache; framework; cache_dir; ignore; filter; targets} =
   let ignore = unwrap_or "" ignore in
   let filter = unwrap_or "" filter in
   catch  (fun () -> App.gen ~nocache ~framework ~cache_dir ~ignore ~filter ~targets) ()
-
-
-let clean _common_opts _repodir =
-  not_implemented "clean"

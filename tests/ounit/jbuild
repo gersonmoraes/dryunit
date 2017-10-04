@@ -21,4 +21,9 @@
 (rule
  ((targets (main.ml))
   (deps    ((glob_files [!{main.ml}])))
-  (action  (with-stdout-to ${@} (run dryunit gen --framework ounit)))))
+  (action  (with-stdout-to ${@} (run
+    dryunit gen
+      --framework ounit
+      ;; --ignore "space separated list"
+      ;; --filter "space separated list"
+  )))))

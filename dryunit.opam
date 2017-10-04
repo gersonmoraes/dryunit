@@ -1,7 +1,7 @@
 version: "89c076e-dirty"
 opam-version: "1.2"
 name: "dryunit"
-version: "0.1.3"
+version: "0.2.0"
 maintainer: "gerson.xp@gmail.com"
 authors: ["Gerson Moraes"]
 homepage: "https://bitbucket.org/gsmoraes/ppx_dryunit"

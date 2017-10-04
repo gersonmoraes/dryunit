@@ -1,8 +1,6 @@
 open Cmdliner
 
 
-
-
 (* Help sections common to all commands *)
 
 let help_secs = [
@@ -112,11 +110,6 @@ let gen_cmd =
 
 (* unstable *)
 let clean_cmd =
-  let repodir =
-    let doc = "Initialize configuration for tests in the project with source root in $(docv)." in
-    Arg.(value & opt file Filename.current_dir_name & info ["repodir"]
-           ~docv:"DIR" ~doc)
-  in
   let doc = "initialize test configuration" in
   let exits = Term.default_exits in
   let man = [
@@ -124,7 +117,7 @@ let clean_cmd =
     `P "Creates a dryunit.toml configuration file";
     `Blocks help_secs; ]
   in
-  Term.(const Action.clean $ common_opts_t $ repodir),
+  Term.(const App.clean $ const ()),
   Term.info "clean" ~doc ~sdocs:Manpage.s_common_options ~exits ~man
 
 
