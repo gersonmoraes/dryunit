@@ -422,7 +422,7 @@ module Ppx_dryunit_runtime = struct
     print_endline ("Tests in `" ^ name ^ "`");
     List.iter (fun t -> Printf.printf " - %s [%s]\n" t.test_title t.test_name) tests
 
-  let debug ~filename : string =
+  let print_tests_from ~filename : string =
     let tests = ref [] in
     let _ : unit =
       detect_suites ~filename ~custom_dir:None ~cache_active:true
@@ -431,7 +431,10 @@ module Ppx_dryunit_runtime = struct
            tests := !tests @ suite.tests
         )
     in
-    String.concat "\n" (List.map (fun test -> test.test_title) !tests)
+    !tests |>
+    List.map (fun test -> test.test_title) |>
+    List.sort String.compare |>
+    String.concat "\n"
 
 
   module Test = struct
@@ -611,7 +614,7 @@ let rewriter _config _cookies =
     match e.pexp_desc with
     (* debug just returns a string with detected tests *)
     | Pexp_extension ({ txt = "dryunit_debug"; _ }, PStr []) ->
-      let output = Ppx_dryunit_runtime.debug ~filename:!Location.input_name in
+      let output = Ppx_dryunit_runtime.print_tests_from ~filename:!Location.input_name in
       { e with pexp_desc = Pexp_constant (Pconst_string (output, None)) }
 
     (* debug just returns a string with detected tests *)

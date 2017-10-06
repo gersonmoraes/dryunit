@@ -20,7 +20,7 @@
 
 (rule
  ((targets (main.ml))
-  (deps    (primary.ml secondary.ml third.ml))
+  (deps    (primary.ml secondary.ml))
   (action  (with-stdout-to ${@} (run
     dryunit gen
       --framework alcotest
