@@ -1,29 +1,36 @@
 
-EXECUTABLE_OUNIT = tests/ounit/main.exe
-EXECUTABLE_ALCOTEST = tests/alcotest/main.exe
-EXECUTABLE_ARGS = tests/args/main.exe
-MAIN_EXECUTABLE = src/dryunit/dryunit.exe
-BUILD_DIR = _build/default
+BUILD = _build/default
+
+# Main executable
+MAIN = src/dryunit/dryunit
+
+# Tests
+TEST_ALCOTEST = tests/alcotest/main
+TEST_OUNIT = tests/ounit/main
+TEST_ARGS = tests/args/main
 
 
 default:
-	@jbuilder build $(MAIN_EXECUTABLE)
+	@jbuilder build $(MAIN).exe
 
 clean:
 	@rm -rf .dryunit
 	jbuilder clean
 
-run_ounit:
-	@jbuilder build $(EXECUTABLE_OUNIT) && _build/default/$(EXECUTABLE_OUNIT)
-
-run_args: clean
-	@jbuilder build $(EXECUTABLE_ARGS) && _build/default/$(EXECUTABLE_ARGS)
-
-build_args: clean
-	@jbuilder build $(EXECUTABLE_ARGS)
+dryunit:
+	@rm -f $(BUILD)/$(TEST_OUNIT).ml
 
 run_alcotest:
-	jbuilder build $(EXECUTABLE_ALCOTEST) && _build/default/$(EXECUTABLE_ALCOTEST)
+	@jbuilder build $(TEST_ALCOTEST).exe && $(BUILD)/$(TEST_ALCOTEST).exe
+
+run_ounit: dryunit
+	@jbuilder build $(TEST_OUNIT).exe && $(BUILD)/$(TEST_OUNIT).exe
+
+run_args: clean
+	@jbuilder build $(TEST_ARGS).exe && $(BUILD)/$(TEST_ARGS).exe
+
+build_args: clean
+	@jbuilder build $(EXE_ARGS)
 
 test: clean
 	@jbuilder runtest
@@ -37,7 +44,7 @@ uninstall:
 reinstall: uninstall install
 
 run: default
-	@$(BUILD_DIR)/$(MAIN_EXECUTABLE) $(filter-out $@,$(MAKECMDGOALS))
+	@$(BUILD)/$(MAIN).exe $(filter-out $@,$(MAKECMDGOALS))
 
 %:
 	@:
