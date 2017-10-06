@@ -307,22 +307,25 @@ module Ppx_dryunit_runtime = struct
 
   let cache_dir () =
     let flag_ref = ref false in
-      Str.split (Str.regexp sep) (Sys.getcwd ()) |>
-      List.rev |>
-      List.filter
+    let root_found = ref "" in
+    Str.split (Str.regexp sep) (Sys.getcwd ()) |>
+    List.rev |>
+    List.filter
       ( fun dir ->
         if !flag_ref then
           true
         else
         ( if (dir = "_build") || (dir = "build") then
-            flag_ref := true;
+          ( flag_ref := true;
+            root_found := dir;
+          );
           false
         )
       ) |>
     List.rev |>
     function
     | []  -> failwith "Dryunit is not being preprocessed from build directory"
-    | l -> sep ^ (String.concat sep l) ^ sep ^ ".dryunit"
+    | l -> sep ^ (String.concat sep l) ^ sep ^ !root_found ^ sep ^ ".dryunit"
 
 
   let cache_file ~main ~custom_dir =
@@ -334,6 +337,7 @@ module Ppx_dryunit_runtime = struct
     (* let dir = cache_dir () in *)
     if not @@ Sys.file_exists dir then
       Unix.mkdir dir 0o755;
+    close_out (open_out (dir ^ sep ^ ".jbuilder-keep"));
     let hash = Digest.(to_hex @@ bytes (main ^ Sys.ocaml_version)) in
     dir ^ sep ^ hash
 
@@ -577,13 +581,13 @@ let boot ~loc ~cache_dir ~cache_active ~framework ~ignore ~filter ~detection =
       | _ -> throw ~loc (format "Test framework not recognized: `%s`" framework)
     ) in
   let custom_dir =
-    if cache_dir = ".dryunit" then None
+    if (cache_dir = ".dryunit") || (cache_dir = "_build/.dryunit") then None
     else
     ( if Util.starts_with cache_dir Filename.dir_sep then
         let () = mkdir_p cache_dir in
         Some cache_dir
       else
-        throw ~loc "Cache directory must be \".dryunit\" or a full custom path.";
+        throw ~loc ("Cache directory must be \".dryunit\" or a full custom path. Current value is `" ^ cache_dir ^ "`");
     ) in
   let ignore = filter_from ~loc ~name:"ignore" ignore in
   let filter = filter_from ~loc ~name:"filter" filter in

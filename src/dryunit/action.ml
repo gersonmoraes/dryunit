@@ -38,7 +38,7 @@ let catch f () =
    Failure e -> `Error (false, e)
 
 let gen { nocache; framework; cache_dir; ignore; filter; targets} =
-  let cache_dir = unwrap_or ".dryunit" cache_dir in
+  let cache_dir = unwrap_or "_build/.dryunit" cache_dir in
   let ignore = unwrap_or "" ignore in
   let filter = unwrap_or "" filter in
   catch  (fun () -> App.gen ~nocache ~framework ~cache_dir ~ignore ~filter ~targets) ()

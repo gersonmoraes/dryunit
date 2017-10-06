@@ -23,7 +23,7 @@ build_args: clean
 	@jbuilder build $(EXECUTABLE_ARGS)
 
 run_alcotest:
-	@rm -f _build/default/tests/alcotest/main.ml && jbuilder build $(EXECUTABLE_ALCOTEST) && _build/default/$(EXECUTABLE_ALCOTEST)
+	jbuilder build $(EXECUTABLE_ALCOTEST) && _build/default/$(EXECUTABLE_ALCOTEST)
 
 test: clean
 	@jbuilder runtest

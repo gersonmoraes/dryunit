@@ -20,7 +20,7 @@
 
 (rule
  ((targets (main.ml))
-  (deps    ((glob_files [!{main.ml}])))
+  (deps    (secondary.ml tests.ml))
   (action  (with-stdout-to ${@} (run
     dryunit gen
       --framework ounit
