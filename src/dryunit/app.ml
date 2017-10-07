@@ -55,7 +55,11 @@ let init () =
 ;; This rule generates the bootstrapping
 (rule
  ((targets (main.ml))
-  (deps    ((glob_files [!{main.ml}])))
+  ;;
+  ;; Uncomment for change detection:
+  ;;
+  ;; (deps (FILE1.ml FILE2.ml))
+  ;;
   (action  (with-stdout-to ${@} (run
     dryunit gen --framework alcotest
     ;;

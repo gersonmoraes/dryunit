@@ -6,13 +6,13 @@ As a result, you get to use plain old OCaml and all the tooling you already use.
 
 ## Quickstart
 
-Install the project in your system:
+Install the extension and command line in your system:
 
 ```
 opam install dryunit
 ```
 
-If you use jbuilder, you can use the command  `dryunit init` to generate a jbuild template config. For example, the commands below will generate the executable `tests/main.exe` for tests based on alcotest:
+If you use jbuilder, you can use the command  `dryunit init` to generate a template config. For example, the commands below will generate the executable `tests/main.exe` for tests based on alcotest:
 
 ```
 mkdir tests
@@ -20,6 +20,79 @@ dryunit init > tests/jbuild
 ```
 
 That will make jbuilder generate the file "tests/main.ml" in your build directory. To add tests, just write a function with a name stating with "test" in any file inside the tests directory.
+
+
+
+## About configuration
+
+This is the content of the command `dryunit init`:
+
+```
+(executables
+ ((names (main))
+  (libraries (alcotest))
+  (preprocess (pps (ppx_dryunit)))))
+
+;; This rule generates the bootstrapping
+(rule
+ ((targets (main.ml))
+  ;;
+  ;; Uncomment for change detection:
+  ;;
+  ;; (deps (FILE1.ml FILE2.ml))
+  ;;
+  (action  (with-stdout-to ${@} (run
+    dryunit gen --framework alcotest
+    ;;
+    ;; Uncomment to configure:
+    ;;
+    ;;  --ignore "space separated list"
+    ;;  --filter "space separated list"
+  )))))
+```
+
+
+
+It defaults to a configuration for a test executable `main.exe` based on Alcotest. By default, this file does not need to be created among your test files.
+
+It also shows helpful information on comments, describing how to setup simple changing detection for a list of files, and in the end, how to filter or ignore some tests.
+
+
+
+### Nuances of changing detection
+
+There two basic ways you can setup change detection:
+
+1. List all test files in the `deps` in the `tests/jbuild` file.
+2. Create locally the file `tests/main.ml`  and *make sure it is recompiled at every build*.
+
+
+
+**Listing test files**
+
+The upside of listing the files is that it only requires jbuilder to work. You also don't need the maintain the file `tests/main.ml` among your test files.
+
+
+
+**Creating locally the file `tests/main.ml `**
+
+If you don't want to keep a list of current test files in the configuration, you need to create the file `main.ml` in the same directory your tests live. This file ***should never be cached*** - it needs to be recompiled at every build. To make sure jbuilder does that it, there must be a random modification between builds.
+
+Here's a template for a task in the Makefile:
+
+```
+dryunit:
+	@dryunit gen --framework alcotest > tests/main.ml
+
+test: dryunit
+	...
+```
+
+
+
+Since this file will change frequently, you should put it in the list of ignored files in your VCS.
+
+
 
 ## How it works
 
@@ -45,7 +118,7 @@ The initial idea for the project was to create a nearly invisible test framework
 
 This is a simplified version of Alcotest's sample test at the time of writing.
 
-````ocaml
+```ocaml
 module MyLib = struct
   let capit letter = Char.uppercase letter
   let plus int_list = List.fold_left (fun a b -> a + b) 0 int_list
@@ -60,7 +133,7 @@ let test_plus () =
 
 All functions starts with test and must be in the same directory of the file used to activate `ppx_dryunit`. If you want to create it manually, it looks like :
 
-```ocaml
+​```ocaml
 (*
   This file is supposed to be generated before build with a random ID.
   ID = 597588864186
@@ -75,7 +148,7 @@ let () =
     ; detection = "dir"
     }
   ]
-```
+​```
 
 If you just need to detect tests from one file, you can skip the command line and add the code above at the end of your main executable, with a slight change: `detection = "file".
 
@@ -83,7 +156,7 @@ If you just need to detect tests from one file, you can skip the command line an
 
 When processing the extension, the following happens:
 
-- Dryunit checks if it's running from a `*build/*` directory, and returns `()` otherwise. 
+- Dryunit checks if it's running from a `*build/*` directory, and returns `()` otherwise.
 
 - Look at the directory where the extension was declared and find all `*.ml` files other than the current file.
 
