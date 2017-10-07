@@ -131,9 +131,9 @@ let test_plus () =
   Alcotest.(check int) "same ints" 7 (Mylib.plus [1;1;2;3])
 ```
 
-All functions starts with test and must be in the same directory of the file used to activate `ppx_dryunit`. If you want to create it manually, it looks like :
+All functions starts with test and must be in the same directory of the file used to activate `ppx_dryunit`. If you want to create it manually, it looks like:
 
-​```ocaml
+```ocaml
 (*
   This file is supposed to be generated before build with a random ID.
   ID = 597588864186
