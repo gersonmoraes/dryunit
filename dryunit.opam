@@ -3,9 +3,9 @@ name: "dryunit"
 version: "0.3.0"
 maintainer: "gerson.xp@gmail.com"
 authors: ["Gerson Moraes"]
-homepage: "https://bitbucket.org/gsmoraes/ppx_dryunit"
-bug-reports: "https://bitbucket.org/gsmoraes/ppx_dryunit"
-dev-repo: "https://bitbucket.org/gsmoraes/ppx_dryunit"
+homepage: "https://github.com/gersonmoraes/dryunit"
+bug-reports: "https://github.com/gersonmoraes/dryunit"
+dev-repo: "https://github.com/gersonmoraes/dryunit.git"
 available: [ ocaml-version >= "4.02.3" & ocaml-version < "4.06" ]
 build: [
   ["jbuilder" "subst"] {pinned}
