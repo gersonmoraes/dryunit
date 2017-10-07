@@ -150,7 +150,7 @@ let () =
   ]
 ​```
 
-If you just need to detect tests from one file, you can skip the command line and add the code above at the end of your main executable, with a slight change: `detection = "file".
+If you just need to detect tests from one file, you can skip the command line and add the code above at the end of your main executable, with a slight change: `detection = "file"`.
 
 ### Under the hood
 
