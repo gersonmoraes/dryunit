@@ -103,7 +103,7 @@ let help_cmd =
 
 (* stable *)
 let default_cmd ~version =
-  let doc = "the nearly invisible test framework for OCaml" in
+  let doc = "a detection tool for traditional testing in OCaml" in
   let sdocs = Manpage.s_common_options in
   let exits = Term.default_exits in
   let man = help_secs in
