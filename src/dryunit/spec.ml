@@ -26,7 +26,7 @@ let gen_opts_t =
     Arg.(value & flag & info ["nocache"] ~docs ~doc) in
   let framework =
     let doc = "Select a test framework." in
-    Arg.(required & opt (some string) None & info ["framework"] ~docs ~doc) in
+    Arg.(value & opt (some string) None & info ["framework"] ~docs ~doc) in
   let cache_dir =
     let doc = "Select a custom cache dir." in
     Arg.(value & opt (some string) None & info ["cache-dir"] ~docs ~doc) in

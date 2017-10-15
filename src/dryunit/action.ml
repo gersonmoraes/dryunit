@@ -23,7 +23,7 @@ let help man_format cmds topic =
 
 type gen_opts =
   { nocache    : bool
-  ; framework  : string
+  ; framework  : string option
   ; cache_dir  : string option
   ; ignore     : string option
   ; filter     : string option
@@ -43,6 +43,7 @@ let gen { nocache; framework; cache_dir; ignore; filter; ignore_path; targets} =
   let ignore = unwrap_or "" ignore in
   let filter = unwrap_or "" filter in
   let ignore_path = unwrap_or "" ignore_path in
+  let framework = unwrap_or "alcotest" framework in
   catch
     ( fun () ->
       App.gen ~nocache ~framework ~cache_dir ~ignore ~filter ~ignore_path ~targets
