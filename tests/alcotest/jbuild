@@ -22,8 +22,9 @@
  ((targets (main.ml))
   (deps    (primary.ml secondary.ml))
   (action  (with-stdout-to ${@} (run
-    dryunit gen
+    ../../src/dryunit/dryunit.exe gen
       --framework alcotest
       ;; --ignore "webservice broker"
       ;; --filter "filter1 filter2"
+      ;; --ignore-path "secondary"
   )))))

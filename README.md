@@ -140,12 +140,13 @@ All functions starts with test and must be in the same directory of the file use
 *)
 let () =
   [%dryunit
-    { cache_dir = ".dryunit"
-    ; cache     = true
-    ; framework = "alcotest"
-    ; ignore    = ""
-    ; filter    = ""
-    ; detection = "dir"
+    { cache_dir   = ".dryunit"
+    ; cache       = true
+    ; framework   = "alcotest"
+    ; ignore      = ""
+    ; filter      = ""
+    ; detection   = "dir"
+    ; ignore_path = "self"
     }
   ]
 ```

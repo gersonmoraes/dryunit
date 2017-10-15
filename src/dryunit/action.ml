@@ -22,12 +22,13 @@ let help man_format cmds topic =
 
 
 type gen_opts =
-  { nocache   : bool
-  ; framework : string
-  ; cache_dir : string option
-  ; ignore    : string option
-  ; filter    : string option
-  ; targets   : string list
+  { nocache    : bool
+  ; framework  : string
+  ; cache_dir  : string option
+  ; ignore     : string option
+  ; filter     : string option
+  ; ignore_path: string option
+  ; targets    : string list
   }
 
 let catch f () =
@@ -37,8 +38,12 @@ let catch f () =
   with
    Failure e -> `Error (false, e)
 
-let gen { nocache; framework; cache_dir; ignore; filter; targets} =
+let gen { nocache; framework; cache_dir; ignore; filter; ignore_path; targets} =
   let cache_dir = unwrap_or "_build/.dryunit" cache_dir in
   let ignore = unwrap_or "" ignore in
   let filter = unwrap_or "" filter in
-  catch  (fun () -> App.gen ~nocache ~framework ~cache_dir ~ignore ~filter ~targets) ()
+  let ignore_path = unwrap_or "" ignore_path in
+  catch
+    ( fun () ->
+      App.gen ~nocache ~framework ~cache_dir ~ignore ~filter ~ignore_path ~targets
+    ) ()

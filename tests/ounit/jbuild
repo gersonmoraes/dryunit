@@ -21,7 +21,7 @@
 (rule
  ((targets (main.ml))
   (action  (with-stdout-to ${@} (run
-    dryunit gen
+    ../../src/dryunit/dryunit.exe gen
       --framework ounit
       ;; --ignore "space separated list"
       ;; --filter "space separated list"

@@ -17,32 +17,30 @@ let help_secs = [
 (* Options common to all commands *)
 
 (* unstable *)
-let gen_opts nocache framework cache_dir ignore filter targets =
-  Action.({ nocache; framework; cache_dir; ignore; filter; targets })
+let gen_opts nocache framework cache_dir ignore filter ignore_path targets =
+  Action.({ nocache; framework; cache_dir; ignore; filter; ignore_path; targets })
 let gen_opts_t =
   let docs = "Generate bootstrap code" in
   let nocache =
     let doc = "Do not use cache." in
-    Arg.(value & flag & info ["nocache"] ~docs ~doc)
-  in
+    Arg.(value & flag & info ["nocache"] ~docs ~doc) in
   let framework =
     let doc = "Select a test framework." in
-    Arg.(required & opt (some string) None & info ["framework"] ~docs ~doc)
-  in
+    Arg.(required & opt (some string) None & info ["framework"] ~docs ~doc) in
   let cache_dir =
     let doc = "Select a custom cache dir." in
-    Arg.(value & opt (some string) None & info ["cache-dir"] ~docs ~doc)
-  in
+    Arg.(value & opt (some string) None & info ["cache-dir"] ~docs ~doc) in
   let ignore =
     let doc = "Space separated list of words used to ignore tests." in
-    Arg.(value & opt (some string) None & info ["ignore"] ~docs ~doc)
-  in
+    Arg.(value & opt (some string) None & info ["ignore"] ~docs ~doc) in
   let filter =
     let doc = "Space separated list of words used to filter tests." in
-    Arg.(value & opt (some string) None & info ["filter"] ~docs ~doc)
-  in
+    Arg.(value & opt (some string) None & info ["filter"] ~docs ~doc) in
+  let ignore_path =
+    let doc = "Space separated list of words used to ignore files." in
+    Arg.(value & opt (some string) None & info ["ignore-path"] ~docs ~doc) in
   let targets = Arg.(value & pos_all string [] & info [] ~docv:"TARGET") in
-  Term.(const gen_opts $ nocache $ framework $ cache_dir $ ignore $ filter $ targets)
+  Term.(const gen_opts $ nocache $ framework $ cache_dir $ ignore $ filter $ ignore_path $ targets)
 
 
 (* Commands *)

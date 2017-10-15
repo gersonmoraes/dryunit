@@ -32,7 +32,7 @@ run_args: clean
 build_args: clean
 	@jbuilder build $(EXE_ARGS)
 
-test: clean
+test: clean default
 	@jbuilder runtest
 
 install:
