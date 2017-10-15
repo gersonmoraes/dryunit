@@ -276,11 +276,27 @@ module Ppx_dryunit_runtime = struct
     | [] -> false
     | _ -> List.exists (fun v -> Util.is_substring name v) ignore
 
+
+  let protected_namespace path =
+    if path = "self.ml" then
+      true
+    else
+      ( let len = String.length path in
+        if len > 11 then
+          String.(sub path 0 5) = "self_"
+        else false
+      )
+
+
   (* XXX: we could add support for inline namespaced tests here *)
   let rec should_ignore_path ~filter path =
-    match filter with
-    | [] -> false
-    | _ -> List.exists (fun v -> Util.is_substring path v) filter
+    if protected_namespace path then
+      not (String.(sub path (length path - 8) 8) = "_Test.ml")
+    else
+      ( match filter with
+        | [] -> false
+        | _ -> List.exists (fun v -> Util.is_substring path v) filter
+      )
 
   let extract_from ~filename : test list =
     tests_from filename |>

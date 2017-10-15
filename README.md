@@ -48,6 +48,7 @@ This is the content of the command `dryunit init`:
     ;;
     ;;  --ignore "space separated list"
     ;;  --filter "space separated list"
+    ;;  --ignore-path \"space separated list\"
   )))))
 ```
 
