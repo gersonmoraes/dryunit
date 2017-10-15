@@ -283,7 +283,9 @@ module Ppx_dryunit_runtime = struct
     else
       ( let len = String.length path in
         if len > 11 then
-          String.(sub path 0 5) = "self_"
+          if String.(sub path 0 5) = "self_" then
+            String.(sub path (length path - 9) 8) = "_Test.ml"
+          else false
         else false
       )
 
@@ -291,7 +293,7 @@ module Ppx_dryunit_runtime = struct
   (* XXX: we could add support for inline namespaced tests here *)
   let rec should_ignore_path ~filter path =
     if protected_namespace path then
-      not (String.(sub path (length path - 8) 8) = "_Test.ml")
+      false
     else
       ( match filter with
         | [] -> false
