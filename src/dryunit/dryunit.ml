@@ -1,4 +1,4 @@
-let version = "0.2"
+let version = "0.4"
 
 let _ =
   let open Util in
