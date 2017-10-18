@@ -19,7 +19,7 @@
   (action (run diff -u main.expected main.normalized))))
 
 (rule
- ((targets (main.ml))
+ ((targets (main2.ml))
   (deps    (primary.ml secondary.ml))
   (action  (with-stdout-to ${@} (run
     ../../src/dryunit/dryunit.exe gen

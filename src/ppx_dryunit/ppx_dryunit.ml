@@ -125,12 +125,12 @@ let bootstrap_ounit suites =
 
 
 let boot ~loc ~cache_dir ~cache_active ~framework ~ignore ~filter ~detection ~ignore_path =
-  let throwf = throw ~loc in
+  let throw = throw ~loc in
   let f =
     ( match framework with
       | "alcotest" -> bootstrap_alcotest
       | "ounit" -> bootstrap_ounit
-      | _ -> throwf (format "Test framework not recognized: `%s`" framework)
+      | _ -> throw (format "Test framework not recognized: `%s`" framework)
     ) in
   let custom_dir =
     if (cache_dir = ".dryunit") || (cache_dir = "_build/.dryunit") then None
@@ -139,19 +139,19 @@ let boot ~loc ~cache_dir ~cache_active ~framework ~ignore ~filter ~detection ~ig
         let () = mkdir_p cache_dir in
         Some cache_dir
       else
-        throwf ("Cache directory must be \".dryunit\" or a full custom path. Current value is `" ^ cache_dir ^ "`");
+        throw ("Cache directory must be \".dryunit\" or a full custom path. Current value is `" ^ cache_dir ^ "`");
     ) in
-  let ignore = filter_from ~throwf ~name:"ignore" ignore in
-  let filter = filter_from ~throwf ~name:"filter" filter in
-  let ignore_path = filter_from ~throwf ~name:"ignore_path" ignore_path in
+  let ignore = filter_from ~throw ~name:"ignore" ignore in
+  let filter = filter_from ~throw ~name:"filter" filter in
+  let ignore_path = filter_from ~throw ~name:"ignore_path" ignore_path in
   let suites =
     let filename = !Location.input_name in
     ( match detection with
       | "dir" -> detect_suites ~filename ~custom_dir ~cache_active ~ignore_path
       | "file" -> [ suite_from ~dir:(Filename.dirname filename) (Filename.basename filename) ]
-      | _ -> throwf "The field `detection` only accepts \"dir\" or \"file\"."
+      | _ -> throw "The field `detection` only accepts \"dir\" or \"file\"."
     ) in
-  validate_filters ~throwf ~ignore ~filter;
+  validate_filters ~throw ~ignore ~filter;
   f (apply_filters ~filter ~ignore suites)
 
 

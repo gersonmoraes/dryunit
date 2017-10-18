@@ -58,21 +58,32 @@ let init_cmd =
   Term.info "init" ~doc ~sdocs:Manpage.s_common_options ~exits ~man
 
 
-let gen_executable_cmd =
-  let doc = "shows a template configuration" in
+let gen_alcotest_cmd =
+  let doc = "Create the bootstrap code for Alcotest" in
   let exits = Term.default_exits in
   let man = [
     `S Manpage.s_description;
-    `P "Creates a dryunit.toml configuration file";
+    `P "All source code describing test suites for Alcotests will be generated";
     `Blocks help_secs; ]
   in
-  Term.(ret (const Action.gen_executable $ gen_opts_t)),
-  Term.info "init2" ~doc ~sdocs:Manpage.s_common_options ~exits ~man
+  Term.(ret (const Action.(gen_executable "alcotest") $ gen_opts_t)),
+  Term.info "alcotest" ~doc ~sdocs:Manpage.s_common_options ~exits ~man
 
 
-(* unstable *)
-let gen_cmd =
-  let doc = "generate dryunit initialization code" in
+let gen_ounit_cmd =
+  let doc = "Create the bootstrap code for Alcotest" in
+  let exits = Term.default_exits in
+  let man = [
+    `S Manpage.s_description;
+    `P "All source code describing test suites for Alcotests will be generated";
+    `Blocks help_secs; ]
+  in
+  Term.(ret (const Action.(gen_executable "ounit") $ gen_opts_t)),
+  Term.info "ounit" ~doc ~sdocs:Manpage.s_common_options ~exits ~man
+
+
+let gen_extension_cmd =
+  let doc = "Generate dryunit initialization code" in
   let exits = Term.default_exits in
   let man = [
     `S Manpage.s_description;
@@ -122,4 +133,4 @@ let default_cmd ~version =
   Term.(ret (const (fun _ -> `Help (`Pager, None)) $ const ())),
   Term.info "dryunit" ~version ~doc ~sdocs ~exits ~man
 
-let cmds = [init_cmd; gen_executable_cmd; gen_cmd; clean_cmd; help_cmd]
+let cmds = [init_cmd; gen_alcotest_cmd; gen_ounit_cmd; gen_extension_cmd; clean_cmd; help_cmd]

@@ -52,19 +52,18 @@ let gen_extension { nocache; framework; cache_dir; ignore; filter; ignore_path; 
       App.gen_extension ~nocache ~framework ~cache_dir ~ignore ~filter ~ignore_path ~targets
     ) ()
 
-let gen_executable { nocache; framework; cache_dir; ignore; filter; ignore_path; targets} =
+let gen_executable default_framework { nocache; framework; cache_dir; ignore; filter; ignore_path; targets} =
   let cache_dir = unwrap_or "_build/.dryunit" cache_dir in
   let ignore = unwrap_or "" ignore in
   let filter = unwrap_or "" filter in
   let ignore_path = unwrap_or "" ignore_path in
-  let framework = TestFramework.of_string (unwrap_or "altotest" framework) in
+  let framework = TestFramework.of_string (unwrap_or default_framework framework) in
+  let targets = if List.length targets == 0 then [ "main.ml" ] else targets in
   List.iter
-    ( fun main ->
-        App.get_suites ~nocache ~framework ~cache_dir ~ignore ~filter ~targets
-          ~ignore_path ~detection:"dir" ~main |>
-        ( fun suites ->
-          ()
-        )
+    ( fun target ->
+        let suites = App.get_suites ~nocache ~framework ~cache_dir ~ignore ~filter ~targets
+          ~ignore_path ~detection:"dir" ~main:target in
+        App.gen_executable framework suites target
     )
     targets;
   `Ok ()

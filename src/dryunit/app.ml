@@ -87,12 +87,7 @@ let throw s =
   exit 1
 
 
-let get_suites ~nocache ~framework ~cache_dir ~ignore ~filter ~targets ~ignore_path ~detection ~main =
-  let _f =
-    ( match framework with
-      | TestFramework.Alcotest -> ignore
-      | TestFramework.OUnit -> ignore
-    ) in
+let get_suites ~nocache ~framework ~cache_dir ~ignore ~filter ~targets ~ignore_path ~detection ~main : TestSuite.t list =
   let custom_dir =
     if (cache_dir = ".dryunit") || (cache_dir = "_build/.dryunit") then None
     else
@@ -115,5 +110,12 @@ let get_suites ~nocache ~framework ~cache_dir ~ignore ~filter ~targets ~ignore_p
   |> apply_filters ~filter ~ignore
 
 
-let gen_executable () =
-  ""
+let gen_executable framework suites path =
+  let oc = open_out path in
+  let f =
+    ( match framework with
+      | TestFramework.Alcotest -> Core_serializer.boot_alcotest
+      | TestFramework.OUnit ->  Core_serializer.boot_ounit
+    ) in
+    f oc suites;
+    close_out oc
