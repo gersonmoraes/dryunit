@@ -81,7 +81,36 @@ let clean () =
     Unix.rmdir dir
   )
 
-let boot_alcotest () =
-  Core_serializer.boot_alcotest stdout []
+let throw s =
+  Printf.eprintf s;
+  exit 1
 
-  
+
+let boot ~nocache ~framework ~cache_dir ~ignore ~filter ~targets ~ignore_path ~detection =
+  let f =
+    ( match framework with
+      | "alcotest" -> ignore
+      | "ounit" -> ignore
+      | _ -> throw (format "Test framework not recognized: `%s`" framework)
+    ) in
+  let custom_dir =
+    if (cache_dir = ".dryunit") || (cache_dir = "_build/.dryunit") then None
+    else
+    ( if Core_util.starts_with cache_dir Filename.dir_sep then
+        let () = mkdir_p cache_dir in
+        Some cache_dir
+      else
+        throw ("Cache directory must be \".dryunit\" or a full custom path. Current value is `" ^ cache_dir ^ "`");
+    ) in
+  let ignore = filter_from ~throw ~name:"ignore" ignore in
+  let filter = filter_from ~throw ~name:"filter" filter in
+  let ignore_path = filter_from ~throw ~name:"ignore_path" ignore_path in
+  let suites =
+    let filename = !Location.input_name in
+    ( match detection with
+      | "dir" -> detect_suites ~filename ~custom_dir ~cache_active ~ignore_path
+      | "file" -> [ suite_from ~dir:(Filename.dirname filename) (Filename.basename filename) ]
+      | _ -> throw "The field `detection` only accepts \"dir\" or \"file\"."
+    ) in
+  validate_filters ~throw ~ignore ~filter;
+  f (apply_filters ~filter ~ignore suites)
