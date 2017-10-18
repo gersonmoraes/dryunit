@@ -22,7 +22,7 @@
 #endif
 
 
-module Capitalize = struct
+module Core_capitalize = struct
 #if OCAML_VERSION < (4, 03, 0)
   let capitalize_ascii = String.capitalize
 #else
@@ -35,9 +35,6 @@ module Ppx_dryunit_runtime = struct
 (* ============================| SHARED CODE |============================ *)
 module Core_util = struct
 #include "../dryunit/core_util.ml"
-end
-module Core_types = struct
-#include "../dryunit/core_types.ml"
 end
 #include "../dryunit/core_runtime.ml"
 
@@ -83,6 +80,8 @@ open Ast_helper
 open Ppx_dryunit_runtime
 open Ppx_dryunit_runtime.Core_util
 
+open TestSuite
+open TestDescription
 
 let bootstrap_alcotest suites =
   suites |>
