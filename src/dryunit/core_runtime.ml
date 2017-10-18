@@ -222,3 +222,75 @@ end
 
 let extract_name_from_file ~filename =
   capitalize_ascii
+
+let mkdir_p dir =
+  split sep dir |>
+  List.fold_left
+  ( fun acc basename ->
+    let path = acc ^ sep ^ basename in
+    if not (Sys.file_exists path) then
+      Unix.mkdir path 0o755;
+    path
+  )
+  "" |>
+  ignore
+
+
+let filter_from ~throwf ~name value : string list =
+  let l = split " " value in
+  List.iter
+    ( fun v ->
+      if String.length v < 4 then
+        throwf (format "Each word in the field `%s` must be at least 3 chars long" name);
+      if v = "test" then
+        throwf (format "You are not allowed to use the word `test` in the field `%s`" name)
+    )
+    l;
+  l
+
+
+let should_ignore ~ignore name =
+  match ignore with
+  | [] -> assert false
+  | _ -> List.exists (fun v -> Core_util.is_substring name v) ignore
+
+let should_filter ~filter name =
+  match filter with
+  | [] -> assert false
+  | _ -> List.exists (fun v -> Core_util.is_substring name v) filter
+
+
+let apply_filters ~filter ~ignore suites =
+  let filter_tests tests =
+    ( if List.length ignore == 0 then tests
+      else
+        List.filter (fun test -> not (should_ignore ~ignore test.test_name)) tests
+    ) |>
+    fun tests ->
+    ( if List.length filter == 0 then tests
+      else
+        List.filter (fun test -> should_filter ~filter test.test_name) tests
+    )
+  in
+  ( List.fold_left
+      ( fun acc suite ->
+        match filter_tests suite.tests with
+        | [] -> acc
+        | active_tests -> { suite with tests = active_tests } :: acc
+      )
+      []
+      suites
+  )
+
+let validate_filters ~throwf ~ignore ~filter =
+  match ignore, filter with
+  | [], [] -> ()
+  | _v, [] -> ()
+  | [], _v -> ()
+  | _ ->
+    List.iter
+      ( fun v_filter ->
+        if List.exists (fun v -> v_filter = v) ignore then
+          throwf (format "Query `%s` appears in the fields `filter` and `ignore`." v_filter)
+      )
+      filter

@@ -123,85 +123,14 @@ let bootstrap_ounit suites =
     app (evar "OUnit2.run_test_tt_main") [ app (evar "OUnit2.>:::") [str "Default"; list tests] ]
   )
 
-let mkdir_p dir =
-  split sep dir |>
-  List.fold_left
-  ( fun acc basename ->
-    let path = acc ^ sep ^ basename in
-    if not (Sys.file_exists path) then
-      Unix.mkdir path 0o755;
-    path
-  )
-  "" |>
-  ignore
-
-
-let filter_from ~loc ~name value : string list =
-  let l = split " " value in
-  List.iter
-    ( fun v ->
-      if String.length v < 4 then
-        throw ~loc (format "Each word in the field `%s` must be at least 3 chars long" name);
-      if v = "test" then
-        throw ~loc (format "You are not allowed to use the word `test` in the field `%s`" name)
-    )
-    l;
-  l
-
-
-let should_ignore ~ignore name =
-  match ignore with
-  | [] -> assert false
-  | _ -> List.exists (fun v -> Core_util.is_substring name v) ignore
-
-let should_filter ~filter name =
-  match filter with
-  | [] -> assert false
-  | _ -> List.exists (fun v -> Core_util.is_substring name v) filter
-
-
-let apply_filters ~loc ~filter ~ignore suites =
-  let filter_tests tests =
-    ( if List.length ignore == 0 then tests
-      else
-        List.filter (fun test -> not (should_ignore ~ignore test.test_name)) tests
-    ) |>
-    fun tests ->
-    ( if List.length filter == 0 then tests
-      else
-        List.filter (fun test -> should_filter ~filter test.test_name) tests
-    )
-  in
-  ( List.fold_left
-      ( fun acc suite ->
-        match filter_tests suite.tests with
-        | [] -> acc
-        | active_tests -> { suite with tests = active_tests } :: acc
-      )
-      []
-      suites
-  )
-
-let validate_filters ~loc ~ignore ~filter =
-  match ignore, filter with
-  | [], [] -> ()
-  | _v, [] -> ()
-  | [], _v -> ()
-  | _ ->
-    List.iter
-      ( fun v_filter ->
-        if List.exists (fun v -> v_filter = v) ignore then
-          throw ~loc (format "Query `%s` appears in the fields `filter` and `ignore`." v_filter)
-      )
-      filter
-
 
 let boot ~loc ~cache_dir ~cache_active ~framework ~ignore ~filter ~detection ~ignore_path =
+  let throwf = throw ~loc in
   let f =
     ( match framework with
       | "alcotest" -> bootstrap_alcotest
       | "ounit" -> bootstrap_ounit
-      | _ -> throw ~loc (format "Test framework not recognized: `%s`" framework)
+      | _ -> throwf (format "Test framework not recognized: `%s`" framework)
     ) in
   let custom_dir =
     if (cache_dir = ".dryunit") || (cache_dir = "_build/.dryunit") then None
@@ -210,20 +139,22 @@ let boot ~loc ~cache_dir ~cache_active ~framework ~ignore ~filter ~detection ~ig
         let () = mkdir_p cache_dir in
         Some cache_dir
       else
-        throw ~loc ("Cache directory must be \".dryunit\" or a full custom path. Current value is `" ^ cache_dir ^ "`");
+        throwf ("Cache directory must be \".dryunit\" or a full custom path. Current value is `" ^ cache_dir ^ "`");
     ) in
-  let ignore = filter_from ~loc ~name:"ignore" ignore in
-  let filter = filter_from ~loc ~name:"filter" filter in
-  let ignore_path = filter_from ~loc ~name:"ignore_path" ignore_path in
+  let ignore = filter_from ~throwf ~name:"ignore" ignore in
+  let filter = filter_from ~throwf ~name:"filter" filter in
+  let ignore_path = filter_from ~throwf ~name:"ignore_path" ignore_path in
   let suites =
     let filename = !Location.input_name in
     ( match detection with
       | "dir" -> detect_suites ~filename ~custom_dir ~cache_active ~ignore_path
       | "file" -> [ suite_from ~dir:(Filename.dirname filename) (Filename.basename filename) ]
-      | _ -> throw ~loc "The field `detection` only accepts \"dir\" or \"file\"."
+      | _ -> throwf "The field `detection` only accepts \"dir\" or \"file\"."
     ) in
-  validate_filters ~loc ~ignore ~filter;
-  f (apply_filters ~loc ~filter ~ignore suites)
+  validate_filters ~throwf ~ignore ~filter;
+  f (apply_filters ~filter ~ignore suites)
+
+
 
 
 let rewriter _config _cookies =
