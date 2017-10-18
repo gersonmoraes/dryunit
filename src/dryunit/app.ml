@@ -56,9 +56,9 @@ let init () =
 (rule
  ((targets (main.ml))
   ;;
-  ;; Uncomment for change detection:
+  ;; Change detection:
   ;;
-  ;; (deps (FILE1.ml FILE2.ml))
+  (deps ( (glob_files *_tests.ml) (glob_files *_Tests.ml) ))
   ;;
   (action  (with-stdout-to ${@} (run
     dryunit gen --framework alcotest

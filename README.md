@@ -39,7 +39,7 @@ This is the content of the command `dryunit init`:
   ;;
   ;; Uncomment for change detection:
   ;;
-  ;; (deps (FILE1.ml FILE2.ml))
+  (deps ( (glob_files *_tests.ml) (glob_files *_Tests.ml) ))
   ;;
   (action  (with-stdout-to ${@} (run
     dryunit gen --framework alcotest
