@@ -17,7 +17,7 @@ let mkdir_p dir =
   "" |>
   ignore
 
-let gen ~nocache ~framework ~cache_dir ~ignore ~filter ~targets ~ignore_path =
+let gen_extension ~nocache ~framework ~cache_dir ~ignore ~filter ~targets ~ignore_path =
   let _ = framework_from framework in
   let detection = "dir" in
   let get_int () =
@@ -86,7 +86,7 @@ let throw s =
   exit 1
 
 
-let boot ~nocache ~framework ~cache_dir ~ignore ~filter ~targets ~ignore_path ~detection =
+let get_suites ~nocache ~framework ~cache_dir ~ignore ~filter ~targets ~ignore_path ~detection ~main =
   let f =
     ( match framework with
       | "alcotest" -> ignore
@@ -105,12 +105,14 @@ let boot ~nocache ~framework ~cache_dir ~ignore ~filter ~targets ~ignore_path ~d
   let ignore = filter_from ~throw ~name:"ignore" ignore in
   let filter = filter_from ~throw ~name:"filter" filter in
   let ignore_path = filter_from ~throw ~name:"ignore_path" ignore_path in
-  let suites =
-    let filename = !Location.input_name in
-    ( match detection with
-      | "dir" -> detect_suites ~filename ~custom_dir ~cache_active ~ignore_path
-      | "file" -> [ suite_from ~dir:(Filename.dirname filename) (Filename.basename filename) ]
-      | _ -> throw "The field `detection` only accepts \"dir\" or \"file\"."
-    ) in
   validate_filters ~throw ~ignore ~filter;
-  f (apply_filters ~filter ~ignore suites)
+  let filename = main in
+  ( match detection with
+    | "dir" -> detect_suites ~filename ~custom_dir ~cache_active ~ignore_path
+    | "file" -> [ suite_from ~dir:(Filename.dirname filename) (Filename.basename filename) ]
+    | _ -> throw "The field `detection` only accepts \"dir\" or \"file\"."
+  )
+  |> apply_filters ~filter ~ignore
+
+  
+let gen_executable

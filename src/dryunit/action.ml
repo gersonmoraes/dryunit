@@ -4,9 +4,6 @@ let init () =
     App.init ();
     `Ok ()
 
-let init2 () =
-    App.boot_alcotest ();
-    `Ok ()
 
 let help man_format cmds topic =
   match topic with
@@ -42,7 +39,8 @@ let catch f () =
   with
    Failure e -> `Error (false, e)
 
-let gen { nocache; framework; cache_dir; ignore; filter; ignore_path; targets} =
+(* move this to App.gen_extension *) 
+let gen_extension { nocache; framework; cache_dir; ignore; filter; ignore_path; targets} =
   let cache_dir = unwrap_or "_build/.dryunit" cache_dir in
   let ignore = unwrap_or "" ignore in
   let filter = unwrap_or "" filter in
@@ -50,5 +48,9 @@ let gen { nocache; framework; cache_dir; ignore; filter; ignore_path; targets} =
   let framework = unwrap_or "alcotest" framework in
   catch
     ( fun () ->
-      App.gen ~nocache ~framework ~cache_dir ~ignore ~filter ~ignore_path ~targets
+      App.gen_extension ~nocache ~framework ~cache_dir ~ignore ~filter ~ignore_path ~targets
     ) ()
+
+let gen_executable gen_opts =
+  let suites = App.get_suites  in
+  `Ok ()
