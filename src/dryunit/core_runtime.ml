@@ -2,26 +2,26 @@ open Printf
 open Core_capitalize
 open Core_util
 
+module TestDescription = struct
+  type t = {
+    test_name: string;
+    test_title: string;
+  }
+end
 
-open Core_util
+module TestSuite = struct
+  type t = {
+    suite_title: string;
+    suite_name: string;
+    suite_path: string;
+    timestamp: float;
+    tests: TestDescription.t list;
+  }
+end
 
+open TestDescription
+open TestSuite
 
-
-
-(* =========================| SHARED |========================= *)
-
-type test = {
-  test_name: string;
-  test_title: string;
-}
-
-type testsuite = {
-  suite_title: string;
-  suite_name: string;
-  suite_path: string;
-  timestamp: float;
-  tests: test list;
-}
 
 let title_from v = capitalize_ascii @@ title_from v
 let title_from_no_padding v = capitalize_ascii @@ title_from_filename v
@@ -58,7 +58,7 @@ let rec should_ignore_path ~filter path =
       | _ -> List.exists (fun v -> Core_util.is_substring path v) filter
     )
 
-let extract_from ~filename : test list =
+let extract_from ~filename : TestDescription.t list =
   tests_from filename |>
   List.map
   (fun test_name ->
@@ -69,7 +69,7 @@ let extract_from ~filename : test list =
 let timestamp_from filename =
   Unix.((stat filename).st_mtime)
 
-let suite_from ~dir filename : testsuite =
+let suite_from ~dir filename : TestSuite.t =
   let name = (Filename.basename filename) in
   { suite_name = capitalize_ascii (Filename.chop_suffix name ".ml");
     suite_title = title_from_no_padding (Filename.chop_suffix name ".ml");
@@ -137,13 +137,13 @@ let load_cache ~main ~custom_dir ~cache_active =
   let path = cache_file ~main ~custom_dir in
   if cache_active && Sys.file_exists path then
   ( let c = open_in_bin path in
-    let suites : testsuite list = Marshal.from_channel c in
+    let suites : TestSuite.t list = Marshal.from_channel c in
     close_in c;
     suites
   )
   else []
 
-let get_from_cache ~cache ~dir filename : testsuite option =
+let get_from_cache ~cache ~dir filename : TestSuite.t option =
   try
     let filename = dir ^ sep ^ filename in
     List.find
@@ -160,7 +160,7 @@ let get_from_cache ~cache ~dir filename : testsuite option =
   with
     Not_found -> None
 
-let detect_suites ~filename ~custom_dir ~cache_active ~ignore_path : testsuite list =
+let detect_suites ~filename ~custom_dir ~cache_active ~ignore_path : TestSuite.t list =
   let cache = load_cache ~main:filename ~custom_dir ~cache_active in
   let cache_dirty = ref false in
   let dir = Filename.dirname filename in
@@ -216,8 +216,8 @@ let print_tests_from ~filename : string =
 
 
 module Test = struct
-  let name (t:test) = t.test_name
-  let title (t:test) = t.test_title
+  let name (t:TestDescription.t) = t.test_name
+  let title (t:TestDescription.t) = t.test_title
 end
 
 let extract_name_from_file ~filename =
