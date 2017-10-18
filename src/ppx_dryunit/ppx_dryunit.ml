@@ -31,11 +31,11 @@ module Capitalize = struct
 end
 
 module Ppx_dryunit_runtime = struct
-module Util = struct
-#include "../dryunit/util.ml"
+module Core_util = struct
+#include "../dryunit/core_util.ml"
 end
 
-#include "../dryunit/runtime.ml"
+#include "../dryunit/core_runtime.ml"
 end
 
 open Migrate_parsetree
@@ -48,7 +48,7 @@ open Ast_convenience
 
 open Ast_helper
 open Ppx_dryunit_runtime
-open Ppx_dryunit_runtime.Util
+open Ppx_dryunit_runtime.Core_util
 
 
 let bootstrap_alcotest suites =
@@ -120,12 +120,12 @@ let filter_from ~loc ~name value : string list =
 let should_ignore ~ignore name =
   match ignore with
   | [] -> assert false
-  | _ -> List.exists (fun v -> Util.is_substring name v) ignore
+  | _ -> List.exists (fun v -> Core_util.is_substring name v) ignore
 
 let should_filter ~filter name =
   match filter with
   | [] -> assert false
-  | _ -> List.exists (fun v -> Util.is_substring name v) filter
+  | _ -> List.exists (fun v -> Core_util.is_substring name v) filter
 
 
 let apply_filters ~loc ~filter ~ignore suites =
@@ -174,7 +174,7 @@ let boot ~loc ~cache_dir ~cache_active ~framework ~ignore ~filter ~detection ~ig
   let custom_dir =
     if (cache_dir = ".dryunit") || (cache_dir = "_build/.dryunit") then None
     else
-    ( if Util.starts_with cache_dir Filename.dir_sep then
+    ( if Core_util.starts_with cache_dir Filename.dir_sep then
         let () = mkdir_p cache_dir in
         Some cache_dir
       else

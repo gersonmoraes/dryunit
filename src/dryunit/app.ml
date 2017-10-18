@@ -2,7 +2,7 @@
   Our cmd-free app definitions and models
 *)
 
-open Util
+open Core_util
 open Types
 
 let mkdir_p dir =

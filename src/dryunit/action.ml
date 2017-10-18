@@ -1,4 +1,4 @@
-open Util
+open Core_util
 
 let init () =
     App.init ();

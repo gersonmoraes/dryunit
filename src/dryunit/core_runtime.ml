@@ -1,6 +1,6 @@
 open Printf
 open Capitalize
-open Util
+open Core_util
 
 (* ext *)
 let throw ~loc msg =
@@ -34,7 +34,7 @@ let validate_params ~loc (current: record_fields) expected_fields =
     throw ~loc (format "Unknown configuration field: `%s`." (param expected_len))
 
 
-open Util
+open Core_util
 
 
 let sep = Filename.dir_sep
@@ -62,7 +62,7 @@ let in_build_dir () =
 let should_ignore ~ignore name =
   match ignore with
   | [] -> false
-  | _ -> List.exists (fun v -> Util.is_substring name v) ignore
+  | _ -> List.exists (fun v -> Core_util.is_substring name v) ignore
 
 
 let protected_namespace path =
@@ -85,7 +85,7 @@ let rec should_ignore_path ~filter path =
   else
     ( match filter with
       | [] -> false
-      | _ -> List.exists (fun v -> Util.is_substring path v) filter
+      | _ -> List.exists (fun v -> Core_util.is_substring path v) filter
     )
 
 let extract_from ~filename : test list =
