@@ -31,6 +31,10 @@ module Capitalize = struct
 end
 
 module Ppx_dryunit_runtime = struct
+module Util = struct
+#include "../dryunit/util.ml"
+end
+
 #include "../dryunit/runtime.ml"
 end
 
@@ -44,6 +48,7 @@ open Ast_convenience
 
 open Ast_helper
 open Ppx_dryunit_runtime
+open Ppx_dryunit_runtime.Util
 
 
 let bootstrap_alcotest suites =
