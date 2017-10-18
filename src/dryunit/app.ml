@@ -3,7 +3,8 @@
 *)
 
 open Core_util
-open Types
+open Printf
+open Core_runtime
 
 let mkdir_p dir =
   split Filename.dir_sep dir |>
@@ -18,13 +19,13 @@ let mkdir_p dir =
   ignore
 
 let gen_extension ~nocache ~framework ~cache_dir ~ignore ~filter ~targets ~ignore_path =
-  let _ = framework_from framework in
+  let _ = TestFramework.of_string framework in
   let detection = "dir" in
   let get_int () =
     (Random.int 9999) + 1 in
   let msg = "This file is supposed to be generated before build with a random ID." in
-  let id = format "%d%d%d" (get_int ()) (get_int ()) (get_int ()) in
-  ( format "(*\n  %s\n  ID = %s\n*)\nlet () =\n  [%%dryunit\n    { cache_dir   = \"%s\"\n    ; cache       = %s\n    ; framework   = \"%s\"\n    ; ignore      = \"%s\"\n    ; filter      = \"%s\"\n    ; detection   = \"%s\"\n    ; ignore_path = \"%s\"\n    }\n  ]\n"
+  let id = sprintf "%d%d%d" (get_int ()) (get_int ()) (get_int ()) in
+  ( sprintf "(*\n  %s\n  ID = %s\n*)\nlet () =\n  [%%dryunit\n    { cache_dir   = \"%s\"\n    ; cache       = %s\n    ; framework   = \"%s\"\n    ; ignore      = \"%s\"\n    ; filter      = \"%s\"\n    ; detection   = \"%s\"\n    ; ignore_path = \"%s\"\n    }\n  ]\n"
       msg id cache_dir (string_of_bool @@ not nocache) framework ignore filter detection ignore_path
   ) |>
   fun output ->
@@ -82,16 +83,15 @@ let clean () =
   )
 
 let throw s =
-  Printf.eprintf s;
+  Printf.eprintf "%s\n" s;
   exit 1
 
 
 let get_suites ~nocache ~framework ~cache_dir ~ignore ~filter ~targets ~ignore_path ~detection ~main =
-  let f =
+  let _f =
     ( match framework with
-      | "alcotest" -> ignore
-      | "ounit" -> ignore
-      | _ -> throw (format "Test framework not recognized: `%s`" framework)
+      | TestFramework.Alcotest -> ignore
+      | TestFramework.OUnit -> ignore
     ) in
   let custom_dir =
     if (cache_dir = ".dryunit") || (cache_dir = "_build/.dryunit") then None
@@ -108,11 +108,12 @@ let get_suites ~nocache ~framework ~cache_dir ~ignore ~filter ~targets ~ignore_p
   validate_filters ~throw ~ignore ~filter;
   let filename = main in
   ( match detection with
-    | "dir" -> detect_suites ~filename ~custom_dir ~cache_active ~ignore_path
+    | "dir" -> detect_suites ~filename ~custom_dir ~cache_active:true ~ignore_path
     | "file" -> [ suite_from ~dir:(Filename.dirname filename) (Filename.basename filename) ]
     | _ -> throw "The field `detection` only accepts \"dir\" or \"file\"."
   )
   |> apply_filters ~filter ~ignore
 
-  
-let gen_executable
+
+let gen_executable () =
+  ""

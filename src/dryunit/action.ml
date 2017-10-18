@@ -1,4 +1,5 @@
 open Core_util
+open Core_runtime
 
 let init () =
     App.init ();
@@ -39,7 +40,7 @@ let catch f () =
   with
    Failure e -> `Error (false, e)
 
-(* move this to App.gen_extension *) 
+(* move this to App.gen_extension *)
 let gen_extension { nocache; framework; cache_dir; ignore; filter; ignore_path; targets} =
   let cache_dir = unwrap_or "_build/.dryunit" cache_dir in
   let ignore = unwrap_or "" ignore in
@@ -51,6 +52,19 @@ let gen_extension { nocache; framework; cache_dir; ignore; filter; ignore_path; 
       App.gen_extension ~nocache ~framework ~cache_dir ~ignore ~filter ~ignore_path ~targets
     ) ()
 
-let gen_executable gen_opts =
-  let suites = App.get_suites  in
+let gen_executable { nocache; framework; cache_dir; ignore; filter; ignore_path; targets} =
+  let cache_dir = unwrap_or "_build/.dryunit" cache_dir in
+  let ignore = unwrap_or "" ignore in
+  let filter = unwrap_or "" filter in
+  let ignore_path = unwrap_or "" ignore_path in
+  let framework = TestFramework.of_string (unwrap_or "altotest" framework) in
+  List.iter
+    ( fun main ->
+        App.get_suites ~nocache ~framework ~cache_dir ~ignore ~filter ~targets
+          ~ignore_path ~detection:"dir" ~main |>
+        ( fun suites ->
+          ()
+        )
+    )
+    targets;
   `Ok ()

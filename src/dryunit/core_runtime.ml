@@ -19,6 +19,19 @@ module TestSuite = struct
   }
 end
 
+module TestFramework = struct
+  type t = Alcotest | OUnit
+
+  let of_string = function
+    | "alcotest" -> Alcotest
+    | "ounit" -> OUnit
+    | other -> raise (Invalid_argument ("Not supported test framework: " ^ other))
+
+  let to_string = function
+    | Alcotest -> "alcotest"
+    | OUnit -> "ounit"
+end
+
 open TestDescription
 open TestSuite
 
@@ -236,14 +249,14 @@ let mkdir_p dir =
   ignore
 
 
-let filter_from ~throwf ~name value : string list =
+let filter_from ~throw ~name value : string list =
   let l = split " " value in
   List.iter
     ( fun v ->
       if String.length v < 4 then
-        throwf (format "Each word in the field `%s` must be at least 3 chars long" name);
+        throw (format "Each word in the field `%s` must be at least 3 chars long" name);
       if v = "test" then
-        throwf (format "You are not allowed to use the word `test` in the field `%s`" name)
+        throw (format "You are not allowed to use the word `test` in the field `%s`" name)
     )
     l;
   l
@@ -282,7 +295,7 @@ let apply_filters ~filter ~ignore suites =
       suites
   )
 
-let validate_filters ~throwf ~ignore ~filter =
+let validate_filters ~throw ~ignore ~filter =
   match ignore, filter with
   | [], [] -> ()
   | _v, [] -> ()
@@ -291,6 +304,6 @@ let validate_filters ~throwf ~ignore ~filter =
     List.iter
       ( fun v_filter ->
         if List.exists (fun v -> v_filter = v) ignore then
-          throwf (format "Query `%s` appears in the fields `filter` and `ignore`." v_filter)
+          throw (format "Query `%s` appears in the fields `filter` and `ignore`." v_filter)
       )
       filter

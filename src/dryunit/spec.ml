@@ -58,7 +58,7 @@ let init_cmd =
   Term.info "init" ~doc ~sdocs:Manpage.s_common_options ~exits ~man
 
 
-let init2_cmd =
+let gen_executable_cmd =
   let doc = "shows a template configuration" in
   let exits = Term.default_exits in
   let man = [
@@ -66,7 +66,7 @@ let init2_cmd =
     `P "Creates a dryunit.toml configuration file";
     `Blocks help_secs; ]
   in
-  Term.(ret (const Action.(catch init2) $ const ())),
+  Term.(ret (const Action.gen_executable $ gen_opts_t)),
   Term.info "init2" ~doc ~sdocs:Manpage.s_common_options ~exits ~man
 
 
@@ -79,7 +79,7 @@ let gen_cmd =
     `P "Creates the code to activate dryunit before building the tests";
     `Blocks help_secs; ]
   in
-  Term.(ret (const Action.gen $ gen_opts_t)),
+  Term.(ret (const Action.gen_extension $ gen_opts_t)),
   Term.info "gen" ~doc ~sdocs:Manpage.s_common_options ~exits ~man
 
 
@@ -122,4 +122,4 @@ let default_cmd ~version =
   Term.(ret (const (fun _ -> `Help (`Pager, None)) $ const ())),
   Term.info "dryunit" ~version ~doc ~sdocs ~exits ~man
 
-let cmds = [init_cmd; init2_cmd; gen_cmd; clean_cmd; help_cmd]
+let cmds = [init_cmd; gen_executable_cmd; gen_cmd; clean_cmd; help_cmd]
