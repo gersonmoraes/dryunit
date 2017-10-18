@@ -2,43 +2,13 @@ open Printf
 open Capitalize
 open Core_util
 
-(* ext *)
-let throw ~loc msg =
-  raise (Location.Error (Location.error ~loc msg))
-
-(* ext *)
-type record_fields = (Longident.t Asttypes.loc *  Parsetree.expression) list
-
-(* ext *)
-let validate_params ~loc (current: record_fields) expected_fields =
-  let param n =
-    ( match fst @@ List.nth current n with
-      | {txt = Lident current} -> current
-      | _ -> throw ~loc ("Unexpected structure")
-    ) in
-  let check_param n expected =
-    let current =
-      ( try param n with
-        | _ -> throw ~loc ("Missing configuration: " ^ expected)
-      ) in
-    if not (current = expected) then
-      throw ~loc (format "I was expecting `%s`, but found `%s`." expected current)
-  in
-  List.iteri
-    ( fun i name ->
-      check_param i name
-    )
-    expected_fields;
-  let expected_len = List.length expected_fields in
-  if List.length current > expected_len then
-    throw ~loc (format "Unknown configuration field: `%s`." (param expected_len))
-
 
 open Core_util
 
 
-let sep = Filename.dir_sep
 
+
+(* =========================| SHARED |========================= *)
 
 type test = {
   test_name: string;
@@ -113,9 +83,6 @@ let test_name ~current_module suite test =
     test.test_name
   else
     (suite.suite_name ^ "." ^ test.test_name)
-
-let split pattern value =
-  Str.split (Str.regexp pattern) value
 
 let cache_dir () =
   let flag_ref = ref false in

@@ -10,6 +10,8 @@ let unwrap_or default = function
 let split pattern value =
   Str.split (Str.regexp pattern) value
 
+let sep = Filename.dir_sep
+
 let is_substring string substring =
   let string, substring = Bytes.of_string string, Bytes.of_string substring in
   let ssl = Bytes.length substring and sl = Bytes.length string in
