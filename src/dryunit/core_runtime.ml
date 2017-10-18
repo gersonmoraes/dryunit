@@ -1,5 +1,5 @@
 open Printf
-open Capitalize
+open Core_capitalize
 open Core_util
 
 

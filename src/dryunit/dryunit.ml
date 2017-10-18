@@ -6,6 +6,7 @@ let _ =
   let open Spec in
   let open App in
   let open Action in
+  let open Core_serializer in
   ()
 
 let () =
