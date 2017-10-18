@@ -80,3 +80,6 @@ let clean () =
       ( Sys.readdir dir );
     Unix.rmdir dir
   )
+
+let boot_alcotest () =
+  Core_serializer.boot_alcotest stdout []

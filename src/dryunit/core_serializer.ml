@@ -4,9 +4,9 @@ open Printf
 open TestSuite
 open TestDescription
 
-let boot_alcotest ~oc suites =
+let boot_alcotest oc suites : unit =
   fprintf oc "let () =\n";
-  fprintf oc "  Alcotest.run \"Name for the starter module\" [\n";
+  fprintf oc "  Alcotest.run \"Main\" [\n";
   List.iter
     ( fun suite ->
       fprintf oc "    \"%s\", [\n" suite.suite_path;
@@ -19,3 +19,4 @@ let boot_alcotest ~oc suites =
     )
     suites;
 fprintf oc "  ]\n";
+flush oc

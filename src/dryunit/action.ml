@@ -4,6 +4,10 @@ let init () =
     App.init ();
     `Ok ()
 
+let init2 () =
+    App.boot_alcotest ();
+    `Ok ()
+
 let help man_format cmds topic =
   match topic with
   | None -> `Help (`Pager, None) (* help about the program. *)
