@@ -2,7 +2,7 @@
 
 Dryunit is a tool that allows you to test OCaml code using *Convention over Configuration*.
 
-Your tests are put first, so TDD can get out of your way. We wanted to get the project right and be *dry*. That's why the first implementations of does not implement a test framework. You are invited to use [Alcotest][] or [OUnit][] for that.
+Your tests are put first, so TDD can get out of your way. We wanted to get the project right and be *dry*. That is why the first implementations do not implement a test framework. You are invited to use [Alcotest][] or [OUnit][] for that.
 
 The big advantage of traditional testing over alternatives is that ***you get to use pure OCaml***. Free of enhancements. Using the exact same syntax you do everything else. Your tests are independent but can use anything in their context. *It's just OCaml, do whatever way you want*.
 
@@ -13,7 +13,7 @@ Conventions are minimal, but necessary. They allow for a good visual distinction
 
 - All files containing tests should be either called `tests.ml` or `something_tests.ml`.
 - All test function names must start with `test`.
-- By default, test executables are created per directory and are called `main`.
+- By default, test executables are created per directory and are called `main`. But you do not need to ever see this file.
 
 ## Quickstart
 
@@ -30,7 +30,7 @@ mkdir tests
 dryunit init alcotest > tests/jbuild
 ```
 
-You don't need any other configuration. The generated rules will define the executable `tests/main.exe` ready for Alcotest.
+No other configuration is required. The generated rules will define the executable `tests/main.exe` ready for Alcotest.
 
 ## Configuration
 
@@ -43,7 +43,7 @@ This is the content of the command `dryunit init`:
 
 (rule
  ((targets (main.ml))
-  (deps ( (glob_files *_tests.ml) (glob_files *_Tests.ml) ))
+  (deps ( (glob_files *tests.ml) (glob_files *Tests.ml) ))
   (action  (with-stdout-to ${@} (run dryunit gen
     --framework alcotest
     ;; --filter "space separated list"
@@ -52,9 +52,7 @@ This is the content of the command `dryunit init`:
   )))))
 ```
 
-
-
-It defaults to a configuration for a test executable `main.exe` based on Alcotest. By default, this file does not need to be created among your test files.
+It defines an executable `main.exe` based on the default framework. A rule to generate and update this file is also defined. In comments you see some configurations passed to the executable before build. For more definitions use `dryunit help` or `dryunit COMMAND - - help`. 
 
 It also shows helpful information on comments, describing how to setup simple changing detection for a list of files, and in the end, how to filter or ignore some tests.
 
@@ -92,7 +90,7 @@ let () =
 
 ## Implementation details
 
-- At build time, dryunit will check anything that look like a test file in the build context and check its internal cache mechanism for preprocessed suites.
+- At build time, dryunit will check anything that looks like a test file in the build context and check its internal cache mechanism for preprocessed suites.
 - If none is found, an instance of OCaml parser will be created to extract a structured representation of the test file.
 - Cache is done in one file for the whole directory. Updated according to timestamps. Default directory is (`_build/.dryunit`).
 - The extension does nothing if outside a build directory.
