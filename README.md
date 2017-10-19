@@ -67,7 +67,7 @@ The simplest way to use it is adding this line at the end of your file `main.ml`
 let () = [%dryunit]
 ```
 
-That will generate a default configuration that only sees the current file. You can override default behavior passing arguments through a record, as shown below. All fields are optionals and might be in any order.
+That will generate a default configuration that only sees the current file. You can override any default behavior passing arguments through a record, as shown below. All fields are optionals and might be in any order.
 
 ```ocaml
 let () =
@@ -76,7 +76,7 @@ let () =
     ; cache       = true
     ; framework   = "alcotest"
     ; ignore      = ""
-    ; filter         = ""
+    ; filter       = ""
     ; detection   = "file"
     ; ignore_path = "self"
     }
@@ -89,7 +89,7 @@ let () =
 
 - At build time, dryunit will check anything that looks like a test file in the build context and check its internal cache mechanism for preprocessed suites.
 - If none is found, an instance of OCaml parser will be created to extract a structured representation of the test file.
-- Cache is done in one file for the whole directory. Updated according to timestamps. Default directory is (`_build/.dryunit`).
+- Cache is done in one file for the whole directory. Updated according to timestamps and compiler version. Default directory is (`_build/.dryunit`).
 - The extension does nothing if outside a build directory.
 
 
