@@ -1,10 +1,9 @@
 open Core_util
 open Core_runtime
 
-let init () =
-    App.init ();
+let init_ext () =
+    Core_serializer.init_extension ();
     `Ok ()
-
 
 let help man_format cmds topic =
   match topic with
@@ -22,7 +21,11 @@ let help man_format cmds topic =
             `Ok (Cmdliner.Manpage.print man_format Format.std_formatter page)
       )
 
-
+(*
+  This options are used generate the code to:
+    - activate ppx_dryunit
+    - generate the final source code with bootstrap code
+*)
 type gen_opts =
   { nocache    : bool
   ; framework  : string option
@@ -32,6 +35,9 @@ type gen_opts =
   ; ignore_path: string option
   ; targets    : string list
   }
+
+type init_opts =
+  { framework: string option }
 
 let catch f () =
   try
@@ -66,4 +72,13 @@ let gen_executable default_framework { nocache; framework; cache_dir; ignore; fi
         App.gen_executable framework suites target
     )
     targets;
+  `Ok ()
+
+let init_executable { framework; } =
+  let framework =
+    match framework with
+    | None -> TestFramework.Alcotest
+    | Some f -> TestFramework.of_string f
+  in
+  Core_serializer.init_default framework;
   `Ok ()

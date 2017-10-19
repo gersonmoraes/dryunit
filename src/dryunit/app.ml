@@ -46,33 +46,6 @@ let gen_extension ~nocache ~framework ~cache_dir ~ignore ~filter ~targets ~ignor
     )
 
 
-let init () =
-  print_endline @@ String.trim @@ "
-(executables
- ((names (main))
-  (libraries (alcotest))
-  (preprocess (pps (ppx_dryunit)))))
-
-;; This rule generates the bootstrapping
-(rule
- ((targets (main.ml))
-  ;;
-  ;; Change detection:
-  ;;
-  (deps ( (glob_files *_tests.ml) (glob_files *_Tests.ml) ))
-  ;;
-  (action  (with-stdout-to ${@} (run
-    dryunit gen --framework alcotest
-    ;;
-    ;; Uncomment to configure:
-    ;;
-    ;;  --ignore \"space separated list\"
-    ;;  --filter \"space separated list\"
-    ;;  --ignore-path \"space separated list\"
-  )))))
-"
-
-
 let clean () =
   let dir = ".dryunit" in
   if Sys.file_exists dir && Sys.is_directory dir then

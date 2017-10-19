@@ -1,6 +1,5 @@
 open Cmdliner
 
-
 (* Help sections common to all commands *)
 
 let help_secs = [
@@ -42,6 +41,15 @@ let gen_opts_t =
   let targets = Arg.(value & pos_all string [] & info [] ~docv:"TARGET") in
   Term.(const gen_opts $ nocache $ framework $ cache_dir $ ignore $ filter $ ignore_path $ targets)
 
+let init_opts framework =
+  Action.({ framework; })
+let init_opts_t =
+  let docs = "Generate jbuild config template" in
+  let framework =
+    let doc = "Select a test framework." in
+    Arg.(value & opt (some string) None & info ["framework"] ~docs ~doc) in
+  Term.(const init_opts $ framework)
+
 
 (* Commands *)
 
@@ -54,7 +62,7 @@ let init_cmd =
     `P "Creates a dryunit.toml configuration file";
     `Blocks help_secs; ]
   in
-  Term.(ret (const Action.(catch init) $ const ())),
+  Term.(ret (const Action.init_executable $ init_opts_t)),
   Term.info "init" ~doc ~sdocs:Manpage.s_common_options ~exits ~man
 
 

@@ -44,10 +44,54 @@ flush oc
 
 
 
+let init_extension () =
+  print_endline @@ String.trim @@ "
+(executables
+ ((names (main))
+  (libraries (alcotest))
+  (preprocess (pps (ppx_dryunit)))))
 
+;; This rule generates the bootstrapping
+(rule
+ ((targets (main.ml))
+  ;;
+  ;; Change detection:
+  ;;
+  (deps ( (glob_files *_tests.ml) (glob_files *_Tests.ml) ))
+  ;;
+  (action  (with-stdout-to ${@} (run
+    dryunit gen --framework alcotest
+    ;;
+    ;; Uncomment to configure:
+    ;;
+    ;;  --ignore \"space separated list\"
+    ;;  --filter \"space separated list\"
+    ;;  --ignore-path \"space separated list\"
+  )))))
+"
 
+let init_default framework =
+  print_endline @@ String.trim @@ "
+(executables
+ ((names (main))
+  (libraries (alcotest))
+  (preprocess (pps (ppx_dryunit)))))
 
-
-
-
-(*  *)
+;; This rule generates the bootstrapping
+(rule
+ ((targets (main.ml))
+  ;;
+  ;; Change detection:
+  ;;
+  (deps ( (glob_files *_tests.ml) (glob_files *_Tests.ml) ))
+  ;;
+  (action  (with-stdout-to ${@} (run
+    dryunit " ^ TestFramework.to_string framework ^ "
+    ;;
+    ;; Uncomment to configure:
+    ;;
+    ;;  --ignore \"space separated list\"
+    ;;  --filter \"space separated list\"
+    ;;  --ignore-path \"space separated list\"
+  )))))
+"
