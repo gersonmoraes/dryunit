@@ -190,7 +190,7 @@ let validate_existing_params ~loc ~configs existing =
   List.iter
     ( function
       | ({txt = Lident id }, _)
-          when (List.find_opt ((=) id) existing) = None ->
+          when (find_opt ((=) id) existing) = None ->
           ( eprintf "Unsupported field: `%s`\n" id;
             exit 1;
           )
@@ -199,7 +199,7 @@ let validate_existing_params ~loc ~configs existing =
     configs
 
 let get_field (name:string) configs =
-  List.find_opt
+  find_opt
     ( function
       | ({txt = Lident id },
           {pexp_desc = Pexp_constant (_)}) when id = name -> true

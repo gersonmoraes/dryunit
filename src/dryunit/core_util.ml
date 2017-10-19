@@ -5,6 +5,10 @@ let unwrap_or default = function
   | Some v -> v
   | None -> default
 
+let find_opt f l =
+  try Some (List.find f l) with
+  | Not_found -> None
+
 let split pattern value =
   Str.split (Str.regexp pattern) value
 
