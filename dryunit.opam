@@ -16,5 +16,6 @@ build-test: []
 
 depends: [
   "jbuilder" {build}
+  "cppo" {build}
   "cmdliner" {>= "1.0.2"}
 ]
