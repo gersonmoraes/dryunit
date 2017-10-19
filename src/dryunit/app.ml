@@ -1,7 +1,7 @@
 (*
   Our cmd-free app definitions and models
 *)
-
+open Core_normalization
 open Core_util
 open Printf
 open Core_runtime

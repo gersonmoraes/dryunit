@@ -1,3 +1,4 @@
+open Core_normalization
 open Core_runtime
 open Printf
 

@@ -1,5 +1,5 @@
 (executables
-  ((names (main))
+  ((names (main normalize))
   (libraries (oUnit))))
 
 (rule

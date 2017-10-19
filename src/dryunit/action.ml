@@ -1,3 +1,4 @@
+open Core_normalization
 open Core_util
 open Core_runtime
 

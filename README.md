@@ -1,17 +1,19 @@
 # Dryunit
 
-Dryunit is a tool that allows you to test OCaml code using *Convention over Configuration*. 
+>  Dryunit is a tool that allows you to test OCaml code using *Convention over Configuration*.
 
-We wanted to get the project right and be *dry*. That's why the first implementations of the project does not implement a test framework. You are invited to use Alcotest and OUnit for that.
+Your tests are put first, so TDD can get out of your way. We wanted to get the project right and be *dry*. That's why the first implementations of does not implement a test framework. You are invited to use [Alcotest][] or [OUnit][] for that.
 
-The big advantage of traditional testing over alternatives in the ecosystem is that *you get to use pure OCaml*. Be free of all the enhancements.  There's no different syntax to learn and no need to use imperative style. Your can define isolated test functions using whatever way you want.
+The big advantage of traditional testing over alternatives is that ***you get to use pure OCaml***. Free of enhancements. Using the exact same syntax you do everything else. Your tests are independent but can use anything in their context. *It's just OCaml, do whatever way you want*.
 
 
-## Conventions 
+## Conventions
 
-Our conventions are minimal. They allow for a good visual distinction when you are interacting with non-test code. They also make configuration simpler.
+Conventions are minimal, but necessary. They allow for a good visual distinction when you are interacting with non-test code. They also make configuration simpler.
 
-All files containing tests should be either called `tests.ml` or `something_tests.ml`. All test function names must start with `test`. By default, test executables are created per directory and are simply called `main.ml`.
+- All files containing tests should be either called `tests.ml` or `something_tests.ml`.
+- All test function names must start with `test`.
+- By default, test executables are created per directory and are called `main`.
 
 ## Quickstart
 
@@ -34,7 +36,7 @@ You don't need any other configuration. The generated rules will define the exec
 
 You could also define the framework to initialize your tests using `--framework ounit`. Don't worry, this and other definitions are easy to customize in the generated file.
 
-## About configuration
+## Filtering tests
 
 This is the content of the command `dryunit init`:
 
@@ -53,9 +55,8 @@ This is the content of the command `dryunit init`:
   (deps ( (glob_files *_tests.ml) (glob_files *_Tests.ml) ))
   ;;
   (action  (with-stdout-to ${@} (run
-    dryunit gen --framework alcotest
-    ;;
-    ;; Uncomment to configure:
+    dryunit alcotest
+    ;; Uncomment to apply filters:
     ;;
     ;;  --ignore "space separated list"
     ;;  --filter "space separated list"
@@ -72,7 +73,7 @@ It also shows helpful information on comments, describing how to setup simple ch
 
 **Detecting only the tests in one file**
 
-If you think detecting all tests in the directory is overkill for your needs, let me talk to you about `ppx_dryunit`. 
+If you think detecting all tests in the directory is overkill for your needs, let me talk to you about `ppx_dryunit`.
 
 If you don't want to keep a list of current test files in the configuration, you need to create the file `main.ml` in the same directory your tests live. This file ***should never be cached*** - it needs to be recompiled at every build. To make sure jbuilder does that it, there must be a random modification between builds.
 
@@ -172,3 +173,6 @@ When processing the extension, the following happens:
 This project is *framework independent*. It changes the AST, but relies on the user environment to provide and validate the appropriate dependencies. The project itself remains *light*, even if support for new test frameworks supporting similar workflows is added in the future.
 
 This is project is *low maintenance*. Thanks to OCaml's parser and the [Migrate-Parsetree](https://github.com/ocaml-ppx/ocaml-migrate-parsetree) project, this ppx  knows very little about the actual source syntax and already works on all major OCaml versions supporting ppx.
+
+[alcotest]: https://github.com/mirage/alcotest
+[ounit]: http://ounit.forge.ocamlcore.org/documentation.html
