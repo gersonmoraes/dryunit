@@ -76,7 +76,7 @@ let () =
     ; cache       = true
     ; framework   = "alcotest"
     ; ignore      = ""
-    ; filter       = ""
+    ; filter      = ""
     ; detection   = "file"
     ; ignore_path = "self"
     }
