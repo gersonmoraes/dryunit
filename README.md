@@ -9,10 +9,9 @@ The big advantage of traditional testing over alternatives in the ecosystem is t
 
 ## Conventions 
 
-Our conventions allow for a good visual distinction when you are interacting with non-test code. They also make configuration simpler.
+Our conventions are minimal. They allow for a good visual distinction when you are interacting with non-test code. They also make configuration simpler.
 
-- All files containing tests should be either called `tests.ml` or `something_tests.ml`.
-- All test functions must have a name started with "test".
+All files containing tests should be either called `tests.ml` or `something_tests.ml`. All test function names must start with `test`. By default, test executables are created per directory and are simply called `main.ml`.
 
 ## Quickstart
 
@@ -22,18 +21,18 @@ Install the command line in your system:
 opam install dryunit
 ```
 
-This project works with whatever building system you have, but integrates with jbuilder out of the box. For help, use `dryunit --help`.
+This project works with whatever building system you have, but integrates with jbuilder out of the box. For more information, use `dryunit --help`.
 
-If you use jbuilder, you can use the command  `dryunit init` to generate a template config. For example, the commands below will generate the executable `tests/main.exe` for tests based on alcotest:
+The commands below will generate a default setup.
 
 ```
 mkdir tests
 dryunit init > tests/jbuild
 ```
 
-That will make jbuilder generate the file "tests/main.ml" in your build directory. To add tests, just write a function with a name stating with "test" in any file inside the tests directory.
+You don't need any other configuration. The generated rules will define the executable `tests/main.exe` ready for Alcotest.
 
-
+You could also define the framework to initialize your tests using `--framework ounit`. Don't worry, this and other definitions are easy to customize in the generated file.
 
 ## About configuration
 
@@ -49,7 +48,7 @@ This is the content of the command `dryunit init`:
 (rule
  ((targets (main.ml))
   ;;
-  ;; Uncomment for change detection:
+  ;; Change detection:
   ;;
   (deps ( (glob_files *_tests.ml) (glob_files *_Tests.ml) ))
   ;;

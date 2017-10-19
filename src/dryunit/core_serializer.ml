@@ -74,7 +74,7 @@ let init_default framework =
   print_endline @@ String.trim @@ "
 (executables
  ((names (main))
-  (libraries (alcotest))
+  (libraries (" ^ TestFramework.package framework ^ "))
   (preprocess (pps (ppx_dryunit)))))
 
 ;; This rule generates the bootstrapping

@@ -30,6 +30,11 @@ module TestFramework = struct
   let to_string = function
     | Alcotest -> "alcotest"
     | OUnit -> "ounit"
+
+  let package = function
+    | Alcotest -> "alcotest"
+    | OUnit -> "oUnit"
+
 end
 
 open TestDescription
@@ -187,10 +192,14 @@ let detect_suites ~filename ~custom_dir ~cache_active ~ignore_path : TestSuite.t
     else
     ( let basename = Filename.basename v in
       let len = String.length basename in
-      if (ends_with v ".ml") && (Bytes.index basename '.' == (len - 3)) then
-        not (should_ignore_path ~filter:ignore_path basename)
-      else
-        false
+      if Bytes.index basename '.' == (len - 3) then
+        let c = Bytes.get basename (len - 8) in
+        if c == 't' || c == 'T' then
+          if ends_with v "ests.ml" then
+            not (should_ignore_path ~filter:ignore_path basename)
+          else false
+        else false
+      else false
     )
   ) |>
   (* filter over records already in cache, invalidating the cache if needed *)
