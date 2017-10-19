@@ -70,23 +70,9 @@ It defaults to a configuration for a test executable `main.exe` based on Alcotes
 It also shows helpful information on comments, describing how to setup simple changing detection for a list of files, and in the end, how to filter or ignore some tests.
 
 
+**Detecting only the tests in one file**
 
-### Nuances of changing detection
-
-There two basic ways you can setup change detection:
-
-1. List all test files in the `deps` in the `tests/jbuild` file.
-2. Create locally the file `tests/main.ml`  and *make sure it is recompiled at every build*.
-
-
-
-**Listing test files**
-
-The upside of listing the files is that it only requires jbuilder to work. You also don't need the maintain the file `tests/main.ml` among your test files.
-
-
-
-**Creating locally the file `tests/main.ml `**
+If you think detecting all tests in the directory is overkill for your needs, let me talk to you about `ppx_dryunit`. 
 
 If you don't want to keep a list of current test files in the configuration, you need to create the file `main.ml` in the same directory your tests live. This file ***should never be cached*** - it needs to be recompiled at every build. To make sure jbuilder does that it, there must be a random modification between builds.
 
