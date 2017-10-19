@@ -52,15 +52,14 @@ This is the output of the command `dryunit init`:
   )))))
 ```
 
-It defines an executable `main.exe` based on the default framework. A rule to generate and update this file is also defined. In comments you see some configurations passed to the executable before build. For more definitions use `dryunit help` or `dryunit COMMAND - - help`. 
-
-It also shows helpful information on comments, describing how to setup simple changing detection for a list of files, and in the end, how to filter or ignore some tests.
+As you see, this is the place to customize to customize your test executable. The definitions in the comments provide a template for common filters, but you can find more information about customizations using `dryunit help` or `dryunit COMMAND - - help`.
 
 
+## About the extension
 
-## The extension ppx_dryunit
+This project was originated as a PPX. It turns out this setup introduces the unnecessary preprocess of every test file, is more expensive to setup incremental compilation, and that's not what most users need.
 
-This project was originated as a PPX. It is still available as an optional package and does the same thing as the command line, plus the possibility to detect tests only in the current file, which is the default.
+It is still available as the optional package `ppx_dryunit`. Currently the extension provides roughly the same functionality as the command line, plus the possibility to detect tests only in the current file, which is its recommended setup.
 
 The simplest way is to use it add this line to the end of your file `main.ml`:
 
@@ -68,9 +67,7 @@ The simplest way is to use it add this line to the end of your file `main.ml`:
 let () = [%dryunit]
 ```
 
-
-
-But that generates a default configuration. But since it could change in the feature, it is  better to define some configurations. Arguments are given using a record. All fields are optionals and might be out of order.
+That generates a default configuration. But since it could change in the future, it is better to define some definitions explicit. Arguments are given using a record. All fields are optionals and might be in any order.
 
 ```ocaml
 let () =
@@ -79,7 +76,7 @@ let () =
     ; cache       = true
     ; framework   = "alcotest"
     ; ignore      = ""
-    ; filter      = ""
+    ; filter         = ""
     ; detection   = "file"
     ; ignore_path = "self"
     }
