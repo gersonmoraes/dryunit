@@ -61,7 +61,7 @@ This project was originated as a PPX. It turns out this setup introduces the unn
 
 It is still available as the optional package `ppx_dryunit`. Currently the extension provides roughly the same functionality as the command line, plus the possibility to detect tests only in the current file, which is its recommended setup.
 
-The simplest way is to use it add this line to the end of your file `main.ml`:
+The simplest way to use it is to add this line to the end of your file `main.ml`:
 
 ```
 let () = [%dryunit]
