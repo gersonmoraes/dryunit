@@ -61,13 +61,13 @@ This project was originated as a PPX. It turns out this setup introduces the unn
 
 It is still available as the optional package `ppx_dryunit`. Currently the extension provides roughly the same functionality as the command line, plus the possibility to detect tests only in the current file, which is its recommended setup.
 
-The simplest way to use it is to add this line to the end of your file `main.ml`:
+The simplest way to use it is adding this line at the end of your file `main.ml`:
 
 ```
 let () = [%dryunit]
 ```
 
-That generates a default configuration. But since it could change in the future, it is better to define some definitions explicit. Arguments are given using a record. All fields are optionals and might be in any order.
+That will generate a default configuration that only sees the current file. You can override default behavior passing arguments through a record, as shown below. All fields are optionals and might be in any order.
 
 ```ocaml
 let () =
