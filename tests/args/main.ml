@@ -14,11 +14,12 @@ let test_plus_in_main () =
 
 let _ =
   [%dryunit
-    { cache_dir = ".dryunit"
-    ; cache     = true
-    ; framework = "alcotest"
-    ; ignore    = "capita"
-    ; filter    = ""
-    ; detection = "file"
+    { detection   = "file"
+    ; cache_dir   = ".dryunit"
+    ; cache       = true
+    ; framework   = "alcotest"
+    ; only        = ""
+    ; ignore      = "capita"
+    ; ignore_path = ""
     }
   ]

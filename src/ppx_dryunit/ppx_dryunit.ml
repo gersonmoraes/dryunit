@@ -21,6 +21,7 @@
 #define Ppx_tools_OMP Ppx_tools_406
 #endif
 
+open Printf
 
 module Core_capitalize = struct
 #if OCAML_VERSION < (4, 03, 0)
@@ -36,7 +37,11 @@ module Ppx_dryunit_runtime = struct
 module Core_util = struct
 #include "../dryunit/core_util.ml"
 end
+
 #include "../dryunit/core_runtime.ml"
+
+module Core_runtime = Make_core_runtime(Core_capitalize)
+open Core_runtime
 
 (* ============================| EXT ONLY |============================ *)
   let throw ~loc msg =
@@ -56,7 +61,7 @@ end
           | _ -> throw ~loc ("Missing configuration: " ^ expected)
         ) in
       if not (current = expected) then
-        throw ~loc (format "I was expecting `%s`, but found `%s`." expected current)
+        throw ~loc (sprintf "I was expecting `%s`, but found `%s`." expected current)
     in
     List.iteri
       ( fun i name ->
@@ -65,7 +70,7 @@ end
       expected_fields;
     let expected_len = List.length expected_fields in
     if List.length current > expected_len then
-      throw ~loc (format "Unknown configuration field: `%s`." (param expected_len))
+      throw ~loc (sprintf "Unknown configuration field: `%s`." (param expected_len))
 end
 
 open Migrate_parsetree
@@ -80,6 +85,7 @@ open Ast_helper
 open Ppx_dryunit_runtime
 open Ppx_dryunit_runtime.Core_util
 
+open Core_runtime
 open TestSuite
 open TestDescription
 
@@ -124,13 +130,13 @@ let bootstrap_ounit suites =
   )
 
 
-let boot ~loc ~cache_dir ~cache_active ~framework ~ignore ~filter ~detection ~ignore_path =
+let boot ~loc ~cache_dir ~cache_active ~framework ~ignore ~only ~detection ~ignore_path =
   let throw = throw ~loc in
   let f =
     ( match framework with
       | "alcotest" -> bootstrap_alcotest
       | "ounit" -> bootstrap_ounit
-      | _ -> throw (format "Test framework not recognized: `%s`" framework)
+      | _ -> throw (sprintf "Test framework not recognized: `%s`" framework)
     ) in
   let custom_dir =
     if (cache_dir = ".dryunit") || (cache_dir = "_build/.dryunit") then None
@@ -141,8 +147,8 @@ let boot ~loc ~cache_dir ~cache_active ~framework ~ignore ~filter ~detection ~ig
       else
         throw ("Cache directory must be \".dryunit\" or a full custom path. Current value is `" ^ cache_dir ^ "`");
     ) in
+  let only = filter_from ~throw ~name:"only" only in
   let ignore = filter_from ~throw ~name:"ignore" ignore in
-  let filter = filter_from ~throw ~name:"filter" filter in
   let ignore_path = filter_from ~throw ~name:"ignore_path" ignore_path in
   let suites =
     let filename = !Location.input_name in
@@ -151,8 +157,8 @@ let boot ~loc ~cache_dir ~cache_active ~framework ~ignore ~filter ~detection ~ig
       | "file" -> [ suite_from ~dir:(Filename.dirname filename) (Filename.basename filename) ]
       | _ -> throw "The field `detection` only accepts \"dir\" or \"file\"."
     ) in
-  validate_filters ~throw ~ignore ~filter;
-  f (apply_filters ~filter ~ignore suites)
+  validate_filters ~throw ~ignore ~only;
+  f (apply_filters ~only ~ignore suites)
 
 
 
@@ -166,7 +172,7 @@ let rewriter _config _cookies =
     match e.pexp_desc with
     (* debug just returns a string with detected tests *)
     | Pexp_extension ({ txt = "dryunit_debug"; _ }, PStr []) ->
-      let output = Ppx_dryunit_runtime.print_tests_from ~filename:!Location.input_name in
+      let output = print_tests_from ~filename:!Location.input_name in
       { e with pexp_desc = Pexp_constant (Pconst_string (output, None)) }
 
     (* debug just returns a string with detected tests *)
@@ -188,27 +194,27 @@ let rewriter _config _cookies =
         PStr [ {pstr_desc = (Pstr_eval ({pexp_desc = Pexp_record (configs, None);
           pexp_loc; _}, attr)); _} ]) ->
         ( match configs with
-          | [({txt = Lident "cache_dir"},
+          | [({txt = Lident "detection"},
+              {pexp_desc = Pexp_constant (Pconst_string (detection, None))});
+             ({txt = Lident "cache_dir"},
               {pexp_desc = Pexp_constant (Pconst_string (cache_dir, None))});
              ({txt = Lident "cache"},
               {pexp_desc = Pexp_construct ({txt = Lident cache}, None)});
              ({txt = Lident "framework"},
               {pexp_desc = Pexp_constant (Pconst_string (framework, None))});
+             ({txt = Lident "only"},
+              {pexp_desc = Pexp_constant (Pconst_string (only, None))});
              ({txt = Lident "ignore"},
               {pexp_desc = Pexp_constant (Pconst_string (ignore, None))});
-             ({txt = Lident "filter"},
-              {pexp_desc = Pexp_constant (Pconst_string (filter, None))});
-             ({txt = Lident "detection"},
-              {pexp_desc = Pexp_constant (Pconst_string (detection, None))});
              ({txt = Lident "ignore_path"},
               {pexp_desc = Pexp_constant (Pconst_string (ignore_path, None))})]
             when cache = "true" || cache = "false" ->
               let cache_active = (cache = "true") in
               boot ~loc:e.pexp_loc ~cache_dir ~cache_active ~framework ~ignore
-                ~filter ~detection ~ignore_path
+                ~only ~detection ~ignore_path
          | _ ->
           validate_params ~loc:e.pexp_loc configs
-            ["cache_dir"; "cache"; "framework"; "ignore"; "filter"; "detection"; "ignore_path" ];
+            ["cache_dir"; "cache"; "framework";  "only"; "ignore"; "detection"; "ignore_path" ];
           throw ~loc:e.pexp_loc "Configuration for ppx_dryunit is invalid."
         )
     | Pexp_extension ({ txt = "dryunit"; _ }, _ ) ->

@@ -74,24 +74,17 @@ let init_default framework =
   print_endline @@ String.trim @@ "
 (executables
  ((names (main))
-  (libraries (" ^ TestFramework.package framework ^ "))
-  (preprocess (pps (ppx_dryunit)))))
+  (libraries (" ^ TestFramework.package framework ^ "))))
 
-;; This rule generates the bootstrapping
 (rule
  ((targets (main.ml))
-  ;;
-  ;; Change detection:
-  ;;
   (deps ( (glob_files *tests.ml) (glob_files *Tests.ml) ))
-  ;;
   (action  (with-stdout-to ${@} (run
     dryunit " ^ TestFramework.to_string framework ^ "
+    ;; Uncomment to define filters:
     ;;
-    ;; Uncomment to configure:
-    ;;
-    ;;  --ignore \"space separated list\"
     ;;  --filter \"space separated list\"
+    ;;  --ignore \"space separated list\"
     ;;  --ignore-path \"space separated list\"
   )))))
 "

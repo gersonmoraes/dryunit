@@ -1,5 +1,3 @@
-let format = Printf.sprintf
-
 let not_implemented feature =
   failwith ("feature `" ^ feature ^ "` is not implemented yet")
 
@@ -156,7 +154,7 @@ let feed_with ~chan =
 
 
 let tests_from path =
-  let cmd = format "ocamlopt -dparsetree %s 2>&1 >/dev/null" path in
+  let cmd = Printf.sprintf "ocamlopt -dparsetree %s 2>&1 >/dev/null" path in
   let chan = Unix.open_process_in cmd in
   feed_with ~chan
 

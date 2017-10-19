@@ -18,15 +18,15 @@ let mkdir_p dir =
   "" |>
   ignore
 
-let gen_extension ~nocache ~framework ~cache_dir ~ignore ~filter ~targets ~ignore_path =
+let gen_extension ~nocache ~framework ~cache_dir ~ignore ~only ~targets ~ignore_path =
   let _ = TestFramework.of_string framework in
   let detection = "dir" in
   let get_int () =
     (Random.int 9999) + 1 in
   let msg = "This file is supposed to be generated before build with a random ID." in
   let id = sprintf "%d%d%d" (get_int ()) (get_int ()) (get_int ()) in
-  ( sprintf "(*\n  %s\n  ID = %s\n*)\nlet () =\n  [%%dryunit\n    { cache_dir   = \"%s\"\n    ; cache       = %s\n    ; framework   = \"%s\"\n    ; ignore      = \"%s\"\n    ; filter      = \"%s\"\n    ; detection   = \"%s\"\n    ; ignore_path = \"%s\"\n    }\n  ]\n"
-      msg id cache_dir (string_of_bool @@ not nocache) framework ignore filter detection ignore_path
+  ( sprintf "(*\n  %s\n  ID = %s\n*)\nlet () =\n  [%%dryunit\n    { cache_dir   = \"%s\"\n    ; cache       = %s\n    ; framework   = \"%s\"\n    ; ignore      = \"%s\"\n    ; only        = \"%s\"\n    ; detection   = \"%s\"\n    ; ignore_path = \"%s\"\n    }\n  ]\n"
+      msg id cache_dir (string_of_bool @@ not nocache) framework ignore only detection ignore_path
   ) |>
   fun output ->
   if List.length targets == 0 then
@@ -60,7 +60,7 @@ let throw s =
   exit 1
 
 
-let get_suites ~nocache ~framework ~cache_dir ~ignore ~filter ~targets ~ignore_path ~detection ~main : TestSuite.t list =
+let get_suites ~nocache ~framework ~cache_dir ~ignore ~only ~targets ~ignore_path ~detection ~main : TestSuite.t list =
   let custom_dir =
     if (cache_dir = ".dryunit") || (cache_dir = "_build/.dryunit") then None
     else
@@ -71,16 +71,16 @@ let get_suites ~nocache ~framework ~cache_dir ~ignore ~filter ~targets ~ignore_p
         throw ("Cache directory must be \".dryunit\" or a full custom path. Current value is `" ^ cache_dir ^ "`");
     ) in
   let ignore = filter_from ~throw ~name:"ignore" ignore in
-  let filter = filter_from ~throw ~name:"filter" filter in
+  let only = filter_from ~throw ~name:"only" only in
   let ignore_path = filter_from ~throw ~name:"ignore_path" ignore_path in
-  validate_filters ~throw ~ignore ~filter;
+  validate_filters ~throw ~ignore ~only;
   let filename = main in
   ( match detection with
     | "dir" -> detect_suites ~filename ~custom_dir ~cache_active:true ~ignore_path
     | "file" -> [ suite_from ~dir:(Filename.dirname filename) (Filename.basename filename) ]
     | _ -> throw "The field `detection` only accepts \"dir\" or \"file\"."
   )
-  |> apply_filters ~filter ~ignore
+  |> apply_filters ~only ~ignore
 
 
 let gen_executable framework suites path =

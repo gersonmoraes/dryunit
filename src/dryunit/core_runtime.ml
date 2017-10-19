@@ -1,5 +1,12 @@
+module Make_core_runtime
+  ( Capitalize: sig
+      val capitalize_ascii: string -> string
+    end
+  ) = struct
+
+
 open Printf
-open Core_capitalize
+open Capitalize
 open Core_util
 
 module TestDescription = struct
@@ -67,13 +74,13 @@ let protected_namespace path =
 
 
 (* XXX: we could add support for inline namespaced tests here *)
-let rec should_ignore_path ~filter path =
+let rec should_ignore_path ~only path =
   if protected_namespace path then
     false
   else
-    ( match filter with
+    ( match only with
       | [] -> false
-      | _ -> List.exists (fun v -> Core_util.is_substring path v) filter
+      | _ -> List.exists (fun v -> Core_util.is_substring path v) only
     )
 
 let extract_from ~filename : TestDescription.t list =
@@ -93,7 +100,7 @@ let suite_from ~dir filename : TestSuite.t =
     suite_title = title_from_no_padding (Filename.chop_suffix name ".ml");
     suite_path = dir ^ sep ^ filename;
     timestamp = timestamp_from (dir ^ sep ^ filename);
-    tests = extract_from ~filename:(format "%s%s%s" dir sep name)
+    tests = extract_from ~filename:(sprintf "%s%s%s" dir sep name)
   }
 
 let test_name ~current_module suite test =
@@ -192,17 +199,17 @@ let detect_suites ~filename ~custom_dir ~cache_active ~ignore_path : TestSuite.t
     else
     ( let basename = Filename.basename v in
       let len = String.length basename in
-      if Bytes.index basename '.' == (len - 3) then
+      if Bytes.index basename '.' == (len - 3) && len > 7 then
         let c = Bytes.get basename (len - 8) in
         if c == 't' || c == 'T' then
           if ends_with v "ests.ml" then
-            not (should_ignore_path ~filter:ignore_path basename)
+            not (should_ignore_path ~only:ignore_path basename)
           else false
         else false
       else false
     )
   ) |>
-  (* filter over records already in cache, invalidating the cache if needed *)
+  (* only over records already in cache, invalidating the cache if needed *)
   List.map
   ( fun filename ->
     ( match get_from_cache ~dir ~cache filename with
@@ -263,9 +270,9 @@ let filter_from ~throw ~name value : string list =
   List.iter
     ( fun v ->
       if String.length v < 4 then
-        throw (format "Each word in the field `%s` must be at least 3 chars long" name);
+        throw (sprintf "Each word in the field `%s` must be at least 3 chars long" name);
       if v = "test" then
-        throw (format "You are not allowed to use the word `test` in the field `%s`" name)
+        throw (sprintf "You are not allowed to use the word `test` in the field `%s`" name)
     )
     l;
   l
@@ -276,27 +283,27 @@ let should_ignore ~ignore name =
   | [] -> assert false
   | _ -> List.exists (fun v -> Core_util.is_substring name v) ignore
 
-let should_filter ~filter name =
-  match filter with
+let should_filter ~only name =
+  match only with
   | [] -> assert false
-  | _ -> List.exists (fun v -> Core_util.is_substring name v) filter
+  | _ -> List.exists (fun v -> Core_util.is_substring name v) only
 
 
-let apply_filters ~filter ~ignore suites =
-  let filter_tests tests =
+let apply_filters ~only ~ignore suites =
+  let only_tests tests =
     ( if List.length ignore == 0 then tests
       else
         List.filter (fun test -> not (should_ignore ~ignore test.test_name)) tests
     ) |>
     fun tests ->
-    ( if List.length filter == 0 then tests
+    ( if List.length only == 0 then tests
       else
-        List.filter (fun test -> should_filter ~filter test.test_name) tests
+        List.filter (fun test -> should_filter ~only test.test_name) tests
     )
   in
   ( List.fold_left
       ( fun acc suite ->
-        match filter_tests suite.tests with
+        match only_tests suite.tests with
         | [] -> acc
         | active_tests -> { suite with tests = active_tests } :: acc
       )
@@ -304,8 +311,8 @@ let apply_filters ~filter ~ignore suites =
       suites
   )
 
-let validate_filters ~throw ~ignore ~filter =
-  match ignore, filter with
+let validate_filters ~throw ~ignore ~only =
+  match ignore, only with
   | [], [] -> ()
   | _v, [] -> ()
   | [], _v -> ()
@@ -313,6 +320,8 @@ let validate_filters ~throw ~ignore ~filter =
     List.iter
       ( fun v_filter ->
         if List.exists (fun v -> v_filter = v) ignore then
-          throw (format "Query `%s` appears in the fields `filter` and `ignore`." v_filter)
+          throw (sprintf "Query `%s` appears in the fields `filter` and `ignore`." v_filter)
       )
-      filter
+      only
+
+end

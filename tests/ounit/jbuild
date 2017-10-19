@@ -1,7 +1,19 @@
 (executables
- ((names (main normalize))
-  (libraries (oUnit))
-  (preprocess (pps (ppx_dryunit)))))
+  ((names (main))
+  (libraries (oUnit))))
+
+(rule
+ ((targets (main.ml))
+  (deps ( (glob_files *tests.ml) (glob_files *Tests.ml) ))
+  (action  (with-stdout-to ${@} (run
+    dryunit ounit
+    ;;
+    ;; Uncomment to apply filters:
+    ;;
+    ;;  --ignore "space separated list"
+    ;;  --filter "space separated list"
+    ;;  --ignore-path "space separated list"
+  )))))
 
 (rule
  ((targets (main.output))
@@ -17,12 +29,3 @@
  ((name   runtest)
   (deps   (main.expected main.normalized))
   (action (run diff -u main.expected main.normalized))))
-
-;; (rule
-;; ((targets (main.ml))
-;;  (action  (with-stdout-to ${@} (run
-;;    ../../src/dryunit/dryunit.exe gen
-;;      --framework ounit
-;;      ;; --ignore "space separated list"
-;;      ;; --filter "space separated list"
-;;  )))))
