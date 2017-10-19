@@ -1,6 +1,6 @@
 open Core_normalization
-open Core_util
 open Core_runtime
+open Core_util
 
 let init_ext () =
     Core_serializer.init_extension ();
@@ -38,7 +38,10 @@ type gen_opts =
   }
 
 type init_opts =
-  { framework: string option }
+  { framework: string }
+
+let create_init_options framework : init_opts =
+  { framework }
 
 let catch f () =
   try
@@ -59,12 +62,12 @@ let gen_extension { nocache; framework; cache_dir; ignore; only; ignore_path; ta
       App.gen_extension ~nocache ~framework ~cache_dir ~ignore ~only ~ignore_path ~targets
     ) ()
 
-let gen_executable default_framework { nocache; framework; cache_dir; ignore; only; ignore_path; targets} =
+let gen_executable { nocache; framework; cache_dir; ignore; only; ignore_path; targets} =
   let cache_dir = unwrap_or "_build/.dryunit" cache_dir in
   let ignore = unwrap_or "" ignore in
   let only = unwrap_or "" only in
   let ignore_path = unwrap_or "" ignore_path in
-  let framework = TestFramework.of_string (unwrap_or default_framework framework) in
+  let framework = TestFramework.of_string (unwrap_or "alcotest" framework) in
   let targets = if List.length targets == 0 then [ "main.ml" ] else targets in
   List.iter
     ( fun target ->
@@ -76,10 +79,9 @@ let gen_executable default_framework { nocache; framework; cache_dir; ignore; on
   `Ok ()
 
 let init_executable { framework; } =
-  let framework =
-    match framework with
-    | None -> TestFramework.Alcotest
-    | Some f -> TestFramework.of_string f
-  in
-  Core_serializer.init_default framework;
+  Core_serializer.init_default (TestFramework.of_string framework);
+  `Ok ()
+
+let init_framework f =
+  Core_serializer.init_default f;
   `Ok ()

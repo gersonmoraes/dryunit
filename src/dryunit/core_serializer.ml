@@ -55,16 +55,10 @@ let init_extension () =
 ;; This rule generates the bootstrapping
 (rule
  ((targets (main.ml))
-  ;;
-  ;; Change detection:
-  ;;
   (deps ( (glob_files *_tests.ml) (glob_files *_Tests.ml) ))
   ;;
-  (action  (with-stdout-to ${@} (run
-    dryunit gen --framework alcotest
-    ;;
-    ;; Uncomment to configure:
-    ;;
+  (action  (with-stdout-to ${@} (run dryunit ext
+    --framework alcotest
     ;;  --ignore \"space separated list\"
     ;;  --filter \"space separated list\"
     ;;  --ignore-path \"space separated list\"
@@ -80,12 +74,10 @@ let init_default framework =
 (rule
  ((targets (main.ml))
   (deps ( (glob_files *tests.ml) (glob_files *Tests.ml) ))
-  (action  (with-stdout-to ${@} (run
-    dryunit " ^ TestFramework.to_string framework ^ "
-    ;; Uncomment to define filters:
-    ;;
-    ;;  --filter \"space separated list\"
-    ;;  --ignore \"space separated list\"
-    ;;  --ignore-path \"space separated list\"
+  (action  (with-stdout-to ${@} (run dryunit gen
+    --framework " ^ TestFramework.to_string framework ^ "
+    ;; --filter \"space separated list\"
+    ;; --ignore \"space separated list\"
+    ;; --ignore-path \"space separated list\"
   )))))
 "

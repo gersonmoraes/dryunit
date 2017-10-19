@@ -15,7 +15,7 @@ default:
 
 clean:
 	@rm -rf .dryunit
-	jbuilder clean
+	@jbuilder clean
 
 dryunit:
 	@rm -f $(BUILD)/$(TEST_OUNIT).ml

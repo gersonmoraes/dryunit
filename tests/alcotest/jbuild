@@ -6,7 +6,8 @@
  ((targets (main.ml))
   (deps ( (glob_files *tests.ml) (glob_files *Tests.ml) ))
   (action  (with-stdout-to ${@} (run
-    ../../src/dryunit/dryunit.exe alcotest
+    ../../src/dryunit/dryunit.exe gen
+      --framework alcotest
       ;; Filters:
       ;; --ignore "webservice broker"
       ;; --filter "filter1 filter2"

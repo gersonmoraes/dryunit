@@ -23,18 +23,16 @@ Install the command line in your system:
 opam install dryunit
 ```
 
-This project works with whatever building system you have, but integrates with jbuilder out of the box. For more information, use `dryunit --help`.
-
-The commands below will generate a default setup.
+Dryunit works with jbuilder out of the box:
 
 ```
 mkdir tests
-dryunit init > tests/jbuild
+dryunit alcotest > tests/jbuild
 ```
 
 You don't need any other configuration. The generated rules will define the executable `tests/main.exe` ready for Alcotest.
 
-You could also define the framework to initialize your tests using `--framework ounit`. Don't worry, this and other definitions are easy to customize in the generated file.
+You could also define the framework to initialize your tests using `--framework ounit`. Don't worry, this and other definitions are easy to customize in the generated file.  For more information, use (`dryunit --help`).
 
 ## Filtering tests
 
@@ -43,24 +41,16 @@ This is the content of the command `dryunit init`:
 ```
 (executables
  ((names (main))
-  (libraries (alcotest))
-  (preprocess (pps (ppx_dryunit)))))
+  (libraries (alcotest))))
 
-;; This rule generates the bootstrapping
 (rule
  ((targets (main.ml))
-  ;;
-  ;; Change detection:
-  ;;
   (deps ( (glob_files *_tests.ml) (glob_files *_Tests.ml) ))
-  ;;
-  (action  (with-stdout-to ${@} (run
-    dryunit alcotest
-    ;; Uncomment to apply filters:
-    ;;
-    ;;  --ignore "space separated list"
-    ;;  --filter "space separated list"
-    ;;  --ignore-path \"space separated list\"
+  (action  (with-stdout-to ${@} (run dryunit gen
+    --framework alcotest
+    ;; --filter "space separated list"
+    ;; --ignore "space separated list"
+    ;; --ignore-path "space separated list"
   )))))
 ```
 
