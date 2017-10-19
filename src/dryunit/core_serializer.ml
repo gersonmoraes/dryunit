@@ -83,7 +83,7 @@ let init_default framework =
   ;;
   ;; Change detection:
   ;;
-  (deps ( (glob_files *_tests.ml) (glob_files *_Tests.ml) ))
+  (deps ( (glob_files *tests.ml) (glob_files *Tests.ml) ))
   ;;
   (action  (with-stdout-to ${@} (run
     dryunit " ^ TestFramework.to_string framework ^ "

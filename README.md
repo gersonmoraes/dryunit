@@ -1,16 +1,28 @@
 # Dryunit
 
-Dryunit is a small tool that detects your unit tests and autogenerate the correspondent bootstrapping code on the fly in your build directory.
+Dryunit is a tool that allows you to test OCaml code using *Convention over Configuration*. 
 
-As a result, you get to use plain old OCaml and all the tooling you already use. It currently works with Alcotest and OUnit and has a template to simplify jbuild integration.
+We wanted to get the project right and be *dry*. That's why the first implementations of the project does not implement a test framework. You are invited to use Alcotest and OUnit for that.
+
+The big advantage of traditional testing over alternatives in the ecosystem is that *you get to use pure OCaml*. Be free of all the enhancements.  There's no different syntax to learn and no need to use imperative style. Your can define isolated test functions using whatever way you want.
+
+
+## Conventions 
+
+Our conventions allow for a good visual distinction when you are interacting with non-test code. They also make configuration simpler.
+
+- All files containing tests should be either called `tests.ml` or `something_tests.ml`.
+- All test functions must have a name started with "test".
 
 ## Quickstart
 
-Install the extension and command line in your system:
+Install the command line in your system:
 
 ```
 opam install dryunit
 ```
+
+This project works with whatever building system you have, but integrates with jbuilder out of the box. For help, use `dryunit --help`.
 
 If you use jbuilder, you can use the command  `dryunit init` to generate a template config. For example, the commands below will generate the executable `tests/main.exe` for tests based on alcotest:
 
