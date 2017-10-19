@@ -1,6 +1,7 @@
 open Cmdliner
 open Core_normalization
 
+
 (* Help sections common to all commands *)
 
 let help_secs = [
@@ -113,3 +114,8 @@ let default_cmd ~version =
   Term.info "dryunit" ~version ~doc ~sdocs ~exits ~man
 
 let cmds = [init_cmd; gen_cmd; gen_extension_cmd; clean_cmd; help_cmd]
+let version = "0.4"
+
+let () =
+  Random.self_init ();
+  Cmdliner.Term.(exit @@ eval_choice (default_cmd ~version) cmds)

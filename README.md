@@ -32,7 +32,7 @@ dryunit alcotest > tests/jbuild
 
 You don't need any other configuration. The generated rules will define the executable `tests/main.exe` ready for Alcotest.
 
-You could also define the framework to initialize your tests using `--framework ounit`. Don't worry, this and other definitions are easy to customize in the generated file.  For more information, use (`dryunit --help`).
+You could also define the framework to initialize your tests using `--framework ounit`. Don't worry, this and other definitions are easy to customize in the generated file.  For more information, use (`dryunit help`).
 
 ## Filtering tests
 

@@ -2,7 +2,7 @@
 BUILD = _build/default
 
 # Main executable
-MAIN = src/dryunit/dryunit
+MAIN = src/dryunit/main
 
 # Tests
 TEST_ALCOTEST = tests/alcotest/main
