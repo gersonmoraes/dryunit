@@ -60,14 +60,6 @@ let gen_cmd =
   Term.info "gen" ~doc ~sdocs ~exits
 
 
-(* unstable *)
-let clean_cmd =
-  let doc = "clean cache" in
-  Term.(const App.clean $ const ()),
-  Term.info "clean" ~doc ~sdocs ~exits
-
-
-(* stable *)
 let help_cmd =
   let topic =
     let doc = "The topic to get help on. `topics' lists the topics." in
@@ -79,7 +71,6 @@ let help_cmd =
   Term.info "help" ~doc ~exits:Term.default_exits
 
 
-(* stable *)
 let default_cmd ~version =
   let doc = "a detection tool for traditional testing in OCaml" in
   Term.(ret (const (fun _ -> `Help (`Pager, None)) $ const ())),
@@ -90,7 +81,6 @@ let cmds =
   [ init_cmd
   ; gen_cmd
   ; gen_extension_cmd
-  ; clean_cmd
   ; help_cmd
   ]
 
