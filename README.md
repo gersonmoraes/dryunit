@@ -27,14 +27,14 @@ Dryunit works with jbuilder out of the box:
 
 ```
 mkdir tests
-dryunit init alcotest > tests/jbuild
+dryunit init > tests/jbuild
 ```
 
-No other configuration is required. The generated rules will define the executable `tests/main.exe` ready for Alcotest.
+No other configuration is required. The generated rules will define the executable `tests/main.exe` ready for the default framework. You can also make the framework explicit by using `dryunit init alcotest`.
 
 ## Configuration
 
-This is the content of the command `dryunit init`:
+This is the output of the command `dryunit init`:
 
 ```
 (executables
