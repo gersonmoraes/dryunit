@@ -1,6 +1,6 @@
 module Make_core_runtime
   ( Capitalize: sig
-      val capitalize_ascii: string -> string
+      val capitalize_ascii: bytes -> bytes
     end
   ) = struct
 
@@ -48,8 +48,11 @@ open TestDescription
 open TestSuite
 
 
-let title_from v = capitalize_ascii @@ title_from v
-let title_from_no_padding v = capitalize_ascii @@ title_from_filename v
+let title_from (v:bytes) : string =
+  Bytes.to_string @@ capitalize_ascii (Core_util.util_title_from v)
+
+let title_from_no_padding (v:bytes) : string  =
+  Bytes.to_string @@ capitalize_ascii (Core_util.util_title_from_filename v)
 
 let in_build_dir () =
   is_substring (Sys.getcwd ()) "build/"
@@ -60,46 +63,33 @@ let should_ignore ~ignore name =
   | _ -> List.exists (fun v -> Core_util.is_substring name v) ignore
 
 
-let protected_namespace path =
-  if path = "self.ml" then
-    true
-  else
-    ( let len = String.length path in
-      if len > 11 then
-        if String.(sub path 0 5) = "self_" then
-          String.(sub path (length path - 9) 8) = "_Test.ml"
-        else false
-      else false
-    )
-
-
 (* XXX: we could add support for inline namespaced tests here *)
 let rec should_ignore_path ~only path =
-  if protected_namespace path then
-    false
-  else
-    ( match only with
-      | [] -> false
-      | _ -> List.exists (fun v -> Core_util.is_substring path v) only
-    )
+  ( match only with
+    | [] -> false
+    | _ -> List.exists (fun v -> Core_util.is_substring path v) only
+  )
 
 let extract_from ~filename : TestDescription.t list =
   tests_from filename |>
   List.map
-  (fun test_name ->
-    { test_name; test_title = title_from test_name }
-  )
+    (fun test_name ->
+      let test_title : string = title_from test_name in
+      let test_name = Bytes.to_string test_name in
+      { test_name; test_title }
+    )
 
 
 let timestamp_from filename =
   Unix.((stat filename).st_mtime)
 
 let suite_from ~dir filename : TestSuite.t =
+  let suite_path = dir ^ sep ^ filename in
   let name = (Filename.basename filename) in
-  { suite_name = capitalize_ascii (Filename.chop_suffix name ".ml");
-    suite_title = title_from_no_padding (Filename.chop_suffix name ".ml");
-    suite_path = dir ^ sep ^ filename;
-    timestamp = timestamp_from (dir ^ sep ^ filename);
+  { suite_name = to_string @@ capitalize_ascii (to_bytes (Filename.chop_suffix name ".ml"));
+    suite_title = title_from_no_padding (to_bytes (Filename.chop_suffix name ".ml"));
+    suite_path;
+    timestamp = timestamp_from suite_path;
     tests = extract_from ~filename:(sprintf "%s%s%s" dir sep name)
   }
 
@@ -142,7 +132,8 @@ let cache_file ~main ~custom_dir =
   if not @@ Sys.file_exists dir then
     Unix.mkdir dir 0o755;
   close_out (open_out (dir ^ sep ^ ".jbuilder-keep"));
-  let hash = Digest.(to_hex @@ bytes (main ^ Sys.ocaml_version)) in
+  let s : bytes = Bytes.of_string (main ^ Sys.ocaml_version) in
+  let hash = Digest.(to_hex @@ bytes s) in
   dir ^ sep ^ hash
 
 let save_cache ~main ~custom_dir ~cache_active suites =
@@ -185,7 +176,7 @@ let get_from_cache ~cache ~dir filename : TestSuite.t option =
   with
     Not_found -> None
 
-let detect_suites ~filename ~custom_dir ~cache_active ~ignore_path : TestSuite.t list =
+let detect_suites ~filename ~custom_dir ~cache_active ~(ignore_path:string list) : TestSuite.t list =
   let cache = load_cache ~main:filename ~custom_dir ~cache_active in
   let cache_dirty = ref false in
   let dir = Filename.dirname filename in
@@ -197,13 +188,13 @@ let detect_suites ~filename ~custom_dir ~cache_active ~ignore_path : TestSuite.t
     if v = main_basename then
       false
     else
-    ( let basename = Filename.basename v in
-      let len = String.length basename in
+    ( let basename = Bytes.of_string @@ Filename.basename v in
+      let len = Bytes.length basename in
       if Bytes.index basename '.' == (len - 3) && len > 7 then
         let c = Bytes.get basename (len - 8) in
         if c == 't' || c == 'T' then
           if ends_with v "ests.ml" then
-            not (should_ignore_path ~only:ignore_path basename)
+            not (should_ignore_path ~only:ignore_path (to_string basename))
           else false
         else false
       else false
@@ -289,7 +280,7 @@ let should_filter ~only name =
   | _ -> List.exists (fun v -> Core_util.is_substring name v) only
 
 
-let apply_filters ~only ~ignore suites =
+let apply_filters ~only ~(ignore:string list) suites =
   let only_tests tests =
     ( if List.length ignore == 0 then tests
       else

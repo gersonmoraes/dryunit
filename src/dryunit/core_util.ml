@@ -1,3 +1,6 @@
+let to_bytes = Bytes.of_string
+let to_string = Bytes.to_string
+
 let not_implemented feature =
   failwith ("feature `" ^ feature ^ "` is not implemented yet")
 
@@ -14,8 +17,8 @@ let split pattern value =
 
 let sep = Filename.dir_sep
 
-let is_substring string substring =
-  let string, substring = Bytes.of_string string, Bytes.of_string substring in
+let is_substring (string:string) (substring:string) =
+  let string = to_bytes string and substring = to_bytes substring in
   let ssl = Bytes.length substring and sl = Bytes.length string in
   if ssl = 0 || ssl > sl then false else
     let max = sl - ssl and clone = Bytes.create ssl in
@@ -54,13 +57,14 @@ let ends_with s1 s2 =
   Hardcore filter to let bindings starting with "test_"
   It does not recognizes test functions inside nested modules
 *)
-let is_possible_test_entry (line:string) =
-  let open String in
+let is_possible_test_entry line =
+  let line = Bytes.of_string line in
+  let open Bytes in
   if length line > 20 then
     if get line 7 == ' ' then
       if get line 10 == 'P' then
         if get line 15 == 'v' then
-          (sub line 20 4) = "test"
+          (sub line 20 4) = to_bytes "test"
         else false
       else false
     else false
@@ -81,8 +85,9 @@ type probation = {
 (* limit for probation iterations, assiciated with time counter *)
 let deadline = 14
 
-let fun_name line : string =
-  String.(sub line 20 ((index_from line 21 '"') - 20))
+let fun_name line  =
+  let line = to_bytes line in
+  Bytes.(sub line 20 ((index_from line 21 '"') - 20))
 
 let new_probation () = {
   active = ref false;
@@ -116,11 +121,11 @@ let probation_pass ~probation line =
     Some false
   else
   ( if !(probation.time) > 3 then
-    ( if is_substring line "construct \"()\"" then
+    ( if is_substring line ("construct \"()\"") then
       let () = reset_probation ~probation () in
       Some true
       else
-      ( if is_substring line "_var \"" then (* ounit ctx's param *)
+      ( if is_substring line ("_var \"") then (* ounit ctx's param *)
        let () = reset_probation ~probation () in
        Some true
        else None
@@ -163,8 +168,7 @@ let tests_from path =
   feed_with ~chan
 
 
-let title_from name =
-  let name = Bytes.of_string name in
+let util_title_from name =
   let name =
     if (Bytes.get name 4) = '_' then
       Bytes.sub name 4 ((Bytes.length name) - 4)
@@ -178,11 +182,10 @@ let title_from name =
     with
       _ -> i := len;
   done;
-  name |> Bytes.trim |> Bytes.to_string
+  name |> Bytes.trim
 
 
-let title_from_filename name =
-  let name = Bytes.of_string name in
+let util_title_from_filename name =
   let len = Bytes.length name in
   let i, len = ref 0, len in
   while !i < len do
@@ -193,4 +196,4 @@ let title_from_filename name =
     with
       _ -> i := len;
   done;
-  name |> Bytes.trim |> Bytes.to_string
+  name |> Bytes.trim

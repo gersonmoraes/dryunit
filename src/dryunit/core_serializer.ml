@@ -4,6 +4,7 @@ open Printf
 
 open TestSuite
 open TestDescription
+open Core_util
 
 let boot_alcotest oc suites : unit =
   fprintf oc "let () =\n";

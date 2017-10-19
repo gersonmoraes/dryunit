@@ -46,15 +46,6 @@ let gen_extension ~nocache ~framework ~cache_dir ~ignore ~only ~targets ~ignore_
     )
 
 
-let clean () =
-  let dir = ".dryunit" in
-  if Sys.file_exists dir && Sys.is_directory dir then
-  ( Array.iter
-      ( fun v -> Unix.unlink (dir ^ Filename.dir_sep ^ v) )
-      ( Sys.readdir dir );
-    Unix.rmdir dir
-  )
-
 let throw s =
   Printf.eprintf "%s\n" s;
   exit 1
