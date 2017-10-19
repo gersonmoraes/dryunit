@@ -7,7 +7,7 @@ MAIN = src/dryunit/main
 # Tests
 TEST_ALCOTEST = tests/alcotest/main
 TEST_OUNIT = tests/ounit/main
-TEST_ARGS = tests/args/main
+TEST_ARGS = tests/extension/main
 
 
 default:

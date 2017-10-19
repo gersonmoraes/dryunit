@@ -161,6 +161,61 @@ let boot ~loc ~cache_dir ~cache_active ~framework ~ignore ~only ~detection ~igno
   f (apply_filters ~only ~ignore suites)
 
 
+type args =
+  { detection    : string
+  ; framework    : string
+  ; cache_dir    : string
+  ; only         : string
+  ; ignore       : string
+  ; cache_active : string
+  ; ignore_path  : string
+  }
+
+
+let default_args =
+  { detection    = "file"
+  ; framework    = "alcotest"
+  ; cache_active = "true"
+  ; cache_dir    = "_build/.dryunit"
+  ; only         = ""
+  ; ignore       = ""
+  ; ignore_path  = ""
+  }
+
+
+open Asttypes
+open Longident
+
+let validate_existing_params ~loc ~configs existing =
+  List.iter
+    ( function
+      | ({txt = Lident id }, _)
+          when (List.find_opt ((=) id) existing) = None ->
+          ( eprintf "Unsupported field: `%s`\n" id;
+            exit 1;
+          )
+      | _ -> ()
+    )
+    configs
+
+let get_field (name:string) configs =
+  List.find_opt
+    ( function
+      | ({txt = Lident id },
+          {pexp_desc = Pexp_constant (_)}) when id = name -> true
+      | _ -> false
+    )
+    configs
+
+let value_from =
+  ( function
+    | ({txt = Lident _ },
+        {pexp_desc = Pexp_constant (Pconst_string (value, None))})
+    | ({txt = Lident _ },
+        {pexp_desc = Pexp_construct ({txt = Lident value}, None)}) -> value
+    | _ ->
+       raise Not_found
+  )
 
 
 let rewriter _config _cookies =
@@ -175,50 +230,30 @@ let rewriter _config _cookies =
       let output = print_tests_from ~filename:!Location.input_name in
       { e with pexp_desc = Pexp_constant (Pconst_string (output, None)) }
 
-    (* debug just returns a string with detected tests *)
-    | Pexp_extension ({ txt = "dryunit_debug2"; _ }, PStr []) ->
-      app (evar "Printf.printf") [str "%s %s"; str "Hello"; str "World!" ]
-
-    (* alcotest *)
-    (* | Pexp_extension ({ txt = "alcotest"; _ }, PStr []) ->
-      bootstrap_alcotest (detect_suites ~filename:!Location.input_name
-        ~custom_dir:None ~cache_active:true) *)
-
-    (* ounit *)
-    (* | Pexp_extension ({ txt = "ounit"; _ }, PStr []) ->
-      bootstrap_ounit (detect_suites ~filename:!Location.input_name
-        ~custom_dir:None ~cache_active:true) *)
-
     (* new-interface *)
     | Pexp_extension ({ txt = "dryunit"; _ },
         PStr [ {pstr_desc = (Pstr_eval ({pexp_desc = Pexp_record (configs, None);
           pexp_loc; _}, attr)); _} ]) ->
-        ( match configs with
-          | [({txt = Lident "detection"},
-              {pexp_desc = Pexp_constant (Pconst_string (detection, None))});
-             ({txt = Lident "cache_dir"},
-              {pexp_desc = Pexp_constant (Pconst_string (cache_dir, None))});
-             ({txt = Lident "cache"},
-              {pexp_desc = Pexp_construct ({txt = Lident cache}, None)});
-             ({txt = Lident "framework"},
-              {pexp_desc = Pexp_constant (Pconst_string (framework, None))});
-             ({txt = Lident "only"},
-              {pexp_desc = Pexp_constant (Pconst_string (only, None))});
-             ({txt = Lident "ignore"},
-              {pexp_desc = Pexp_constant (Pconst_string (ignore, None))});
-             ({txt = Lident "ignore_path"},
-              {pexp_desc = Pexp_constant (Pconst_string (ignore_path, None))})]
-            when cache = "true" || cache = "false" ->
-              let cache_active = (cache = "true") in
-              boot ~loc:e.pexp_loc ~cache_dir ~cache_active ~framework ~ignore
-                ~only ~detection ~ignore_path
-         | _ ->
-          validate_params ~loc:e.pexp_loc configs
+          let get name default =
+            match get_field name configs with
+            | Some field -> value_from field
+            | None -> default in
+          validate_existing_params ~loc:e.pexp_loc ~configs
             ["cache_dir"; "cache"; "framework";  "only"; "ignore"; "detection"; "ignore_path" ];
-          throw ~loc:e.pexp_loc "Configuration for ppx_dryunit is invalid."
-        )
+          let v = default_args in
+          let detection    = get "detection" v.detection  in
+          let framework    = get "framework" v.framework  in
+          let cache_dir    = get "cache_dir" v.cache_dir in
+          let only         = get "only" v.only in
+          let ignore       = get "ignore" v.ignore in
+          let ignore_path  = get "ignore_path" v.ignore_path in
+          let cache_active =(get "cache_active" v.cache_active ) = "true" in
+          boot ~loc:e.pexp_loc ~cache_dir ~cache_active ~framework ~ignore
+            ~only ~detection ~ignore_path
     | Pexp_extension ({ txt = "dryunit"; _ }, _ ) ->
-        throw ~loc:e.pexp_loc "Dryunit configuration should defined as a record."
+        let { cache_dir; cache_active; framework; ignore; only; detection; ignore_path; } = default_args in
+        boot ~loc:e.pexp_loc ~cache_dir ~cache_active:(cache_active = "true") ~framework ~ignore
+          ~only ~detection ~ignore_path
 
     (* anything else *)
     | _ -> super.expr self e

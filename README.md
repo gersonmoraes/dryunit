@@ -27,14 +27,12 @@ Dryunit works with jbuilder out of the box:
 
 ```
 mkdir tests
-dryunit alcotest > tests/jbuild
+dryunit init alcotest > tests/jbuild
 ```
 
 You don't need any other configuration. The generated rules will define the executable `tests/main.exe` ready for Alcotest.
 
-You could also define the framework to initialize your tests using `--framework ounit`. Don't worry, this and other definitions are easy to customize in the generated file.  For more information, use (`dryunit help`).
-
-## Filtering tests
+## Configuration
 
 This is the content of the command `dryunit init`:
 
@@ -60,8 +58,7 @@ It defaults to a configuration for a test executable `main.exe` based on Alcotes
 
 It also shows helpful information on comments, describing how to setup simple changing detection for a list of files, and in the end, how to filter or ignore some tests.
 
-
-**Detecting only the tests in one file**
+### Detecting only the tests in one file
 
 If you think detecting all tests in the directory is overkill for your needs, let me talk to you about `ppx_dryunit`.
 

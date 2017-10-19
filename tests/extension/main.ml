@@ -12,14 +12,4 @@ let test_plus_in_main () =
   Alcotest.(check int) "same ints" 7 (To_test.plus [1;1;2;3])
 
 
-let _ =
-  [%dryunit
-    { detection   = "file"
-    ; cache_dir   = ".dryunit"
-    ; cache       = true
-    ; framework   = "alcotest"
-    ; only        = ""
-    ; ignore      = "capita"
-    ; ignore_path = ""
-    }
-  ]
+let _ = [%dryunit]
