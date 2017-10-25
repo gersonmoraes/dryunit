@@ -57,7 +57,7 @@ As you see, this is the place to customize your test executable. The definitions
 
 ## About the extension
 
-This project was originated as a PPX. It turns out this setup introduces the unnecessary preprocess of every test file, is more expensive to setup incremental compilation, and that's not what most users need.
+This project was originated as a PPX. It turns out this setup introduces the unnecessary preprocess of every test file, and that's not what most users need.
 
 It is still available as the optional package `ppx_dryunit`. Currently the extension provides roughly the same functionality as the command line, plus the possibility to detect tests only in the current file, which is its recommended setup.
 
