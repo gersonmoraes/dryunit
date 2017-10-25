@@ -52,7 +52,7 @@ This is the output of the command `dryunit init`:
   )))))
 ```
 
-As you see, this is the place to customize to customize your test executable. The definitions in the comments provide a template for common filters, but you can find more information about customizations using `dryunit help` or `dryunit COMMAND - - help`.
+As you see, this is the place to customize your test executable. The definitions in the comments provide a template for common filters, but you can find more information about customizations using `dryunit help` or `dryunit COMMAND - - help`.
 
 
 ## About the extension
