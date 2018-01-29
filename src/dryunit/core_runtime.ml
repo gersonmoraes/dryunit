@@ -9,6 +9,8 @@ open Printf
 open Capitalize
 open Core_util
 
+let running_ppx = ref false
+
 module TestDescription = struct
   type t = {
     test_name: string;
@@ -118,7 +120,11 @@ let cache_dir () =
     ) |>
   List.rev |>
   function
-  | []  -> failwith "Dryunit is not being preprocessed from build directory"
+  | []  ->
+      if !running_ppx then
+        failwith "ppx_dryunit should only be run from a 'build' or '_build' directory"
+      else
+        ".dryunit"
   | l -> sep ^ (String.concat sep l) ^ sep ^ !root_found ^ sep ^ ".dryunit"
 
 

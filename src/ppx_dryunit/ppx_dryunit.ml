@@ -131,6 +131,7 @@ let bootstrap_ounit suites =
 
 
 let boot ~loc ~cache_dir ~cache_active ~framework ~ignore ~only ~detection ~ignore_path =
+  Core_runtime.running_ppx := true;
   let throw = throw ~loc in
   let f =
     ( match framework with
