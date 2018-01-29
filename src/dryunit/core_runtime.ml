@@ -188,17 +188,20 @@ let detect_suites ~filename ~custom_dir ~cache_active ~(ignore_path:string list)
     if v = main_basename then
       false
     else
-    ( let basename = Bytes.of_string @@ Filename.basename v in
-      let len = Bytes.length basename in
-      if Bytes.index basename '.' == (len - 3) && len > 7 then
-        let c = Bytes.get basename (len - 8) in
-        if c == 't' || c == 'T' then
-          if ends_with v "ests.ml" then
-            not (should_ignore_path ~only:ignore_path (to_string basename))
-          else false
-        else false
-      else false
-    )
+      ( let basename = Bytes.of_string @@ Filename.basename v in
+        let len = Bytes.length basename in
+        try
+          ( if Bytes.index basename '.' == (len - 3) && len > 7 then
+              let c = Bytes.get basename (len - 8) in
+              if c == 't' || c == 'T' then
+                if ends_with v "ests.ml" then
+                  not (should_ignore_path ~only:ignore_path (to_string basename))
+                else false
+              else false
+            else false
+          )
+        with Not_found -> false
+      )
   ) |>
   (* only over records already in cache, invalidating the cache if needed *)
   List.map

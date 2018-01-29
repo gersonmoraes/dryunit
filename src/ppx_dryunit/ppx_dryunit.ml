@@ -25,9 +25,9 @@ open Printf
 
 module Core_capitalize = struct
 #if OCAML_VERSION < (4, 03, 0)
-  let capitalize_ascii = String.capitalize
+  let capitalize_ascii = Bytes.capitalize
 #else
-  let capitalize_ascii = String.capitalize_ascii
+  let capitalize_ascii = Bytes.capitalize_ascii
 #endif
 end
 
