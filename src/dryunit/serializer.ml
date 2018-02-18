@@ -59,6 +59,12 @@ let init_extension () =
     ;;  --filter \"space separated list\"
     ;;  --ignore-path \"space separated list\"
   )))))
+
+(alias
+  ((name   runtest)
+   (deps   (main.exe))
+   (action (run ${<}))
+  ))
 "
 
 let init_default framework =
@@ -69,11 +75,17 @@ let init_default framework =
 
 (rule
  ((targets (main.ml))
-  (deps ( (glob_files tests.ml) (glob_files *tests.ml) (glob_files *Tests.ml) ))
-  (action  (with-stdout-to ${@} (run dryunit gen
+  (deps ((glob_files tests.ml) (glob_files *tests.ml) (glob_files *Tests.ml)))
+  (action (with-stdout-to ${@} (run dryunit gen
     --framework " ^ TestFramework.to_string framework ^ "
     ;; --filter \"space separated list\"
     ;; --ignore \"space separated list\"
     ;; --ignore-path \"space separated list\"
   )))))
+
+(alias
+  ((name runtest)
+   (deps (main.exe))
+   (action (run ${<}))
+  ))
 "
