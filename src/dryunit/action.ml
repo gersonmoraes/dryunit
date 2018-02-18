@@ -7,7 +7,7 @@ let init_ext () =
 
 let help man_format cmds topic =
   match topic with
-  | None -> `Help (`Pager, None) (* help about the program. *)
+  | None -> `Help (`Pager, None)
   | Some topic ->
       let topics = "topics" :: "patterns" :: "environment" :: cmds in
       let conv, _ =
@@ -21,11 +21,6 @@ let help man_format cmds topic =
             `Ok (Cmdliner.Manpage.print man_format Format.std_formatter page)
       )
 
-(*
-  This options are used generate the code to:
-    - activate ppx_dryunit
-    - generate the final source code with bootstrap code
-*)
 type gen_opts =
   { nocache    : bool
   ; framework  : string option
@@ -49,7 +44,6 @@ let catch f () =
   with
    Failure e -> `Error (false, e)
 
-(* move this to App.gen_extension *)
 let gen_extension { nocache; framework; cache_dir; ignore; only; ignore_path; targets} =
   let cache_dir = unwrap_or "_build/.dryunit" cache_dir in
   let ignore = unwrap_or "" ignore in
@@ -67,7 +61,6 @@ let gen_executable { nocache; framework; cache_dir; ignore; only; ignore_path; t
   let only = unwrap_or "" only in
   let ignore_path = unwrap_or "" ignore_path in
   let framework = TestFramework.of_string (unwrap_or "alcotest" framework) in
-  (* let targets = if List.length targets == 0 then [ "main.ml" ] else targets in *)
   if List.length targets == 0 then
     ( let suites = App.get_suites ~nocache ~framework ~cache_dir ~ignore ~only ~targets
         ~ignore_path ~detection:"dir" ~main:"main.ml" in
