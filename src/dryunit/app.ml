@@ -59,11 +59,11 @@ let get_suites ~nocache ~framework ~cache_dir ~ignore ~only ~targets ~ignore_pat
   |> apply_filters ~only ~ignore
 
 let gen_executable framework suites oc =
-  (* let oc = open_out path in *)
-  let f =
-    ( match framework with
-      | TestFramework.Alcotest -> Serializer.boot_alcotest
-      | TestFramework.OUnit ->  Serializer.boot_ounit
-    ) in
-    f oc suites
-    (* close_out oc *)
+  if List.length suites > 0 then
+    ( let f =
+      ( match framework with
+        | TestFramework.Alcotest -> Serializer.boot_alcotest
+        | TestFramework.OUnit ->  Serializer.boot_ounit
+      ) in
+      f oc suites
+    )

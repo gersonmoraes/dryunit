@@ -7,6 +7,7 @@ Changelog
   * Adding support for `jbuilder runtest` in the templates
   * Fix for causal exceptions when persisting cache
   * Removed all ppx-related code
+  * Optimizing for empty suites
 
 
 0.5.0
