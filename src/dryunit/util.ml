@@ -197,3 +197,25 @@ let util_title_from_filename name =
       _ -> i := len;
   done;
   name |> Bytes.trim
+
+let create_dir ?(r=false) ?(perms=0o755) path =
+  let f () =
+    if r then
+      ( split Filename.dir_sep path |>
+        List.fold_left
+        ( fun acc basename ->
+          let path = acc ^ Filename.dir_sep ^ basename in
+          if not (Sys.file_exists path) then
+            Unix.mkdir path perms;
+          path
+        )
+        "" |> ignore
+      )
+    else
+      ( if not (Sys.file_exists path) then
+          Unix.mkdir path perms
+      ) in
+  try f () with
+  | Unix.Unix_error(Unix.EEXIST, "mkdir", _) -> failwith "HELLLLLLO"
+
+let capitalize_ascii = Bytes.capitalize_ascii

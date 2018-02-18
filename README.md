@@ -55,42 +55,11 @@ This is the output of the command `dryunit init`:
 As you see, this is the place to customize your test executable. The definitions in the comments provide a template for common filters, but you can find more information about customizations using `dryunit help` or `dryunit COMMAND - - help`.
 
 
-## About the extension
-
-This project was originated as a PPX. It turns out this setup introduces the unnecessary preprocess of every test file, needs to be randomly modified at every build to bypass jbuilder cache, and overall, that's not even what most users need.
-
-It is still available as the optional package `ppx_dryunit`. Currently the extension provides roughly the same functionality as the command line, plus the possibility to detect tests only in the current file, which is its recommended setup.
-
-The simplest way to use it is adding this line at the end of your file `main.ml`:
-
-```
-let () = [%dryunit]
-```
-
-That will generate a default configuration that only sees the current file. You can override any default behavior passing arguments through a record, as shown below. All fields are optionals and might be in any order.
-
-```ocaml
-let () =
-  [%dryunit
-    { cache_dir   = ".dryunit"
-    ; cache       = true
-    ; framework   = "alcotest"
-    ; ignore      = ""
-    ; filter      = ""
-    ; detection   = "file"
-    ; ignore_path = "self"
-    }
-  ]
-```
-
-
-
 ## Implementation details
 
 - At build time, dryunit will check anything that looks like a test file in the build context and check its internal cache mechanism for preprocessed suites.
 - If none is found, an instance of OCaml parser will be created to extract a structured representation of the test file.
 - Cache is done in one file for the whole directory. Updated according to timestamps and compiler version. Default directory is (`_build/.dryunit`).
-- The extension does nothing if outside a build directory.
 
 
 

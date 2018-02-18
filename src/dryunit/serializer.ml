@@ -1,10 +1,9 @@
-open Core_normalization
-open Core_runtime
+open Runtime
 open Printf
 
 open TestSuite
 open TestDescription
-open Core_util
+open Util
 
 let boot_alcotest oc suites : unit =
   fprintf oc "let () =\n";

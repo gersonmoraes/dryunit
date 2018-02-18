@@ -1,0 +1,15 @@
+(executable
+  ((name main)
+  (libraries (oUnit))))
+
+(rule
+ ((targets (main.ml))
+  (deps ( (glob_files tests.ml) (glob_files *tests.ml) (glob_files *Tests.ml) ))
+  (action  (with-stdout-to ${@} (run
+    ../../src/dryunit/main.exe gen --framework ounit
+  )))))
+
+(alias
+ ((name   runtest)
+  (deps   (main.exe main.expected main.ml))
+  (action (run diff -u main.expected main.ml))))

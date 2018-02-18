@@ -1,9 +1,8 @@
-open Core_normalization
-open Core_runtime
-open Core_util
+open Runtime
+open Util
 
 let init_ext () =
-    Core_serializer.init_extension ();
+    Serializer.init_extension ();
     `Ok ()
 
 let help man_format cmds topic =
@@ -87,9 +86,9 @@ let gen_executable { nocache; framework; cache_dir; ignore; only; ignore_path; t
   `Ok ()
 
 let init_executable { framework; } =
-  Core_serializer.init_default (TestFramework.of_string framework);
+  Serializer.init_default (TestFramework.of_string framework);
   `Ok ()
 
 let init_framework f =
-  Core_serializer.init_default f;
+  Serializer.init_default f;
   `Ok ()

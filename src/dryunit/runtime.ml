@@ -1,13 +1,5 @@
-module Make_core_runtime
-  ( Capitalize: sig
-      val capitalize_ascii: bytes -> bytes
-    end
-  ) = struct
-
-
 open Printf
-open Capitalize
-open Core_util
+open Util
 
 let running_ppx = ref false
 
@@ -51,10 +43,10 @@ open TestSuite
 
 
 let title_from (v:bytes) : string =
-  Bytes.to_string @@ capitalize_ascii (Core_util.util_title_from v)
+  Bytes.to_string @@ capitalize_ascii (Util.util_title_from v)
 
 let title_from_no_padding (v:bytes) : string  =
-  Bytes.to_string @@ capitalize_ascii (Core_util.util_title_from_filename v)
+  Bytes.to_string @@ capitalize_ascii (Util.util_title_from_filename v)
 
 let in_build_dir () =
   is_substring (Sys.getcwd ()) "build/"
@@ -62,14 +54,14 @@ let in_build_dir () =
 let should_ignore ~ignore name =
   match ignore with
   | [] -> false
-  | _ -> List.exists (fun v -> Core_util.is_substring name v) ignore
+  | _ -> List.exists (fun v -> Util.is_substring name v) ignore
 
 
 (* XXX: we could add support for inline namespaced tests here *)
 let rec should_ignore_path ~only path =
   ( match only with
     | [] -> false
-    | _ -> List.exists (fun v -> Core_util.is_substring path v) only
+    | _ -> List.exists (fun v -> Util.is_substring path v) only
   )
 
 let extract_from ~filename : TestDescription.t list =
@@ -134,9 +126,7 @@ let cache_file ~main ~custom_dir =
       | None -> cache_dir ()
       | Some dir -> dir
     ) in
-  (* let dir = cache_dir () in *)
-  if not @@ Sys.file_exists dir then
-    Unix.mkdir dir 0o755;
+  Util.create_dir dir;
   close_out (open_out (dir ^ sep ^ ".jbuilder-keep"));
   let s : bytes = Bytes.of_string (main ^ Sys.ocaml_version) in
   let hash = Digest.(to_hex @@ bytes s) in
@@ -252,19 +242,6 @@ end
 let extract_name_from_file ~filename =
   capitalize_ascii
 
-let mkdir_p dir =
-  split sep dir |>
-  List.fold_left
-  ( fun acc basename ->
-    let path = acc ^ sep ^ basename in
-    if not (Sys.file_exists path) then
-      Unix.mkdir path 0o755;
-    path
-  )
-  "" |>
-  ignore
-
-
 let filter_from ~throw ~name value : string list =
   let l = split " " value in
   List.iter
@@ -281,12 +258,12 @@ let filter_from ~throw ~name value : string list =
 let should_ignore ~ignore name =
   match ignore with
   | [] -> assert false
-  | _ -> List.exists (fun v -> Core_util.is_substring name v) ignore
+  | _ -> List.exists (fun v -> Util.is_substring name v) ignore
 
 let should_filter ~only name =
   match only with
   | [] -> assert false
-  | _ -> List.exists (fun v -> Core_util.is_substring name v) only
+  | _ -> List.exists (fun v -> Util.is_substring name v) only
 
 
 let apply_filters ~only ~(ignore:string list) suites =
@@ -323,5 +300,3 @@ let validate_filters ~throw ~ignore ~only =
           throw (sprintf "Query `%s` appears in the fields `filter` and `ignore`." v_filter)
       )
       only
-
-end

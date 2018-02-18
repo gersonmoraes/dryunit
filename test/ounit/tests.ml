@@ -1,5 +1,4 @@
 open OUnit2
-open Foo
 
 let test1 test_ctxt =
   assert_equal "x" (Char.escaped 'x')

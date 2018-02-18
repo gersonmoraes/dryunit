@@ -1,22 +1,6 @@
-(*
-  Our cmd-free app definitions and models
-*)
-open Core_normalization
-open Core_util
+open Util
 open Printf
-open Core_runtime
-
-let mkdir_p dir =
-  split Filename.dir_sep dir |>
-  List.fold_left
-  ( fun acc basename ->
-    let path = acc ^ Filename.dir_sep ^ basename in
-    if not (Sys.file_exists path) then
-      Unix.mkdir path 0o755;
-    path
-  )
-  "" |>
-  ignore
+open Runtime
 
 let gen_extension ~nocache ~framework ~cache_dir ~ignore ~only ~targets ~ignore_path =
   let _ = TestFramework.of_string framework in
@@ -36,8 +20,7 @@ let gen_extension ~nocache ~framework ~cache_dir ~ignore ~only ~targets ~ignore_
       ( fun target ->
         let path = Sys.getcwd () ^ Filename.dir_sep ^ target in
         let dir = Filename.dirname path in
-        if not (Sys.file_exists dir) then
-          mkdir_p dir;
+        Util.create_dir dir;
         let oc = open_out path in
         Printf.fprintf oc "%s" output;
         close_out oc
@@ -55,10 +38,10 @@ let get_suites ~nocache ~framework ~cache_dir ~ignore ~only ~targets ~ignore_pat
   let custom_dir =
     if (cache_dir = ".dryunit") || (cache_dir = "_build/.dryunit") then None
     else
-    ( if Core_util.starts_with cache_dir Filename.dir_sep then
-        let () = mkdir_p cache_dir in
+    ( if Util.starts_with cache_dir Filename.dir_sep then
+        let () = Util.create_dir cache_dir in
         Some cache_dir
-      else if not !Core_runtime.running_ppx then
+      else if not !Runtime.running_ppx then
         Some cache_dir
       else
         throw ("Cache directory must be \".dryunit\" or a full custom path. Current value is `" ^ cache_dir ^ "`");
@@ -79,8 +62,8 @@ let gen_executable framework suites oc =
   (* let oc = open_out path in *)
   let f =
     ( match framework with
-      | TestFramework.Alcotest -> Core_serializer.boot_alcotest
-      | TestFramework.OUnit ->  Core_serializer.boot_ounit
+      | TestFramework.Alcotest -> Serializer.boot_alcotest
+      | TestFramework.OUnit ->  Serializer.boot_ounit
     ) in
     f oc suites
     (* close_out oc *)

@@ -1,39 +1,7 @@
+INSTALL_ARGS := $(if $(PREFIX),--prefix stty$(PREFIX),)
 
-BUILD = _build/default
-
-# Main executable
-MAIN = src/dryunit/main
-
-# Tests
-TEST_ALCOTEST = tests/alcotest/main
-TEST_OUNIT = tests/ounit/main
-TEST_ARGS = tests/extension/main
-
-
-default:
-	@jbuilder build $(MAIN).exe
-
-clean:
-	@rm -rf .dryunit
-	@jbuilder clean
-
-dryunit:
-	@rm -f $(BUILD)/$(TEST_OUNIT).ml
-
-run_alcotest:
-	@jbuilder build $(TEST_ALCOTEST).exe && $(BUILD)/$(TEST_ALCOTEST).exe
-
-run_ounit: dryunit
-	@jbuilder build $(TEST_OUNIT).exe && $(BUILD)/$(TEST_OUNIT).exe
-
-run_args:
-	@jbuilder build $(TEST_ARGS).exe && $(BUILD)/$(TEST_ARGS).exe
-
-build_args:
-	@jbuilder build $(EXE_ARGS)
-
-test: default
-	@jbuilder runtest
+default: normalize
+	@jbuilder build @install
 
 install:
 	jbuilder install $(INSTALL_ARGS)
@@ -41,12 +9,15 @@ install:
 uninstall:
 	jbuilder uninstall $(INSTALL_ARGS)
 
-reinstall: uninstall install
+reinstall: uninstall reinstall
 
-run: default
-	@$(BUILD)/$(MAIN).exe $(filter-out $@,$(MAKECMDGOALS))
+clean:
+	@jbuilder clean
 
-%:
-	@:
+test: normalize
+	@jbuilder runtest
 
-.PHONY: default install uninstall reinstall clean examples
+normalize:
+	@mkdir -p _build/default/test/{ounit,detection,alcotest}
+
+.PHONY: default install uninstall reinstall clean test

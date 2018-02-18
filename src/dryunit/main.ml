@@ -1,5 +1,4 @@
 open Cmdliner
-open Core_normalization
 
 let version = "0.4.1"
 let sdocs = Manpage.s_common_options
