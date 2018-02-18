@@ -8,6 +8,7 @@ Changelog
   * Fix for causal exceptions when persisting cache
   * Removed all ppx-related code
   * Optimizing for empty suites
+  * Simplifying testsuite names
 
 
 0.5.0

@@ -80,8 +80,13 @@ let timestamp_from filename =
 let suite_from ~dir filename : TestSuite.t =
   let suite_path = dir ^ sep ^ filename in
   let name = (Filename.basename filename) in
+  let suite_title =
+    let s = String.trim @@ title_from_no_padding (to_bytes (Filename.chop_suffix name "tests.ml")) in
+    let len = String.length s in
+    if len > 0 then s
+    else "Tests" in
   { suite_name = to_string @@ capitalize_ascii (to_bytes (Filename.chop_suffix name ".ml"));
-    suite_title = title_from_no_padding (to_bytes (Filename.chop_suffix name ".ml"));
+    suite_title;
     suite_path;
     timestamp = timestamp_from suite_path;
     tests = extract_from ~filename:(sprintf "%s%s%s" dir sep name)
