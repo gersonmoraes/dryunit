@@ -1,6 +1,6 @@
 opam-version: "1.2"
 name: "dryunit"
-version: "0.5.1"
+version: "0.6.0"
 maintainer: "gerson.xp@gmail.com"
 authors: ["Gerson Moraes"]
 homepage: "https://github.com/gersonmoraes/dryunit"
@@ -8,7 +8,6 @@ bug-reports: "https://github.com/gersonmoraes/dryunit"
 dev-repo: "https://github.com/gersonmoraes/dryunit.git"
 available: [ ocaml-version >= "4.03.0" ]
 build: [
-  ["jbuilder" "subst"] {pinned}
   ["jbuilder" "build" "-p" name "-j" jobs]
 ]
 

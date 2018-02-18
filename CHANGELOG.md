@@ -1,14 +1,14 @@
 Changelog
 =========
 
-0.5.1
+0.6.0
 -----
 
-  * Adding support for `jbuilder runtest` in the templates
+  * Integrating incremental test execution with `jbuilder runtest`
   * Fix for causal exceptions when persisting cache
-  * Removed all ppx-related code
-  * Optimizing for empty suites
-  * Simplifying testsuite names
+  * Removed all ppx and cppo related code (now dryunit only deps on cmdliner)
+  * When the suite is empty, no bootstrap is generated
+  * Names for testsuites were simplified
 
 
 0.5.0
