@@ -216,6 +216,6 @@ let create_dir ?(r=false) ?(perms=0o755) path =
           Unix.mkdir path perms
       ) in
   try f () with
-  | Unix.Unix_error(Unix.EEXIST, "mkdir", _) -> failwith "HELLLLLLO"
+  | Unix.Unix_error(Unix.EEXIST, "mkdir", _) -> ()
 
 let capitalize_ascii = Bytes.capitalize_ascii
