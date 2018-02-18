@@ -169,8 +169,9 @@ let tests_from path =
 
 
 let util_title_from name =
+  let i, len = ref 0, Bytes.length name in
   let name =
-    if (Bytes.get name 4) = '_' then
+    if len > 4 && (Bytes.get name 4) = '_' then
       Bytes.sub name 4 ((Bytes.length name) - 4)
     else name in
   let i, len = ref 0, Bytes.length name in
