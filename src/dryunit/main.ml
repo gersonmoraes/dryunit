@@ -14,13 +14,14 @@ let help_secs = [
 ]
 
 
-let gen_opts nocache framework cache_dir ignore only ignore_path targets =
-  Action.({ nocache; framework; cache_dir; ignore; only; ignore_path; targets; })
+let gen_opts sort nocache framework cache_dir ignore only ignore_path targets =
+  Action.({ sort; nocache; framework; cache_dir; ignore; only; ignore_path; targets; })
 
 
 let gen_opts_t =
   let docs = "Generate source code for test executable with appropriate code to bootstrap a test framework" in
   let open Arg in
+  let sort = value & flag & info ["sort"] ~docs ~doc:"Sort testsuites and test functions. Default is false." in
   let nocache = value & flag & info ["nocache"] ~docs ~doc:"Disable cache." in
   let framework = value & opt (some string) None & info ["framework"] ~docs ~doc:"Define a test framework. Currently only 'alcotest' and 'ounit' are available. The default is 'alcotest'." in
   let cache_dir = value & opt (some string) None & info ["cache-dir"] ~docs ~doc:"Select a custom cache dir." in
@@ -28,7 +29,7 @@ let gen_opts_t =
   let ignore = value & opt (some string) None & info ["ignore"] ~docs ~doc:"Space separated list of words used to ignore tests." in
   let ignore_path = value & opt (some string) None & info ["ignore-path"] ~docs ~doc:"Space separated list of words used to ignore files." in
   let targets = value & pos_all string [] & info [] ~docv:"TARGET" in
-  Term.(const gen_opts $ nocache $ framework $ cache_dir $ ignore $ only $ ignore_path $ targets)
+  Term.(const gen_opts $ sort $ nocache $ framework $ cache_dir $ ignore $ only $ ignore_path $ targets)
 
 
 let init_opts framework =

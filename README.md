@@ -24,7 +24,7 @@ If for whatever reason you would like to stop using Dryuniy, you can migrate bac
 
 #### Using traditional testing frameworks matters
 
-There's something about the simplicity and predictability of traditional testing frameworks producing self contained test executables from pure OCaml that is facinating. 
+There's something about the simplicity and predictability of traditional testing frameworks producing self contained test executables from pure OCaml that is facinating.
 
 Different from existing approaches, in traditional frameworks the test code is not *special*: there's no no enhanced syntax or rewriting that could potentially get in the way of your tooling to interact with your code. Which in term, means autocompletion and linting works as in any other piece of pure OCaml code.
 
@@ -90,7 +90,7 @@ This is the output of the command `dryunit init`:
     ;; --ignore "space separated list"
     ;; --ignore-path "space separated list"
   )))))
-  
+
 (alias
   ((name runtest)
    (deps (main.exe))

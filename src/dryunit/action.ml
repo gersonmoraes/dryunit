@@ -22,7 +22,8 @@ let help man_format cmds topic =
       )
 
 type gen_opts =
-  { nocache    : bool
+  { sort       : bool
+  ; nocache    : bool
   ; framework  : string option
   ; cache_dir  : string option
   ; only       : string option
@@ -44,32 +45,21 @@ let catch f () =
   with
    Failure e -> `Error (false, e)
 
-let gen_extension { nocache; framework; cache_dir; ignore; only; ignore_path; targets} =
-  let cache_dir = unwrap_or "_build/.dryunit" cache_dir in
-  let ignore = unwrap_or "" ignore in
-  let only = unwrap_or "" only in
-  let ignore_path = unwrap_or "" ignore_path in
-  let framework = unwrap_or "alcotest" framework in
-  catch
-    ( fun () ->
-      App.gen_extension ~nocache ~framework ~cache_dir ~ignore ~only ~ignore_path ~targets
-    ) ()
-
-let gen_executable { nocache; framework; cache_dir; ignore; only; ignore_path; targets } =
+let gen_executable { sort; nocache; framework; cache_dir; ignore; only; ignore_path; targets } =
   let cache_dir = unwrap_or "_build/.dryunit" cache_dir in
   let ignore = unwrap_or "" ignore in
   let only = unwrap_or "" only in
   let ignore_path = unwrap_or "" ignore_path in
   let framework = TestFramework.of_string (unwrap_or "alcotest" framework) in
   if List.length targets == 0 then
-    ( let suites = App.get_suites ~nocache ~framework ~cache_dir ~ignore ~only ~targets
+    ( let suites = App.get_suites ~sort ~nocache ~framework ~cache_dir ~ignore ~only ~targets
         ~ignore_path ~detection:"dir" ~main:"main.ml" in
       App.gen_executable framework suites stdout
     )
   else
     List.iter
       ( fun target ->
-          let suites = App.get_suites ~nocache ~framework ~cache_dir ~ignore ~only ~targets
+          let suites = App.get_suites ~sort ~nocache ~framework ~cache_dir ~ignore ~only ~targets
             ~ignore_path ~detection:"dir" ~main:target in
           let oc = open_out target in
           App.gen_executable framework suites oc;

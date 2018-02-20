@@ -1,13 +1,13 @@
 let () =
   Alcotest.run "Main" [
-    "Secondary", [
-      "Capit", `Quick, Secondary_tests.test_capit;
-      "Plus", `Quick, Secondary_tests.test_plus;
-      "Capit another4", `Quick, Secondary_tests.test_capit_another4;
-    ];
     "Primary", [
       "Capit", `Quick, Primary_tests.test_capit;
-      "Plus", `Quick, Primary_tests.test_plus;
       "Capit another", `Quick, Primary_tests.test_capit_another;
+      "Plus", `Quick, Primary_tests.test_plus;
+    ];
+    "Secondary", [
+      "Capit", `Quick, Secondary_tests.test_capit;
+      "Capit another4", `Quick, Secondary_tests.test_capit_another4;
+      "Plus", `Quick, Secondary_tests.test_plus;
     ];
   ]

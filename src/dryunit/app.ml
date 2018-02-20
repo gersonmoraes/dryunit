@@ -34,7 +34,7 @@ let throw s =
   exit 1
 
 
-let get_suites ~nocache ~framework ~cache_dir ~ignore ~only ~targets ~ignore_path ~detection ~main : TestSuite.t list =
+let get_suites ~sort ~nocache ~framework ~cache_dir ~ignore ~only ~targets ~ignore_path ~detection ~main : TestSuite.t list =
   let custom_dir =
     if (cache_dir = ".dryunit") || (cache_dir = "_build/.dryunit") then None
     else
@@ -55,8 +55,21 @@ let get_suites ~nocache ~framework ~cache_dir ~ignore ~only ~targets ~ignore_pat
     | "dir" -> detect_suites ~filename ~custom_dir ~cache_active:true ~ignore_path
     | "file" -> [ suite_from ~dir:(Filename.dirname filename) (Filename.basename filename) ]
     | _ -> throw "The field `detection` only accepts \"dir\" or \"file\"."
+  ) |>
+  apply_filters ~only ~ignore |>
+  fun suites ->
+  ( if sort then
+      ( let open Runtime.TestSuite in
+        let open Runtime.TestDescription in
+        let suites = List.map
+          ( fun v ->
+            { v with tests = List.sort (fun v1 v2 -> String.compare v1.test_title v2.test_title) v.tests }
+          )
+          suites in
+        List.sort (fun v1 v2 -> String.compare v1.suite_title v2.suite_title) suites
+      )
+    else suites
   )
-  |> apply_filters ~only ~ignore
 
 let gen_executable framework suites oc =
   if List.length suites > 0 then
