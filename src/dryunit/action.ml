@@ -5,6 +5,7 @@ let init_ext () =
     Serializer.init_extension ();
     `Ok ()
 
+
 let help man_format cmds topic =
   match topic with
   | None -> `Help (`Pager, None)
@@ -21,6 +22,7 @@ let help man_format cmds topic =
             `Ok (Cmdliner.Manpage.print man_format Format.std_formatter page)
       )
 
+
 type gen_opts =
   { sort       : bool
   ; nocache    : bool
@@ -32,11 +34,14 @@ type gen_opts =
   ; targets    : string list
   }
 
+
 type init_opts =
   { framework: string }
 
+
 let create_init_options framework : init_opts =
   { framework }
+
 
 let catch f () =
   try
@@ -44,6 +49,7 @@ let catch f () =
     `Ok ()
   with
    Failure e -> `Error (false, e)
+
 
 let gen_executable { sort; nocache; framework; cache_dir; ignore; only; ignore_path; targets } =
   let cache_dir = unwrap_or "_build/.dryunit" cache_dir in
@@ -68,9 +74,11 @@ let gen_executable { sort; nocache; framework; cache_dir; ignore; only; ignore_p
       targets;
   `Ok ()
 
+
 let init_executable { framework; } =
   Serializer.init_default (TestFramework.of_string framework);
   `Ok ()
+
 
 let init_framework f =
   Serializer.init_default f;

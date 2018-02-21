@@ -5,14 +5,18 @@ open Model
 open TestDescription
 open TestSuite
 
+
 let title_from (v:bytes) : string =
   Bytes.to_string @@ capitalize_ascii (Util.util_title_from v)
+
 
 let title_from_no_padding (v:bytes) : string  =
   Bytes.to_string @@ capitalize_ascii (Util.util_title_from_filename v)
 
+
 let in_build_dir () =
   is_substring (Sys.getcwd ()) "build/"
+
 
 let should_ignore ~ignore name =
   match ignore with
@@ -26,6 +30,7 @@ let rec should_ignore_path ~only path =
     | [] -> false
     | _ -> List.exists (fun v -> Util.is_substring path v) only
   )
+
 
 let extract_from ~filename : TestDescription.t list =
   tests_from filename |>
@@ -53,11 +58,13 @@ let suite_from ~dir filename : TestSuite.t =
     tests = extract_from ~filename:(sprintf "%s%s%s" dir sep name)
   }
 
+
 let test_name ~current_module suite test =
   if current_module then
     test.test_name
   else
     (suite.suite_name ^ "." ^ test.test_name)
+
 
 let is_test_file ~main_basename ~ignore_path path =
   if path = main_basename then
@@ -77,6 +84,7 @@ let is_test_file ~main_basename ~ignore_path path =
         )
       with Not_found -> false
     )
+
 
 let detect_suites ~filename ~custom_dir ~cache_active ~(ignore_path:string list) : TestSuite.t list =
   let cache = Cache.load_suites ~main:filename ~custom_dir ~cache_active in
@@ -102,9 +110,11 @@ let detect_suites ~filename ~custom_dir ~cache_active ~(ignore_path:string list)
     Cache.save_suites ~main:filename ~custom_dir ~cache_active suites;
   suites
 
+
 let pp name tests =
   print_endline ("Tests in `" ^ name ^ "`");
   List.iter (fun t -> Printf.printf " - %s [%s]\n" t.test_title t.test_name) tests
+
 
 let print_tests_from ~filename : string =
   let tests = ref [] in
@@ -125,8 +135,10 @@ module Test = struct
   let title (t:TestDescription.t) = t.test_title
 end
 
+
 let extract_name_from_file ~filename =
   capitalize_ascii
+
 
 let filter_from ~throw ~name value : string list =
   let l = split " " value in
@@ -145,6 +157,7 @@ let should_ignore ~ignore name =
   match ignore with
   | [] -> assert false
   | _ -> List.exists (fun v -> Util.is_substring name v) ignore
+
 
 let should_filter ~only name =
   match only with
@@ -173,6 +186,7 @@ let apply_filters ~only ~(ignore:string list) suites =
       []
       suites
   )
+
 
 let validate_filters ~throw ~ignore ~only =
   match ignore, only with

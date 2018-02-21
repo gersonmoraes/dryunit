@@ -1,21 +1,27 @@
-let to_bytes = Bytes.of_string
-let to_string = Bytes.to_string
+
+let to_bytes, to_string = Bytes.(of_string, to_string)
+
 
 let not_implemented feature =
   failwith ("feature `" ^ feature ^ "` is not implemented yet")
+
 
 let unwrap_or default = function
   | Some v -> v
   | None -> default
 
+
 let find_opt f l =
   try Some (List.find f l) with
   | Not_found -> None
 
+
 let split pattern value =
   Str.split (Str.regexp pattern) value
 
+
 let sep = Filename.dir_sep
+
 
 let is_substring (string:string) (substring:string) =
   let string = to_bytes string and substring = to_bytes substring in
@@ -31,6 +37,7 @@ let is_substring (string:string) (substring:string) =
     try check (Bytes.index string (Bytes.get substring 0))
     with Not_found -> false
 
+
 let starts_with s1 s2 =
   let open  String in
   let len1, len2 = length s1, length s2 in
@@ -42,6 +49,7 @@ let starts_with s1 s2 =
     (sub s1 0 len2) = s2
   end
 
+
 let ends_with s1 s2 =
   let open  String in
   let len1, len2 = length s1, length s2 in
@@ -52,6 +60,7 @@ let ends_with s1 s2 =
   else begin
     (sub s1 (len1 - len2) len2) = s2
   end
+
 
 (*
   Hardcore filter to let bindings starting with "test_"
@@ -70,6 +79,7 @@ let is_possible_test_entry line =
     else false
   else false
 
+
 (**
   Definition used in parsing logic.
 
@@ -82,25 +92,31 @@ type probation = {
   time: int ref;
 }
 
+
 (* limit for probation iterations, assiciated with time counter *)
 let deadline = 14
+
 
 let fun_name line  =
   let line = to_bytes line in
   Bytes.(sub line 20 ((index_from line 21 '"') - 20))
+
 
 let new_probation () = {
   active = ref false;
   time = ref 0;
 }
 
+
 let start_probation ~probation () =
   probation.active := true;
   probation.time := 0
 
+
 let reset_probation ~probation () =
   probation.active := false;
   probation.time := 0
+
 
 let can_confirm_test_entry line =
   let open String in
@@ -113,6 +129,7 @@ let can_confirm_test_entry line =
       else false
     else false
   else false
+
 
 let probation_pass ~probation line =
   probation.time := !(probation.time) + 1;
@@ -161,7 +178,6 @@ let feed_with ~chan =
     List.rev !lines
 
 
-
 let tests_from path =
   let cmd = Printf.sprintf "ocamlopt -dparsetree %s 2>&1 >/dev/null" path in
   let chan = Unix.open_process_in cmd in
@@ -199,6 +215,7 @@ let util_title_from_filename name =
   done;
   name |> Bytes.trim
 
+
 let create_dir ?(r=false) ?(perms=0o755) path =
   let f () =
     if r then
@@ -219,7 +236,9 @@ let create_dir ?(r=false) ?(perms=0o755) path =
   try f () with
   | Unix.Unix_error(Unix.EEXIST, "mkdir", _) -> ()
 
+
 let capitalize_ascii = Bytes.capitalize_ascii
+
 
 let timestamp_from filename =
   Unix.((stat filename).st_mtime)

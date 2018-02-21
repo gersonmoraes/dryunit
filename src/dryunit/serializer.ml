@@ -6,6 +6,7 @@ open TestSuite
 open TestDescription
 open Util
 
+
 let boot_alcotest oc suites : unit =
   fprintf oc "let () =\n";
   fprintf oc "  Alcotest.run \"Main\" [\n";
@@ -22,6 +23,7 @@ let boot_alcotest oc suites : unit =
     suites;
 fprintf oc "  ]\n";
 flush oc
+
 
 let boot_ounit oc suites : unit =
   fprintf oc "open OUnit2\n";
@@ -67,6 +69,7 @@ let init_extension () =
    (action (run ${<}))
   ))
 "
+
 
 let init_default framework =
   print_endline @@ String.trim @@ "
