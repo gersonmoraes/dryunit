@@ -160,18 +160,18 @@ let feed_with ~chan =
     while true; do
       let line = input_line chan in
       if !(probation.active) then
-      (match probation_pass ~probation line with
-        | Some true -> ()
-        | Some false ->
-            lines := List.tl !lines
-        | _ -> ()
-      )
+        ( match probation_pass ~probation line with
+          | Some true -> ()
+          | Some false ->
+              lines := List.tl !lines
+          | _ -> ()
+        )
       else
-      ( if is_possible_test_entry line then
-        ( lines := (fun_name line) :: !lines;
-          start_probation ~probation ()
-        );
-      )
+        ( if is_possible_test_entry line then
+          ( lines := (fun_name line) :: !lines;
+            start_probation ~probation ()
+          );
+        )
     done; !lines
   with End_of_file ->
     close_in chan;

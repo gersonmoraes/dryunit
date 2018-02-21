@@ -6,7 +6,7 @@
  ((targets (main.ml))
   (deps ( (glob_files tests.ml) (glob_files *tests.ml) (glob_files *Tests.ml) ))
   (action  (with-stdout-to ${@} (run
-    ../../src/main.exe gen --framework alcotest --sort
+    ../../../src/main.exe gen --framework alcotest --sort
   )))))
 
 

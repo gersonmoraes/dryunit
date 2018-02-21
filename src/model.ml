@@ -38,21 +38,21 @@ end
 
 module Modifiers = struct
   type t =
-    | Long
     | Async
-    | Result
     | Echain
+    | Long
+    | Result
 
   let of_string = function
-    | "long"   -> Long
-    | "async"  -> Async
-    | "result" -> Result
-    | "echain" -> Echain
-    | other -> failwith ("invalid modifier: `" ^ other ^ "'")
+    | "async"  -> Some Async
+    | "echain" -> Some Echain
+    | "long"   -> Some Long
+    | "result" -> Some Result
+    | other -> None
 
   let to_string = function
-    | Long   -> "long"
     | Async  -> "async"
+    | Echain -> "echain"
+    | Long   -> "long"
     | Result -> "result"
-    | Echain -> "echain" 
 end

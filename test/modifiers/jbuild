@@ -1,12 +1,12 @@
 (executable
  ((name main)
-  (libraries (alcotest))))
+  (libraries (alcotest str))))
 
 (rule
  ((targets (main.ml))
   (deps ((glob_files tests.ml) (glob_files *tests.ml) (glob_files *Tests.ml)))
-  (action (with-stdout-to ${@} (run dryunit gen
-    --framework alcotest
+  (action (with-stdout-to ${@} (run ../../src/main.exe gen
+    --framework alcotest --sort
     ;; --filter "space separated list"
     ;; --ignore "space separated list"
     ;; --ignore-path "space separated list"
