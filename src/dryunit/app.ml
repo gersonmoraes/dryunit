@@ -1,5 +1,6 @@
 open Util
 open Printf
+open Model
 open Runtime
 
 let gen_extension ~nocache ~framework ~cache_dir ~ignore ~only ~targets ~ignore_path =
@@ -59,8 +60,8 @@ let get_suites ~sort ~nocache ~framework ~cache_dir ~ignore ~only ~targets ~igno
   apply_filters ~only ~ignore |>
   fun suites ->
   ( if sort then
-      ( let open Runtime.TestSuite in
-        let open Runtime.TestDescription in
+      ( let open TestSuite in
+        let open TestDescription in
         let suites = List.map
           ( fun v ->
             { v with tests = List.sort (fun v1 v2 -> String.compare v1.test_title v2.test_title) v.tests }
