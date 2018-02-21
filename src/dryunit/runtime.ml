@@ -59,6 +59,25 @@ let test_name ~current_module suite test =
   else
     (suite.suite_name ^ "." ^ test.test_name)
 
+let is_test_file ~main_basename ~ignore_path path =
+  if path = main_basename then
+    false
+  else
+    ( let basename = Bytes.of_string @@ Filename.basename path in
+      let len = Bytes.length basename in
+      try
+        ( if Bytes.index basename '.' == (len - 3) && len > 7 then
+            let c = Bytes.get basename (len - 8) in
+            if c == 't' || c == 'T' then
+              if ends_with path "ests.ml" then
+                not (should_ignore_path ~only:ignore_path (to_string basename))
+              else false
+            else false
+          else false
+        )
+      with Not_found -> false
+    )
+
 let detect_suites ~filename ~custom_dir ~cache_active ~(ignore_path:string list) : TestSuite.t list =
   let cache = Cache.load_suites ~main:filename ~custom_dir ~cache_active in
   let cache_dirty = ref false in
@@ -66,26 +85,7 @@ let detect_suites ~filename ~custom_dir ~cache_active ~(ignore_path:string list)
   let main_basename = Filename.basename filename in
   Sys.readdir dir |>
   Array.to_list |>
-  List.filter
-  ( fun v ->
-    if v = main_basename then
-      false
-    else
-      ( let basename = Bytes.of_string @@ Filename.basename v in
-        let len = Bytes.length basename in
-        try
-          ( if Bytes.index basename '.' == (len - 3) && len > 7 then
-              let c = Bytes.get basename (len - 8) in
-              if c == 't' || c == 'T' then
-                if ends_with v "ests.ml" then
-                  not (should_ignore_path ~only:ignore_path (to_string basename))
-                else false
-              else false
-            else false
-          )
-        with Not_found -> false
-      )
-  ) |>
+  List.filter ( is_test_file ~main_basename ~ignore_path  ) |>
   (* only over records already in cache, invalidating the cache if needed *)
   List.map
   ( fun filename ->
@@ -109,12 +109,11 @@ let pp name tests =
 let print_tests_from ~filename : string =
   let tests = ref [] in
   let _ : unit =
-    detect_suites ~filename ~custom_dir:None ~cache_active:true ~ignore_path:[]
-    |> List.iter
-       ( fun suite ->
-         tests := !tests @ suite.tests
-      )
-  in
+    detect_suites ~filename ~custom_dir:None ~cache_active:true ~ignore_path:[] |>
+    List.iter
+    ( fun suite ->
+      tests := !tests @ suite.tests
+    ) in
   !tests |>
   List.map (fun test -> test.test_title) |>
   List.sort String.compare |>

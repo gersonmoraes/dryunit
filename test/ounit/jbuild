@@ -11,5 +11,5 @@
 
 (alias
  ((name   runtest)
-  (deps   (main.exe main.expected main.ml))
+  (deps   (main.exe (file main.expected)))
   (action (run diff -u main.expected main.ml))))
