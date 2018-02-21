@@ -34,3 +34,25 @@ module TestFramework = struct
     | OUnit -> "oUnit"
 
 end
+
+
+module Modifiers = struct
+  type t =
+    | Long
+    | Async
+    | Result
+    | Echain
+
+  let of_string = function
+    | "long"   -> Long
+    | "async"  -> Async
+    | "result" -> Result
+    | "echain" -> Echain
+    | other -> failwith ("invalid modifier: `" ^ other ^ "'")
+
+  let to_string = function
+    | Long   -> "long"
+    | Async  -> "async"
+    | Result -> "result"
+    | Echain -> "echain" 
+end

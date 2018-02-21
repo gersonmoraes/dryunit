@@ -18,6 +18,6 @@ test: normalize
 	@jbuilder runtest
 
 normalize:
-	@mkdir -p _build/default/test/{ounit,detection,alcotest}
+	@mkdir -p _build/default/test/{ounit,detection,alcotest,modifiers}
 
 .PHONY: default install uninstall reinstall clean test

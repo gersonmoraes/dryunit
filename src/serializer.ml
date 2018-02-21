@@ -44,37 +44,10 @@ fprintf oc "  )\n";
 flush oc
 
 
-let init_extension () =
-  print_endline @@ String.trim @@ "
-(executables
- ((names (main))
-  (libraries (alcotest))
-  (preprocess (pps (ppx_dryunit)))))
-
-;; This rule generates the bootstrapping
-(rule
- ((targets (main.ml))
-  (deps ( (glob_files tests.ml) (glob_files *tests.ml) (glob_files *Tests.ml) ))
-  ;;
-  (action  (with-stdout-to ${@} (run dryunit ext
-    --framework alcotest
-    ;;  --ignore \"space separated list\"
-    ;;  --filter \"space separated list\"
-    ;;  --ignore-path \"space separated list\"
-  )))))
-
-(alias
-  ((name   runtest)
-   (deps   (main.exe))
-   (action (run ${<}))
-  ))
-"
-
-
 let init_default framework =
   print_endline @@ String.trim @@ "
-(executables
- ((names (main))
+(executable
+ ((name main)
   (libraries (" ^ TestFramework.package framework ^ "))))
 
 (rule

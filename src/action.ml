@@ -1,10 +1,6 @@
 open Model
 open Util
 
-let init_ext () =
-    Serializer.init_extension ();
-    `Ok ()
-
 
 let help man_format cmds topic =
   match topic with
