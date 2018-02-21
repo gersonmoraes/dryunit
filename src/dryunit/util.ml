@@ -220,3 +220,6 @@ let create_dir ?(r=false) ?(perms=0o755) path =
   | Unix.Unix_error(Unix.EEXIST, "mkdir", _) -> ()
 
 let capitalize_ascii = Bytes.capitalize_ascii
+
+let timestamp_from filename =
+  Unix.((stat filename).st_mtime)

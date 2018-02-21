@@ -42,10 +42,8 @@ let get_suites ~sort ~nocache ~framework ~cache_dir ~ignore ~only ~targets ~igno
     ( if Util.starts_with cache_dir Filename.dir_sep then
         let () = Util.create_dir cache_dir in
         Some cache_dir
-      else if not !Runtime.running_ppx then
-        Some cache_dir
       else
-        throw ("Cache directory must be \".dryunit\" or a full custom path. Current value is `" ^ cache_dir ^ "`");
+        Some cache_dir
     ) in
   let ignore = filter_from ~throw ~name:"ignore" ignore in
   let only = filter_from ~throw ~name:"only" only in

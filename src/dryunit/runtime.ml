@@ -1,12 +1,9 @@
 open Printf
 open Util
 
-let running_ppx = ref false
-
 open Model
 open TestDescription
 open TestSuite
-
 
 let title_from (v:bytes) : string =
   Bytes.to_string @@ capitalize_ascii (Util.util_title_from v)
@@ -40,8 +37,6 @@ let extract_from ~filename : TestDescription.t list =
     )
 
 
-let timestamp_from filename =
-  Unix.((stat filename).st_mtime)
 
 let suite_from ~dir filename : TestSuite.t =
   let suite_path = dir ^ sep ^ filename in
@@ -64,87 +59,8 @@ let test_name ~current_module suite test =
   else
     (suite.suite_name ^ "." ^ test.test_name)
 
-let cache_dir () =
-  let flag_ref = ref false in
-  let root_found = ref "" in
-  Str.split (Str.regexp sep) (Sys.getcwd ()) |>
-  List.rev |>
-  List.filter
-    ( fun dir ->
-      if !flag_ref then
-        true
-      else
-      ( if (dir = "_build") || (dir = "build") then
-        ( flag_ref := true;
-          root_found := dir;
-        );
-        false
-      )
-    ) |>
-  List.rev |>
-  function
-  | []  ->
-      if !running_ppx then
-        failwith "ppx_dryunit should only be run from a 'build' or '_build' directory"
-      else
-        ".dryunit"
-  | l -> sep ^ (String.concat sep l) ^ sep ^ !root_found ^ sep ^ ".dryunit"
-
-
-let cache_file ~main ~custom_dir =
-  let dir =
-    ( match custom_dir with
-      | None -> cache_dir ()
-      | Some dir -> dir
-    ) in
-  Util.create_dir dir;
-  close_out (open_out (dir ^ sep ^ ".jbuilder-keep"));
-  let s : bytes = Bytes.of_string (main ^ Sys.ocaml_version) in
-  let hash = Digest.(to_hex @@ bytes s) in
-  dir ^ sep ^ hash
-
-let save_cache ~main ~custom_dir ~cache_active suites =
-  if not cache_active then ()
-  else
-  ( let path = cache_file ~main ~custom_dir in
-    if Sys.file_exists path then
-      Sys.remove path;
-    let c = open_out_bin path in
-    Marshal.to_channel c suites [];
-    flush c;
-    close_out c
-  )
-
-
-let load_cache ~main ~custom_dir ~cache_active =
-  let path = cache_file ~main ~custom_dir in
-  if cache_active && Sys.file_exists path then
-  ( let c = open_in_bin path in
-    let suites : TestSuite.t list = Marshal.from_channel c in
-    close_in c;
-    suites
-  )
-  else []
-
-let get_from_cache ~cache ~dir filename : TestSuite.t option =
-  try
-    let filename = dir ^ sep ^ filename in
-    List.find
-    ( fun s ->
-      if s.suite_path = filename  then
-        if timestamp_from s.suite_path = s.timestamp then
-          true
-        else false
-      else false
-    )
-    cache |>
-    fun s ->
-    Some s
-  with
-    Not_found -> None
-
 let detect_suites ~filename ~custom_dir ~cache_active ~(ignore_path:string list) : TestSuite.t list =
-  let cache = load_cache ~main:filename ~custom_dir ~cache_active in
+  let cache = Cache.load_suites ~main:filename ~custom_dir ~cache_active in
   let cache_dirty = ref false in
   let dir = Filename.dirname filename in
   let main_basename = Filename.basename filename in
@@ -173,7 +89,7 @@ let detect_suites ~filename ~custom_dir ~cache_active ~(ignore_path:string list)
   (* only over records already in cache, invalidating the cache if needed *)
   List.map
   ( fun filename ->
-    ( match get_from_cache ~dir ~cache filename with
+    ( match Cache.get ~dir ~cache filename with
       | Some suite -> suite
       | None ->
         ( cache_dirty := true;
@@ -183,7 +99,7 @@ let detect_suites ~filename ~custom_dir ~cache_active ~(ignore_path:string list)
   ) |>
   fun suites ->
   if !cache_dirty then
-    save_cache ~main:filename ~custom_dir ~cache_active suites;
+    Cache.save_suites ~main:filename ~custom_dir ~cache_active suites;
   suites
 
 let pp name tests =
