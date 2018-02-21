@@ -29,8 +29,8 @@ let test_requesting_only_long () =
   len_should_be 1 ~path:"long_tests.ml"
 
 let tests_requiring_multiple_mods () =
-  len_should_be 1 ~path:"async_long_tests.ml";
-  len_should_be 1 ~path:"echain_result_tests.ml";
-  len_should_be 1 ~path:"echain_result_async_tests.ml";
-  len_should_be 1 ~path:"echain_long_result_async_tests.ml";
+  len_should_be 2 ~path:"async_long_tests.ml";
+  len_should_be 2 ~path:"echain_result_tests.ml";
+  len_should_be 3 ~path:"echain_result_async_tests.ml";
+  len_should_be 4 ~path:"echain_long_result_async_tests.ml";
   ()
