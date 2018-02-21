@@ -6,8 +6,8 @@ open TestDescription
 open TestSuite
 
 
-let title_from (v:bytes) : string =
-  Bytes.to_string @@ capitalize_ascii (Util.util_title_from v)
+let title_from (v:string) : string =
+  Bytes.to_string @@ capitalize_ascii (Util.util_title_from (Bytes.of_string v))
 
 
 let title_from_no_padding (v:bytes) : string  =
@@ -36,7 +36,7 @@ let extract_from ~filename : TestDescription.t list =
   tests_from filename |>
   List.map
     (fun test_name ->
-      let test_title : string = title_from test_name in
+      let test_title : string = title_from (Bytes.to_string test_name) in
       let test_name = Bytes.to_string test_name in
       { test_name; test_title }
     )
