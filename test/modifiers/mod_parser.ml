@@ -61,6 +61,11 @@ module Mods = struct
 
 
     let of_path path =
-      list_of_path path |> of_list
+      let v = list_of_path path |> of_list in
+      ( if v.result && v.echain then
+          raise (Invalid_argument "you cannot activate result and echain simultaneously")
+      );
+      v
+
 
 end
