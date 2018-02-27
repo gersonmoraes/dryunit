@@ -40,12 +40,12 @@ let get_suites ~sort ~nocache ~framework ~cache_dir ~ignore ~only ~targets ~igno
   let custom_dir =
     if (cache_dir = ".dryunit") || (cache_dir = "_build/.dryunit") then None
     else
-    ( if Util.starts_with cache_dir Filename.dir_sep then
-        let () = Util.create_dir cache_dir in
-        Some cache_dir
-      else
-        Some cache_dir
-    ) in
+      ( if Util.starts_with cache_dir Filename.dir_sep then
+          let () = Util.create_dir cache_dir in
+          Some cache_dir
+        else
+          Some cache_dir
+      ) in
   let ignore = filter_from ~throw ~name:"ignore" ignore in
   let only = filter_from ~throw ~name:"only" only in
   let ignore_path = filter_from ~throw ~name:"ignore_path" ignore_path in

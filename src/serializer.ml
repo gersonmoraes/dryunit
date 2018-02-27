@@ -15,7 +15,10 @@ let boot_alcotest oc suites : unit =
       fprintf oc "    \"%s\", [\n" suite.suite_title;
       List.iter
         ( fun test ->
-          fprintf oc "      \"%s\", `Quick, %s.%s;\n" test.test_title suite.suite_name test.test_name;
+          fprintf oc "      \"%s\", `Quick, %s.%s;\n"
+            test.test_title
+            suite.suite_name
+            test.test_name;
         )
         suite.tests;
       fprintf oc "    ];\n";
@@ -33,7 +36,11 @@ let boot_ounit oc suites : unit =
     ( fun suite ->
       List.iter
         ( fun test ->
-          fprintf oc "      \"%s.%s\" >:: %s.%s;\n" suite.suite_name test.test_name suite.suite_name test.test_name;
+          fprintf oc "      \"%s.%s\" >:: %s.%s;\n"
+            suite.suite_name
+            test.test_name
+            suite.suite_name
+            test.test_name;
         )
         suite.tests;
         fprintf oc "\n";
