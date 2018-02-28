@@ -68,7 +68,7 @@ let init_default framework =
 
 (rule
  ((targets (main.ml))
-  (deps ((glob_files tests.ml) (glob_files *tests.ml) (glob_files *Tests.ml)))
+  (deps ( (glob_files {tests.ml,*tests.ml,*Tests.ml}) ))
   (action (with-stdout-to ${@} (run dryunit gen
     --framework " ^ TestFramework.to_string framework ^ "
     ;; --filter \"space separated list\"
