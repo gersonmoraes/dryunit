@@ -1,4 +1,3 @@
-(* open Runtime *)
 open Printf
 
 open Model

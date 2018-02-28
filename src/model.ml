@@ -2,6 +2,7 @@ module TestDescription = struct
   type t = {
     test_name: string;
     test_title: string;
+    test_loc: string;
   }
 end
 

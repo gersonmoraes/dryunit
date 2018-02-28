@@ -97,9 +97,10 @@ type probation = {
 let deadline = 14
 
 
-let fun_name line  =
+let fun_name line : string =
   let line = to_bytes line in
-  Bytes.(sub line 20 ((index_from line 21 '"') - 20))
+  Bytes.to_string @@ Bytes.(sub line 20 ((index_from line 21 '"') - 20))
+
 
 
 let new_probation () = {
@@ -158,7 +159,7 @@ let feed_with ~chan =
     let probation = new_probation () in
     reset_probation ~probation ();
     while true; do
-      let line = input_line chan in
+      let line : string = input_line chan in
       if !(probation.active) then
         ( match probation_pass ~probation line with
           | Some true -> ()
@@ -168,7 +169,7 @@ let feed_with ~chan =
         )
       else
         ( if is_possible_test_entry line then
-          ( lines := (fun_name line) :: !lines;
+          ( lines := line :: !lines;
             start_probation ~probation ()
           );
         )

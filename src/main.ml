@@ -1,5 +1,4 @@
 open Cmdliner
-let _ = let module S = Ctx_serializer in ()
 let version = "0.6.0"
 let sdocs = Manpage.s_common_options
 let exits = Term.default_exits

@@ -35,10 +35,14 @@ let rec should_ignore_path ~only path =
 let extract_from ~filename : TestDescription.t list =
   tests_from filename |>
   List.map
-    (fun test_name ->
-      let test_title : string = title_from (Bytes.to_string test_name) in
-      let test_name = Bytes.to_string test_name in
-      { test_name; test_title }
+    (fun line ->
+      let test_name = fun_name line in
+      let test_title : string = title_from test_name in
+      let test_loc =
+        let bytes = Bytes.of_string line in
+        let idx = (Bytes.rindex bytes '(') in
+        Bytes.sub bytes idx (Bytes.length bytes -idx) |> Bytes.to_string in
+      { test_name; test_title; test_loc }
     )
 
 
