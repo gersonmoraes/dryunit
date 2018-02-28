@@ -1,5 +1,5 @@
 open Cmdliner
-let version = "0.6.0"
+let version = "0.6.1"
 let sdocs = Manpage.s_common_options
 let exits = Term.default_exits
 
