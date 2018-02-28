@@ -48,7 +48,10 @@ let extract_from ~filename : TestDescription.t list =
 
 
 let suite_from ~dir filename : TestSuite.t =
-  let suite_path = dir ^ sep ^ filename in
+  (* XXX: experimental codee *)
+  let suite_path =
+    let dir = if dir = "." then Sys.getcwd () else dir in
+    dir ^ sep ^ filename in
   let name = (Filename.basename filename) in
   let suite_title =
     let s = String.trim @@ title_from_no_padding (to_bytes (Filename.chop_suffix name "tests.ml")) in

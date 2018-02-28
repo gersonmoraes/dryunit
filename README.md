@@ -84,7 +84,7 @@ This is the output of the command `dryunit init`:
 
 (rule
  ((targets (main.ml))
-  (deps ( (glob_files {tests.ml,*tests.ml,*tests.ml}) ))
+  (deps ( (glob_files {tests.ml,*tests.ml,*Tests.ml}) ))
   (action  (with-stdout-to ${@} (run dryunit gen
     --framework alcotest
     ;; --filter "space separated list"

@@ -64,10 +64,12 @@ let load_suites ~main ~custom_dir ~cache_active =
 
 let get ~cache ~dir filename : TestSuite.t option =
   try
+    (* XXX: experimental codee *)
+    let dir = if dir = "." then Sys.getcwd () else dir in
     let filename = dir ^ sep ^ filename in
     List.find
     ( fun s ->
-      if s.suite_path = filename  then
+      if s.suite_path = filename then
         if timestamp_from s.suite_path = s.timestamp then
           true
         else false
