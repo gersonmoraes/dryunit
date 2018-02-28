@@ -1,0 +1,19 @@
+(executable
+ ((name main)
+  (libraries (alcotest str))))
+
+(rule
+ ((targets (main.ml))
+  (deps ( (glob_files {tests.ml,*tests.ml,*Tests.ml}) ))
+  (action (with-stdout-to ${@} (run dryunit gen
+    --framework alcotest --context
+    ;; --filter "space separated list"
+    ;; --ignore "space separated list"
+    ;; --ignore-path "space separated list"
+  )))))
+
+(alias
+  ((name runtest)
+   (deps (main.exe))
+   (action (run ${<}))
+  ))
