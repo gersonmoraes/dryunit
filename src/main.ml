@@ -1,5 +1,5 @@
 open Cmdliner
-
+let _ = let module S = Ctx_serializer in ()
 let version = "0.6.0"
 let sdocs = Manpage.s_common_options
 let exits = Term.default_exits
@@ -17,17 +17,28 @@ let help_secs = [
 let gen_opts sort nocache framework cache_dir ignore only ignore_path targets =
   Action.({ sort; nocache; framework; cache_dir; ignore; only; ignore_path; targets; })
 
+module My_doc = struct
+  let sort        = "Sort testsuites and test functions. Default is false."
+  let nocache     = "Disable cache."
+  let framework   = "Define a test framework. Currently only 'alcotest' and " ^
+    "'ounit' are available. The default is 'alcotest'."
+  let cache_dir   = "Select a custom cache dir."
+  let only        = "Space separated list of words used to filter tests."
+  let ignore      = "Space separated list of words used to ignore tests."
+  let ignore_path = "Space separated list of words used to ignore files."
+end
+
 
 let gen_opts_t =
   let docs = "Generate source code for test executable with appropriate code to bootstrap a test framework" in
   let open Arg in
-  let sort = value & flag & info ["sort"] ~docs ~doc:"Sort testsuites and test functions. Default is false." in
-  let nocache = value & flag & info ["nocache"] ~docs ~doc:"Disable cache." in
-  let framework = value & opt (some string) None & info ["framework"] ~docs ~doc:"Define a test framework. Currently only 'alcotest' and 'ounit' are available. The default is 'alcotest'." in
-  let cache_dir = value & opt (some string) None & info ["cache-dir"] ~docs ~doc:"Select a custom cache dir." in
-  let only = value & opt (some string) None & info ["only"] ~docs ~doc:"Space separated list of words used to filter tests." in
-  let ignore = value & opt (some string) None & info ["ignore"] ~docs ~doc:"Space separated list of words used to ignore tests." in
-  let ignore_path = value & opt (some string) None & info ["ignore-path"] ~docs ~doc:"Space separated list of words used to ignore files." in
+  let sort = value & flag & info ["sort"] ~docs ~doc:My_doc.sort in
+  let nocache = value & flag & info ["nocache"] ~docs  ~doc:My_doc.nocache in
+  let framework = value & opt (some string) None & info ["framework"] ~docs ~doc:My_doc.framework in
+  let cache_dir = value & opt (some string) None & info ["cache-dir"] ~docs ~doc:My_doc.cache_dir in
+  let only = value & opt (some string) None & info ["only"] ~docs ~doc:My_doc.only in
+  let ignore = value & opt (some string) None & info ["ignore"] ~docs ~doc:My_doc.ignore in
+  let ignore_path = value & opt (some string) None & info ["ignore-path"] ~docs ~doc:My_doc.ignore_path in
   let targets = value & pos_all string [] & info [] ~docv:"TARGET" in
   Term.(const gen_opts $ sort $ nocache $ framework $ cache_dir $ ignore $ only $ ignore_path $ targets)
 
@@ -36,7 +47,7 @@ let init_opts framework =
   Action.( {framework } )
 let init_opts_t =
   let framework =
-    Arg.(value & pos 0 string "alcotest" & info [] ~docv:"FRAMEWORK" ~doc:"Define a test framework. The default is 'alcotest'.") in
+    Arg.(value & pos 0 string "alcotest" & info [] ~docv:"FRAMEWORK" ~doc:My_doc.framework) in
   Term.(const init_opts $ framework)
 
 
