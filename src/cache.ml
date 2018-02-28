@@ -43,8 +43,6 @@ let save_suites ~main ~custom_dir ~cache_active suites =
   if not cache_active then ()
   else
   ( let path = cache_file ~main ~custom_dir in
-    if Sys.file_exists path then
-      Sys.remove path;
     let c = open_out_bin path in
     Marshal.to_channel c suites [];
     flush c;
@@ -55,11 +53,16 @@ let save_suites ~main ~custom_dir ~cache_active suites =
 let load_suites ~main ~custom_dir ~cache_active =
   let path = cache_file ~main ~custom_dir in
   if cache_active && Sys.file_exists path then
-  ( let c = open_in_bin path in
-    let suites : TestSuite.t list = Marshal.from_channel c in
-    close_in c;
-    suites
-  )
+    ( try
+        let c = open_in_bin path in
+        let suites : TestSuite.t list = Marshal.from_channel c in
+        close_in c;
+        suites
+      with e ->
+        let () =
+          Printf.printf "Warning: I could not read cache for the testsuite: %s" (Printexc.to_string e) in
+        []
+    )
   else []
 
 let get ~cache ~dir filename : TestSuite.t option =
