@@ -3,12 +3,12 @@ let () =
     "Primary", [
       "Capit", `Quick, 
         ( fun v ->
-          let () = Unix.putenv "DRYUNIT_CTX" "fqdn=Primary_tests.test_capit|suite=Primary|name=Capit|loc=(./primary_tests.ml[6,138+4]..[6,138+14])" in
+          let () = Unix.putenv "DRYUNIT_CTX" "fqdn=Primary_tests.test_capit|suite=Primary|name=Capit|loc=(./primary_tests.ml[6,138+4]..[6,138+14])|dir=undefined" in
           Primary_tests.test_capit v
         );
       "Capit another", `Quick, 
         ( fun v ->
-          let () = Unix.putenv "DRYUNIT_CTX" "fqdn=Primary_tests.test_capit_another|suite=Primary|name=Capit another|loc=(./primary_tests.ml[12,306+4]..[12,306+22])" in
+          let () = Unix.putenv "DRYUNIT_CTX" "fqdn=Primary_tests.test_capit_another|suite=Primary|name=Capit another|loc=(./primary_tests.ml[12,306+4]..[12,306+22])|dir=undefined" in
           Primary_tests.test_capit_another v
         );
       "Plus", `Quick, 

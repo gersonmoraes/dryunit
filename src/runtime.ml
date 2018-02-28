@@ -51,6 +51,7 @@ let suite_from ~dir filename : TestSuite.t =
   (* XXX: experimental codee *)
   let suite_path =
     let dir = if dir = "." then Sys.getcwd () else dir in
+    (* let _ = failwith dir in *)
     dir ^ sep ^ filename in
   let name = (Filename.basename filename) in
   let suite_title =
