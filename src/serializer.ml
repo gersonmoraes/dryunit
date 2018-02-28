@@ -5,8 +5,20 @@ open TestSuite
 open TestDescription
 open Util
 
+let wrap ~context ~suite ~test =
+  let fqdn = sprintf "%s.%s" suite.suite_name test.test_name in
+  ( if context then
+      sprintf {|
+        ( fun v ->
+          let () = Unix.putenv "DRYUNIT_CTX" "fqdn=%s|suite=%s|name=%s|loc=%s" in
+          %s v
+        )|}
+        fqdn suite.suite_title test.test_title test.test_loc fqdn
+    else
+      fqdn
+  )
 
-let boot_alcotest oc suites : unit =
+let boot_alcotest ~context oc suites : unit =
   fprintf oc "let () =\n";
   fprintf oc "  Alcotest.run \"Main\" [\n";
   List.iter
@@ -14,10 +26,9 @@ let boot_alcotest oc suites : unit =
       fprintf oc "    \"%s\", [\n" suite.suite_title;
       List.iter
         ( fun test ->
-          fprintf oc "      \"%s\", `Quick, %s.%s;\n"
+          fprintf oc "      \"%s\", `Quick, %s;\n"
             test.test_title
-            suite.suite_name
-            test.test_name;
+            (wrap ~context ~suite ~test);
         )
         suite.tests;
       fprintf oc "    ];\n";
@@ -27,7 +38,7 @@ fprintf oc "  ]\n";
 flush oc
 
 
-let boot_ounit oc suites : unit =
+let boot_ounit ~context oc suites : unit =
   fprintf oc "open OUnit2\n";
   fprintf oc "\nlet () =\n  run_test_tt_main (\n";
   fprintf oc "    \"All tests\" >::: [\n";
@@ -35,11 +46,10 @@ let boot_ounit oc suites : unit =
     ( fun suite ->
       List.iter
         ( fun test ->
-          fprintf oc "      \"%s.%s\" >:: %s.%s;\n"
+          fprintf oc "      \"%s.%s\" >:: %s;\n"
             suite.suite_name
             test.test_name
-            suite.suite_name
-            test.test_name;
+            (wrap ~context ~suite ~test);
         )
         suite.tests;
         fprintf oc "\n";

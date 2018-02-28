@@ -1,0 +1,24 @@
+open OUnit2
+
+let () =
+  run_test_tt_main (
+    "All tests" >::: [
+      "Secondary_tests.test_in_secondary" >:: 
+        ( fun v ->
+          let () = Unix.putenv "DRYUNIT_CTX" "fqdn=Secondary_tests.test_in_secondary|suite=Secondary|name=In secondary|loc=(./secondary_tests.ml[3,12+4]..[3,12+21])" in
+          Secondary_tests.test_in_secondary v
+        );
+
+      "Tests.test1" >:: 
+        ( fun v ->
+          let () = Unix.putenv "DRYUNIT_CTX" "fqdn=Tests.test1|suite=Tests|name=Test1|loc=(./tests.ml[3,13+4]..[3,13+9])" in
+          Tests.test1 v
+        );
+      "Tests.test2" >:: 
+        ( fun v ->
+          let () = Unix.putenv "DRYUNIT_CTX" "fqdn=Tests.test2|suite=Tests|name=Test2|loc=(./tests.ml[6,74+4]..[6,74+9])" in
+          Tests.test2 v
+        );
+
+    ]
+  )

@@ -1,0 +1,27 @@
+let () =
+  Alcotest.run "Main" [
+    "Primary", [
+      "First thing", `Quick, 
+        ( fun v ->
+          let () = Unix.putenv "DRYUNIT_CTX" "fqdn=Primary_tests.test_first_thing|suite=Primary|name=First thing|loc=(./primary_tests.ml[1,0+4]..[1,0+20])" in
+          Primary_tests.test_first_thing v
+        );
+      "Second thing", `Quick, 
+        ( fun v ->
+          let () = Unix.putenv "DRYUNIT_CTX" "fqdn=Primary_tests.test_second_thing|suite=Primary|name=Second thing|loc=(./primary_tests.ml[2,29+4]..[2,29+21])" in
+          Primary_tests.test_second_thing v
+        );
+      "Test3", `Quick, 
+        ( fun v ->
+          let () = Unix.putenv "DRYUNIT_CTX" "fqdn=Primary_tests.test3|suite=Primary|name=Test3|loc=(./primary_tests.ml[4,88+4]..[4,88+9])" in
+          Primary_tests.test3 v
+        );
+    ];
+    "Secondary", [
+      "In secondary", `Quick, 
+        ( fun v ->
+          let () = Unix.putenv "DRYUNIT_CTX" "fqdn=Secondary_tests.test_in_secondary|suite=Secondary|name=In secondary|loc=(./secondary_tests.ml[2,1+4]..[2,1+21])" in
+          Secondary_tests.test_in_secondary v
+        );
+    ];
+  ]

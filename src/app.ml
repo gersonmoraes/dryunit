@@ -72,12 +72,12 @@ let get_suites ~sort ~nocache ~framework ~cache_dir ~ignore ~only ~targets ~igno
   )
 
 
-let gen_executable framework suites oc =
+let gen_executable ~context framework suites oc =
   if List.length suites > 0 then
     ( let f =
       ( match framework with
-        | TestFramework.Alcotest -> Serializer.boot_alcotest
-        | TestFramework.OUnit ->  Serializer.boot_ounit
+        | TestFramework.Alcotest -> Serializer.boot_alcotest ~context
+        | TestFramework.OUnit ->  Serializer.boot_ounit ~context
       ) in
       f oc suites
     )

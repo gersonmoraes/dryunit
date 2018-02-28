@@ -4,7 +4,7 @@
 
 (rule
  ((targets (main.ml))
-  (deps ( (glob_files tests.ml) (glob_files *tests.ml) (glob_files *Tests.ml) ))
+  (deps ( (glob_files {tests.ml,*tests.ml,*tests.ml}) ))
   (action  (with-stdout-to ${@} (run
     ../../../src/main.exe gen --framework alcotest --sort
   )))))

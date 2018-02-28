@@ -20,7 +20,8 @@ let help man_format cmds topic =
 
 
 type gen_opts =
-  { sort       : bool
+  { context    : bool
+  ; sort       : bool
   ; nocache    : bool
   ; framework  : string option
   ; cache_dir  : string option
@@ -47,7 +48,7 @@ let catch f () =
    Failure e -> `Error (false, e)
 
 
-let gen_executable { sort; nocache; framework; cache_dir; ignore; only; ignore_path; targets } =
+let gen_executable { context; sort; nocache; framework; cache_dir; ignore; only; ignore_path; targets } =
   let cache_dir = unwrap_or "_build/.dryunit" cache_dir in
   let ignore = unwrap_or "" ignore in
   let only = unwrap_or "" only in
@@ -56,7 +57,7 @@ let gen_executable { sort; nocache; framework; cache_dir; ignore; only; ignore_p
   if List.length targets == 0 then
     ( let suites = App.get_suites ~sort ~nocache ~framework ~cache_dir ~ignore ~only ~targets
         ~ignore_path ~detection:"dir" ~main:"main.ml" in
-      App.gen_executable framework suites stdout
+      App.gen_executable ~context framework suites stdout
     )
   else
     List.iter
@@ -64,7 +65,7 @@ let gen_executable { sort; nocache; framework; cache_dir; ignore; only; ignore_p
           let suites = App.get_suites ~sort ~nocache ~framework ~cache_dir ~ignore ~only ~targets
             ~ignore_path ~detection:"dir" ~main:target in
           let oc = open_out target in
-          App.gen_executable framework suites oc;
+          App.gen_executable ~context framework suites oc;
           close_out oc
       )
       targets;
