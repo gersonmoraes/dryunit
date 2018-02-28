@@ -72,8 +72,8 @@ let get ~cache ~dir filename : TestSuite.t option =
     let filename = dir ^ sep ^ filename in
     List.find
     ( fun s ->
-      if s.suite_path = filename then
-        if timestamp_from s.suite_path = s.timestamp then
+      if s.suite_full_path = filename then
+        if timestamp_from s.suite_full_path = s.timestamp then
           true
         else false
       else false

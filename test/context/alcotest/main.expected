@@ -3,34 +3,34 @@ let () =
     "Primary", [
       "Capit", `Quick, 
         ( fun v ->
-          let () = Unix.putenv "DRYUNIT_CTX" "fqdn=Primary_tests.test_capit|suite=Primary|name=Capit|loc=(./primary_tests.ml[6,138+4]..[6,138+14])|dir=undefined" in
+          let () = Unix.putenv "DRYUNIT_CTX" "fqdn=Primary_tests.test_capit|suite=Primary|name=Capit|loc=[6,138+4]..[6,138+14]|path=test/context/alcotest/primary_tests.ml" in
           Primary_tests.test_capit v
         );
       "Capit another", `Quick, 
         ( fun v ->
-          let () = Unix.putenv "DRYUNIT_CTX" "fqdn=Primary_tests.test_capit_another|suite=Primary|name=Capit another|loc=(./primary_tests.ml[12,306+4]..[12,306+22])|dir=undefined" in
+          let () = Unix.putenv "DRYUNIT_CTX" "fqdn=Primary_tests.test_capit_another|suite=Primary|name=Capit another|loc=[12,306+4]..[12,306+22]|path=test/context/alcotest/primary_tests.ml" in
           Primary_tests.test_capit_another v
         );
       "Plus", `Quick, 
         ( fun v ->
-          let () = Unix.putenv "DRYUNIT_CTX" "fqdn=Primary_tests.test_plus|suite=Primary|name=Plus|loc=(./primary_tests.ml[9,224+4]..[9,224+13])" in
+          let () = Unix.putenv "DRYUNIT_CTX" "fqdn=Primary_tests.test_plus|suite=Primary|name=Plus|loc=[9,224+4]..[9,224+13]|path=test/context/alcotest/primary_tests.ml" in
           Primary_tests.test_plus v
         );
     ];
     "Secondary", [
       "Capit", `Quick, 
         ( fun v ->
-          let () = Unix.putenv "DRYUNIT_CTX" "fqdn=Secondary_tests.test_capit|suite=Secondary|name=Capit|loc=(./secondary_tests.ml[6,138+4]..[6,138+14])" in
+          let () = Unix.putenv "DRYUNIT_CTX" "fqdn=Secondary_tests.test_capit|suite=Secondary|name=Capit|loc=[6,138+4]..[6,138+14]|path=test/context/alcotest/secondary_tests.ml" in
           Secondary_tests.test_capit v
         );
       "Capit another4", `Quick, 
         ( fun v ->
-          let () = Unix.putenv "DRYUNIT_CTX" "fqdn=Secondary_tests.test_capit_another4|suite=Secondary|name=Capit another4|loc=(./secondary_tests.ml[12,306+4]..[12,306+23])" in
+          let () = Unix.putenv "DRYUNIT_CTX" "fqdn=Secondary_tests.test_capit_another4|suite=Secondary|name=Capit another4|loc=[12,306+4]..[12,306+23]|path=test/context/alcotest/secondary_tests.ml" in
           Secondary_tests.test_capit_another4 v
         );
       "Plus", `Quick, 
         ( fun v ->
-          let () = Unix.putenv "DRYUNIT_CTX" "fqdn=Secondary_tests.test_plus|suite=Secondary|name=Plus|loc=(./secondary_tests.ml[9,224+4]..[9,224+13])" in
+          let () = Unix.putenv "DRYUNIT_CTX" "fqdn=Secondary_tests.test_plus|suite=Secondary|name=Plus|loc=[9,224+4]..[9,224+13]|path=test/context/alcotest/secondary_tests.ml" in
           Secondary_tests.test_plus v
         );
     ];

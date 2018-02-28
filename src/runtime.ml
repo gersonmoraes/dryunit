@@ -40,18 +40,21 @@ let extract_from ~filename : TestDescription.t list =
       let test_title : string = title_from test_name in
       let test_loc =
         let bytes = Bytes.of_string line in
-        let idx = (Bytes.rindex bytes '(') in
-        Bytes.sub bytes idx (Bytes.length bytes -idx) |> Bytes.to_string in
+        let idx = (Bytes.index bytes '[') in
+        Bytes.sub bytes idx (Bytes.length bytes - idx - 1) |> Bytes.to_string in
       { test_name; test_title; test_loc }
     )
 
 
 
 let suite_from ~dir filename : TestSuite.t =
-  (* XXX: experimental codee *)
+  (* XXX: experimental code *)
   let suite_path =
+    let dir = path_relative_to_workspace @@
+      if dir = "." then Sys.getcwd () else dir in
+    dir ^ sep ^ filename in
+  let suite_full_path =
     let dir = if dir = "." then Sys.getcwd () else dir in
-    (* let _ = failwith dir in *)
     dir ^ sep ^ filename in
   let name = (Filename.basename filename) in
   let suite_title =
@@ -61,9 +64,10 @@ let suite_from ~dir filename : TestSuite.t =
     else "Tests" in
   { suite_name = to_string @@ capitalize_ascii (to_bytes (Filename.chop_suffix name ".ml"));
     suite_title;
-    suite_path;
-    timestamp = timestamp_from suite_path;
-    tests = extract_from ~filename:(sprintf "%s%s%s" dir sep name)
+    suite_full_path;
+    timestamp = timestamp_from suite_full_path;
+    tests = extract_from ~filename:(sprintf "%s%s%s" dir sep name);
+    suite_path
   }
 
 

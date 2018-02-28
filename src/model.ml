@@ -11,6 +11,7 @@ module TestSuite = struct
   type t = {
     suite_title: string;
     suite_name: string;
+    suite_full_path: string;
     suite_path: string;
     timestamp: float;
     tests: TestDescription.t list;

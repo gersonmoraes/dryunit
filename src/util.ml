@@ -243,3 +243,23 @@ let capitalize_ascii = Bytes.capitalize_ascii
 
 let timestamp_from filename =
   Unix.((stat filename).st_mtime)
+
+
+let path_relative_to_workspace path =
+  ( let sep = Filename.dir_sep in
+    let flag_ref = ref false in
+    Str.split (Str.regexp sep) path |>
+    List.filter
+      ( fun dir ->
+        if !flag_ref then
+          true
+        else
+        ( if (dir = "_build") || (dir = "build") then
+            flag_ref := true;
+          false
+        )
+      ) |>
+    function
+    | []  -> path
+    | l -> (String.concat sep @@ List.tl l)
+  )

@@ -10,7 +10,7 @@ let wrap ~context ~suite ~test =
   ( if context then
       sprintf {|
         ( fun v ->
-          let () = Unix.putenv "DRYUNIT_CTX" "fqdn=%s|suite=%s|name=%s|loc=%s|dir=%s" in
+          let () = Unix.putenv "DRYUNIT_CTX" "fqdn=%s|suite=%s|name=%s|loc=%s|path=%s" in
           %s v
         )|}
         fqdn suite.suite_title test.test_title test.test_loc suite.suite_path fqdn
