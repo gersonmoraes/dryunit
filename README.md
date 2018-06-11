@@ -2,15 +2,15 @@
 
 Dryunit is a detection tool for unit testing in OCaml that is focused in *Convention over Configuration*.
 
+
+
 ## Why should you use it?
-
-
 
 #### Dryunit is non-intrusive and nearly invisible
 
 Your tests are put first and this boosts TDD in a very seamless way. Dryunit stays invisible once you setup the building system and requires no changes over the original test code, provided that you use minimal naming conventions.
 
-It will not affect your OCaml code, add complexy layers nor keep you from using any feature in OCaml, because it's simply not going to be in your code. There's no need for PPX's nor extra libraries to import.
+It will not affect your OCaml code, add complexity layers nor keep you from using any feature in OCaml, because it's simply not going to be in your code. There's no need for PPX's nor extra libraries to import.
 
 
 

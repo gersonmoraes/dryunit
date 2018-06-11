@@ -1,6 +1,6 @@
 INSTALL_ARGS := $(if $(PREFIX),--prefix stty$(PREFIX),)
 
-default: normalize
+default:
 	@jbuilder build @install
 
 install:
@@ -14,12 +14,12 @@ reinstall: uninstall reinstall
 clean:
 	@jbuilder clean
 
-test: normalize
+test:
 	@jbuilder runtest
 
-normalize:
-	@mkdir -p _build/default/test/detection/{ounit,generic,alcotest}
-	@mkdir -p _build/default/test/context/{ounit,generic,alcotest}
-	@mkdir -p _build/default/test/modifiers
+# normalize:
+# 	@mkdir -p _build/default/test/detection/{ounit,generic,alcotest}
+# 	@mkdir -p _build/default/test/context/{ounit,generic,alcotest}
+# 	@mkdir -p _build/default/test/modifiers
 
 .PHONY: default install uninstall reinstall clean test

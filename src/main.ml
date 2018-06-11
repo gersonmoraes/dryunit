@@ -75,7 +75,11 @@ let gen_cmd =
 
 let help_cmd =
   let topic =
-    let doc = "The topic to get help on. `topics' lists the topics." in
+    let doc = "The topic to
+# 	@mkdir -p _build/default/test/detection/{ounit,generic,alcotest}
+# 	@mkdir -p _build/default/test/context/{ounit,generic,alcotest}
+# 	@mkdir -p _build/default/test/modifiers
+get help on. `topics' lists the topics." in
     Arg.(value & pos 0 (some string) None & info [] ~docv:"TOPIC" ~doc)
   in
   let doc = "show help" in
