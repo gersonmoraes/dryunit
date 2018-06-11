@@ -40,20 +40,17 @@ end
 module Modifiers = struct
   type t =
     | Async
-    | Echain
     | Long
     | Result
 
   let of_string = function
     | "async"  -> Some Async
-    | "echain" -> Some Echain
     | "long"   -> Some Long
     | "result" -> Some Result
     | other -> None
 
   let to_string = function
     | Async  -> "async"
-    | Echain -> "echain"
     | Long   -> "long"
     | Result -> "result"
 end
