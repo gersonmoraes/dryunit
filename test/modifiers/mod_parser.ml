@@ -1,4 +1,5 @@
 
+(* This file is dynamically imported from source code *)
 open Model
 
 module Parser_utils = struct
@@ -24,9 +25,9 @@ module Mods = struct
     let open Modifiers in
     List.iter
       ( function
-        | Async   -> async  := true
-        | Long    -> long   := true
-        | Result  -> result := true
+        | Async_mod   -> async  := true
+        | Long_mod    -> long   := true
+        | Result_mod  -> result := true
       )
       values;
     { async  = !async

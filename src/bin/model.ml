@@ -39,18 +39,19 @@ end
 
 module Modifiers = struct
   type t =
-    | Async
-    | Long
-    | Result
+    | Async_mod
+    | Long_mod
+    | Result_mod
 
   let of_string = function
-    | "async"  -> Some Async
-    | "long"   -> Some Long
-    | "result" -> Some Result
-    | other -> None
+    | "async"  -> Some Async_mod
+    | "lwt"    -> Some Async_mod
+    | "long"   -> Some Long_mod
+    | "result" -> Some Result_mod
+    | other    -> None
 
   let to_string = function
-    | Async  -> "async"
-    | Long   -> "long"
-    | Result -> "result"
+    | Async_mod  -> "async"
+    | Long_mod   -> "long"
+    | Result_mod -> "result"
 end

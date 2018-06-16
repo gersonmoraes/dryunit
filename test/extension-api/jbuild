@@ -1,6 +1,6 @@
 (executable
  ((name main)
-  (libraries (alcotest str))))
+  (libraries (alcotest dryunit))))
 
 (rule
  ((targets (main.ml))
@@ -17,8 +17,3 @@
    (deps (main.exe))
    (action (run ${<}))
   ))
-
-(rule
-  ((targets (model.ml))
-  (deps ((file ../../src/bin/model.ml)))
-  (action (copy# ../../src/bin/model.ml model.ml))))
