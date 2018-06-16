@@ -43,7 +43,7 @@ let extract_from ~filename : TestDescription.t list =
           let idx = (Bytes.index bytes '[') in
           Bytes.sub bytes idx (Bytes.length bytes - idx - 1) |> Bytes.to_string
         ) in
-      let test_mods = Mod_parser.of_function_name test_name in
+      let test_mods = Mods_parser.of_function_name test_name in
       { test_name; test_title; test_loc; test_mods }
     )
 

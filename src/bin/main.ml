@@ -17,14 +17,14 @@ let gen_opts context sort nocache framework cache_dir ignore only ignore_path mo
   let mods =
     Util.map_opt mods ~f:
       ( fun mods ->
-        Mod_parser.Parser_utils.split ~sep:" " mods |>
+        Mods_parser.Parser_utils.split ~sep:" " mods |>
         List.map
           ( fun s ->
             match Model.Modifiers.of_string s with
             | None ->  invalid_arg ("Not a valid modifier: " ^ s)
             | Some m -> m
           ) |>
-        Mod_parser.of_list
+        Mods_parser.of_list
       ) in
   Action.({ context; sort; nocache; framework; cache_dir; ignore; only; ignore_path; mods; targets; })
 
