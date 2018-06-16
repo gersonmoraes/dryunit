@@ -5,7 +5,7 @@ open TestSuite
 open TestDescription
 open Util
 
-let wrap ~context ~suite ~test =
+let resolv ~context ~suite ~test =
   let fqdn = sprintf "%s.%s" suite.suite_name test.test_name in
   ( if context then
       sprintf {|
@@ -28,7 +28,7 @@ let boot_alcotest ~context oc suites : unit =
         ( fun test ->
           fprintf oc "      \"%s\", `Quick, %s;\n"
             test.test_title
-            (wrap ~context ~suite ~test);
+            (resolv ~context ~suite ~test);
         )
         suite.tests;
       fprintf oc "    ];\n";
@@ -49,7 +49,7 @@ let boot_ounit ~context oc suites : unit =
           fprintf oc "      \"%s.%s\" >:: %s;\n"
             suite.suite_name
             test.test_name
-            (wrap ~context ~suite ~test);
+            (resolv ~context ~suite ~test);
         )
         suite.tests;
         fprintf oc "\n";
@@ -58,6 +58,45 @@ let boot_ounit ~context oc suites : unit =
 fprintf oc "    ]\n";
 fprintf oc "  )\n";
 flush oc
+
+
+
+let boot_generic ~context ~runner oc suites : unit =
+  fprintf oc "let () = \nlet module T = %s in\n" runner;
+  fprintf oc "  let module T = %s in\n" runner;
+  fprintf oc "  T.run [\n";
+  List.iter
+    ( fun suite ->
+      fprintf oc
+{|
+  let ctx =
+    T.suite_ctx ~name:"%s" ~title:"%s" ~path:"%s" in
+  T.suite ~ctx ~tests:[
+|}
+      suite.suite_name suite.suite_title suite.suite_path;
+      List.iter
+        ( fun test ->
+          fprintf oc
+{|
+  T.test "%s" ~ctx
+    ~name:"%s"
+    ~f:(T.wrap_%s %s)
+    ~loc:"%s";
+|}
+            test.test_title
+            "fun"
+            test.test_name
+            (resolv ~context ~suite ~test)
+            test.test_loc;
+        )
+        suite.tests;
+        fprintf oc "  ])\n";
+    )
+    suites;
+  fprintf oc "  ]\n";
+  flush oc
+
+
 
 
 let init_default framework =
