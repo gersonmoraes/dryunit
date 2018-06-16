@@ -1,0 +1,25 @@
+(executable
+ ((name main)
+  (libraries (dryunit))))
+
+(rule
+ ((targets (main.ml))
+  (deps ( (glob_files {tests.ml,*tests.ml,*Tests.ml}) ))
+  (action (with-stdout-to ${@} (run dryunit gen
+    ;; --framework alcotest
+    ;; --filter "space separated list"
+    ;; --ignore "space separated list"
+    ;; --ignore-path "space separated list"
+
+    ;; Active modifiers (detected through name filtering):
+    ;; --mods "async opt result long"
+
+    ;; Custom framework (remove --framework before enabling it):
+    --runner "Dryunit.Runner"
+  )))))
+
+(alias
+  ((name runtest)
+   (deps (main.exe))
+   (action (run ${<}))
+  ))

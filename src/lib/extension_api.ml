@@ -75,31 +75,31 @@
   end
 
 
-  (**
-    Include the default wrappers definitions, including:
+(**
+  Include the default wrappers definitions, including:
 
-      - default callback as [unit -> unit]
-      - using the id monad instead of an async lib
-      - wrappers raise Failure indicating the expected constructor
-  *)
-  module Default_wrappers = struct
-    type arg = unit
-    type 'a m = 'a
-    type callback = unit -> unit
+    - default callback as [unit -> unit]
+    - using the id monad instead of an async lib
+    - wrappers raise Failure indicating the expected constructor
+*)
+module Default_wrappers = struct
+  type arg = unit
+  type 'a m = 'a
+  type callback = unit -> unit
 
-    let wrap_fun f = f
-    let wrap_opt f () =
-      ( if f () = None then
-          failwith "I got the constructor 'None'"
-      )
-    let wrap_res f () =
-      ( match f () with
-        | Error _ ->
-            failwith "I got the constructor 'Error'"
-        | _ -> ()
-      )
+  let wrap_fun f = f
+  let wrap_opt f () =
+    ( if f () = None then
+        failwith "I got the constructor 'None'"
+    )
+  let wrap_res f () =
+    ( match f () with
+      | Error _ ->
+          failwith "I got the constructor 'Error'"
+      | _ -> ()
+    )
 
-    let wrap_async_fun = wrap_fun
-    let wrap_async_opt = wrap_opt
-    let wrap_async_res = wrap_res
-  end
+  let wrap_async_fun = wrap_fun
+  let wrap_async_opt = wrap_opt
+  let wrap_async_res = wrap_res
+end

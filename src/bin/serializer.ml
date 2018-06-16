@@ -82,9 +82,9 @@ let wrapper_from ~activated_mods test =
 *)
 let boot_generic ~context ~runner ~mods:activated_mods oc suites : unit =
   let runner = String.capitalize_ascii runner in
-  fprintf oc "let () = \nlet module T = %s in\n" runner;
+  fprintf oc "let () = \n";
   fprintf oc "  let module T = %s in\n" runner;
-  fprintf oc "  T.run [\n";
+  fprintf oc "  T.run ~suites:[\n";
   List.iter
     ( fun suite ->
       fprintf oc
@@ -96,19 +96,19 @@ let boot_generic ~context ~runner ~mods:activated_mods oc suites : unit =
       List.iter
         ( fun test ->
           fprintf oc
-{| T.test "%s" ~ctx
-    ~name:"%s"
-    ~f:(T.wrap_%s %s)
-    ~loc:"%s";
+{|      T.test "%s" ~ctx
+        ~name:"%s"
+        ~f:(T.wrap_%s %s)
+        ~loc:"%s";
 |}
             test.test_title
-            (wrapper_from ~activated_mods test)
             test.test_name
+            (wrapper_from ~activated_mods test)
             (resolv ~context ~suite ~test)
             test.test_loc;
         )
         suite.tests;
-        fprintf oc "  ]);\n";
+        fprintf oc "    ]);\n";
     )
     suites;
   fprintf oc "  ]\n";

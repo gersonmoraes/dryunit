@@ -1,7 +1,26 @@
+module Default_runner = struct
 
-module TestRunner = struct
+  (* type arg = unit
+  type 'a m = 'a
+  type callback = unit -> unit
 
-  include Dryunit.Extension_api.Default_wrappers
+  let wrap_fun f = f
+  let wrap_opt f () =
+    ( if f () = None then
+        failwith "I got the constructor 'None'"
+    )
+  let wrap_res f () =
+    ( match f () with
+      | Error _ ->
+          failwith "I got the constructor 'Error'"
+      | _ -> ()
+    )
+
+  let wrap_async_fun = wrap_fun
+  let wrap_async_opt = wrap_opt
+  let wrap_async_res = wrap_res *)
+
+  include Extension_api.Default_wrappers
 
   type test =
     { test_name : string
@@ -12,9 +31,9 @@ module TestRunner = struct
     }
 
   type suite_ctx =
-    { suite_name: string
-    ; suite_title: string
-    ; suite_path: string
+    { suite_name  : string
+    ; suite_title : string
+    ; suite_path  : string
     }
 
   type suite =
@@ -52,9 +71,9 @@ module TestRunner = struct
     }
 
   let run ~(suites: suite list) =
-    ()
-
-
+    failwith "DRYUNIT FRAMEWORK IS NOT READY FOR RUNNING"
 end
+let _ : (module Extension_api.Runner) = (module Default_runner)
 
-let _  = (module TestRunner : Dryunit.Extension_api.Runner)
+
+include Default_runner
