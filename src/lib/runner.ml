@@ -1,79 +1,103 @@
-module Default_runner = struct
+(* Monad type placeholder *)
+type 'a m = 'a
 
-  (* type arg = unit
-  type 'a m = 'a
-  type callback = unit -> unit
+(* Placeholder for the one parameter all test functions should have *)
+type arg = unit
 
-  let wrap_fun f = f
-  let wrap_opt f () =
-    ( if f () = None then
-        failwith "I got the constructor 'None'"
-    )
-  let wrap_res f () =
-    ( match f () with
-      | Error _ ->
-          failwith "I got the constructor 'Error'"
-      | _ -> ()
-    )
+(* Signature for test functions in this test framework *)
+type callback =
+  | Fun       : (arg -> unit)                 -> callback
+  | Opt       : (arg -> 'a option)            -> callback
+  | Res       : (arg -> ('ok, 'err) result)   -> callback
+  | Async_fun : (arg -> unit m)               -> callback
+  | Async_opt : (arg -> 'a option m)          -> callback
+  | Async_res : (arg -> ('ok, 'err) result m) -> callback
 
-  let wrap_async_fun = wrap_fun
-  let wrap_async_opt = wrap_opt
-  let wrap_async_res = wrap_res *)
+(* Internals of a test *)
+type test =
+  { test_name     : string
+  ; test_loc      : unit -> string
+  ; test_fqdn     : string
+  ; test_callback : callback
+  ; test_long     : bool
+  }
 
-  include Extension_api.Default_wrappers
+type suite_ctx =
+  { ctx_name  : string
+  ; ctx_title : string
+  ; ctx_path  : string
+  }
 
-  type test =
-    { test_name : string
-    ; test_desc : string
-    ; callback  : callback
-    ; location  : string
-    ; fqdn      : string
-    }
+(* Internals of a test suite *)
+type suite =
+  { suite_name  : string
+  ; suite_path  : string
+  ; tests : test list
+  ; mutable has_errors : bool
+  }
 
-  type suite_ctx =
-    { suite_name  : string
-    ; suite_title : string
-    ; suite_path  : string
-    }
+(* Creating a new test *)
+let test ~loc ~fqdn
+    ~(f:callback) test_name
+    : test
+  =
+  { test_name
+  ; test_loc = loc
+  ; test_fqdn = fqdn
+  ; test_callback = f
+  ; test_long = false
+  }
 
-  type suite =
-    { info  : suite_ctx
-    ; tests : test list
-    }
+let suite ~tests ~path suite_name : suite =
+  { suite_name
+  ; suite_path = path
+  ; tests = tests
+  ; has_errors = false
+  }
 
-  let suite_ctx
-      ~name:suite_name
-      ~title:suite_title
-      ~path:suite_path
-      : suite_ctx
-    =
-    { suite_name
-    ; suite_title
-    ; suite_path
-    }
+let suite_ctx ~name ~title ~path =
+  { ctx_name  = name
+  ; ctx_title = title
+  ; ctx_path  = path
+  }
 
-  let suite ~ctx:info ~(tests:test list) : suite =
-    { info; tests }
+(* XXX:
+  This is the Api used to wrap test functions with the matching modifiers.
+  By default, all modifiers should be inactive.
+*)
 
-  let test
-      test_desc
-      ~ctx
-      ~name:test_name
-      ~f:callback
-      ~loc:location
-      : test
-    =
-    { test_name
-    ; test_desc
-    ; callback
-    ; location
-    ; fqdn = Printf.sprintf "%s.%s" ctx.suite_name test_name
-    }
+let wrap_fun f : callback = Fun f
+let wrap_opt f : callback = Opt f
+let wrap_res f : callback = Res f
 
-  let run ~(suites: suite list) =
-    failwith "DRYUNIT FRAMEWORK IS NOT READY FOR RUNNING"
-end
-let _ : (module Extension_api.Runner) = (module Default_runner)
+let wrap_async_fun f : callback = Async_fun f
+let wrap_async_opt f : callback = Async_opt f
+let wrap_async_res f : callback = Async_res f
 
 
-include Default_runner
+
+let suite ~ctx:info ~(tests:test list) : suite =
+  { suite_name = info.ctx_title
+  ; suite_path = info.ctx_path
+  ; tests
+  ; has_errors = false
+  }
+
+let test
+    test_desc
+    ~ctx
+    ~name:test_name
+    ~f
+    ~loc
+    : test
+  =
+  let _ : suite_ctx = ctx in
+  { test_name     = test_desc
+  ; test_long     = true
+  ; test_callback = f
+  ; test_loc      = loc
+  ; test_fqdn     = (Printf.sprintf "%s.%s" ctx.ctx_name test_name)
+  }
+
+let run ~(suites: suite list) =
+  failwith "DRYUNIT FRAMEWORK IS NOT READY TO RUN"

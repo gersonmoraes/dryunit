@@ -47,7 +47,7 @@
       -> ctx: suite_ctx
       -> name: string
       -> f: callback
-      -> loc: string
+      -> loc: (unit -> string)
       -> test
 
     val run:

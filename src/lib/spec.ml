@@ -1,83 +1,5 @@
-
-(* XXX:
-    - We don't know yet if we want to support this feature, specially like this
-    - This is just a design idea
- *)
-type flag =
-  [ `Quick
-  | `Long
-  ]
-
-(* Monad type placeholder *)
-type 'a m = 'a
-
-(* Placeholder for the one parameter all test functions should have *)
-type ctx = unit
-
-(* Signature for test functions in this test framework *)
-type callback =
-  | Fun       : (ctx -> unit)                 -> callback
-  | Opt       : (ctx -> 'a option)            -> callback
-  | Res       : (ctx -> ('ok, 'err) result)   -> callback
-  | Async_fun : (ctx -> unit m)               -> callback
-  | Async_opt : (ctx -> 'a option m)          -> callback
-  | Async_res : (ctx -> ('ok, 'err) result m) -> callback
-
-(* Internals of a test *)
-type test =
-  { name     : string
-  ; loc      : unit -> string
-  ; fqdn     : unit -> string
-  ; callback : callback
-  ; flags    : flag list
-  }
-
-(* Internals of a test suite *)
-type suite =
-  { suite_name  : string
-  ; path        : string
-  ; flags       : flag list
-  ; tests       : test list
-  ; mutable has_errors : bool
-  }
-
-(* Creating a new test *)
-let test ~loc ?(flags=[]) ~fqdn
-    ~(f:callback) name
-    : test
-  =
-  { name
-  ; loc
-  ; fqdn
-  ; callback = f
-  ; flags
-  }
-
-let suite ?(flags=[]) ~tests ~path suite_name : suite =
-  { suite_name
-  ; path
-  ; flags
-  ; tests
-  ; has_errors = false
-  }
-
-
-(* XXX:
-  This is the Api used to wrap test functions with the matching modifiers.
-  By default, all modifiers should be inactive.
-*)
-
-let wrap_fun f : callback = Fun f
-let wrap_opt f : callback = Opt f
-let wrap_res f : callback = Res f
-
-let wrap_async_fun f : callback = Async_fun f
-let wrap_async_opt f : callback = Async_opt f
-let wrap_async_res f : callback = Async_res f
-
-
 open Printf
-
+open Runner
 
 
 module Theme = struct
@@ -185,7 +107,7 @@ let run_test (f: unit -> unit) =
 
 let process test =
     run_test
-      ( fun () -> match test.callback with
+      ( fun () -> match test.test_callback with
         | Fun f -> f ()
         | Res f ->
             ( match f () with
@@ -207,7 +129,7 @@ let print_loc suite test =
   in
   eprintf  {|File "%s", line %d, characters %d-%d:
 |}
-  suite.path
+  suite.suite_path
   line start len
   let print_error ((module Theme):Theme.t) suite test e =
 
@@ -273,7 +195,7 @@ let run ?(colors=true) name suites =
                 )
           );
 
-          eprintf "%s\n" test.name
+          eprintf "%s\n" test.test_name
         )
         suite.tests;
         eprintf "\n";
@@ -281,7 +203,7 @@ let run ?(colors=true) name suites =
           ( List.iter
               ( fun (test, e) ->
                 eprintf "%s %s %s\n"
-                  (red "Assertion failed on [") test.name (red "]");
+                  (red "Assertion failed on [") test.test_name (red "]");
                 print_loc suite test;
                 print_error theme suite test e;
               )
@@ -312,3 +234,8 @@ let run ?(colors=true) name suites =
       eprintf "\n";
       exit 1;
     )
+
+
+
+(* Checking errors in the Extension_api *)
+let _ = (module Runner : Extension_api.Runner)
