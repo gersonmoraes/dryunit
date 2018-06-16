@@ -131,6 +131,12 @@ let init_default framework =
     ;; --filter \"space separated list\"
     ;; --ignore \"space separated list\"
     ;; --ignore-path \"space separated list\"
+
+    ;; Active modifiers (detected through name filtering):
+    ;; --mods \"async opt result long\"
+
+    ;; Custom framework (remove --framework before enabling it):
+    ;; --runner \"Dryspec.Runner\"
   )))))
 
 (alias

@@ -1,4 +1,3 @@
-module Extension_api = struct
 
   (**
     Interface for custom frameworks
@@ -104,5 +103,3 @@ module Extension_api = struct
     let wrap_async_opt = wrap_opt
     let wrap_async_res = wrap_res
   end
-
-end
