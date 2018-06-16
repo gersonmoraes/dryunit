@@ -50,26 +50,59 @@ let catch f () =
    Failure e -> `Error (false, e)
 
 
-let gen_executable { context; sort; nocache; framework; cache_dir; ignore; only; ignore_path; mods; runner; targets; } =
-  let cache_dir = unwrap_or "_build/.dryunit" cache_dir in
-  let ignore = unwrap_or "" ignore in
-  let only = unwrap_or "" only in
+let gen_executable
+    { context
+    ; sort
+    ; nocache
+    ; framework
+    ; cache_dir
+    ; ignore
+    ; only
+    ; ignore_path
+    ; mods
+    ; runner
+    ; targets
+    }
+  =
+  let cache_dir   = unwrap_or "_build/.dryunit" cache_dir in
+  let ignore      = unwrap_or "" ignore in
+  let only        = unwrap_or "" only in
   let ignore_path = unwrap_or "" ignore_path in
   let framework =
     ( match runner with
-      | Some runner -> TestFramework.ExtensionApi { runner }
       | None -> TestFramework.of_string (unwrap_or "alcotest" framework)
+      | Some runner -> TestFramework.ExtensionApi { runner }
     ) in
   if List.length targets == 0 then
-    ( let suites = App.get_suites ~sort ~nocache ~framework ~cache_dir ~ignore ~only ~targets
-        ~ignore_path ~detection:"dir" ~main:"main.ml" in
+    ( let suites =
+        App.get_suites
+          ~sort
+          ~nocache
+          ~framework
+          ~cache_dir
+          ~ignore
+          ~only
+          ~targets
+          ~ignore_path
+          ~detection:"dir"
+          ~main:"main.ml" in
       App.gen_executable ~context ~mods framework suites stdout
     )
   else
     List.iter
       ( fun target ->
-          let suites = App.get_suites ~sort ~nocache ~framework ~cache_dir ~ignore ~only ~targets
-            ~ignore_path ~detection:"dir" ~main:target in
+          let suites =
+            App.get_suites
+              ~sort
+              ~nocache
+              ~framework
+              ~cache_dir
+              ~ignore
+              ~only
+              ~targets
+              ~ignore_path
+              ~detection:"dir"
+              ~main:target in
           let oc = open_out target in
           App.gen_executable ~context ~mods framework suites oc;
           close_out oc
