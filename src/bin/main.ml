@@ -13,7 +13,7 @@ let help_secs = [
 ]
 
 
-let gen_opts context sort nocache framework cache_dir ignore only ignore_path mods targets =
+let gen_opts context sort nocache framework cache_dir ignore only ignore_path mods runner targets =
   let mods =
     Util.map_opt mods ~f:
       ( fun mods ->
@@ -26,7 +26,12 @@ let gen_opts context sort nocache framework cache_dir ignore only ignore_path mo
           ) |>
         Mods_parser.of_list
       ) in
-  Action.({ context; sort; nocache; framework; cache_dir; ignore; only; ignore_path; mods; targets; })
+  let () =
+    ( match framework, runner with
+      | Some _, Some _ -> invalid_arg "You cannot use --framework and --runner simultaneously"
+      | _ -> ()
+    ) in
+  Action.({ context; sort; nocache; framework; cache_dir; ignore; only; ignore_path; mods; runner; targets })
 
 module My_doc = struct
   let context     = "Define dryunit test context using environment variables."
@@ -39,23 +44,25 @@ module My_doc = struct
   let ignore      = "Space separated list of words used to ignore tests."
   let ignore_path = "Space separated list of words used to ignore files."
   let mods        = "Space separated list with active mods (available: async, result and long)."
+  let runner      = "Custom framework runner. This option replaces the parameter --framework"
 end
 
 
 let gen_opts_t =
   let docs = "Generate source code for test executable with appropriate code to bootstrap a test framework" in
   let open Arg in
-  let context = value & flag & info ["context"] ~docs ~doc:My_doc.context in
-  let sort = value & flag & info ["sort"] ~docs ~doc:My_doc.sort in
-  let nocache = value & flag & info ["nocache"] ~docs  ~doc:My_doc.nocache in
-  let framework = value & opt (some string) None & info ["framework"] ~docs ~doc:My_doc.framework in
-  let cache_dir = value & opt (some string) None & info ["cache-dir"] ~docs ~doc:My_doc.cache_dir in
-  let only = value & opt (some string) None & info ["only"] ~docs ~doc:My_doc.only in
-  let ignore = value & opt (some string) None & info ["ignore"] ~docs ~doc:My_doc.ignore in
+  let context     = value & flag & info ["context"] ~docs ~doc:My_doc.context in
+  let sort        = value & flag & info ["sort"]    ~docs ~doc:My_doc.sort in
+  let nocache     = value & flag & info ["nocache"] ~docs ~doc:My_doc.nocache in
+  let framework   = value & opt (some string) None & info ["framework"]   ~docs ~doc:My_doc.framework in
+  let cache_dir   = value & opt (some string) None & info ["cache-dir"]   ~docs ~doc:My_doc.cache_dir in
+  let only        = value & opt (some string) None & info ["only"]        ~docs ~doc:My_doc.only in
+  let ignore      = value & opt (some string) None & info ["ignore"]      ~docs ~doc:My_doc.ignore in
   let ignore_path = value & opt (some string) None & info ["ignore-path"] ~docs ~doc:My_doc.ignore_path in
-  let mods = value & opt (some string) None & info ["mods"] ~docs ~doc:My_doc.mods in
-  let targets = value & pos_all string [] & info [] ~docv:"TARGET" in
-  Term.(const gen_opts $ context $ sort $ nocache $ framework $ cache_dir $ ignore $ only $ ignore_path $ mods $ targets)
+  let mods        = value & opt (some string) None & info ["mods"]        ~docs ~doc:My_doc.mods in
+  let runner      = value & opt (some string) None & info ["runner"]      ~docs ~doc:My_doc.runner in
+  let targets     = value & pos_all string [] & info [] ~docv:"TARGET" in
+  Term.(const gen_opts $ context $ sort $ nocache $ framework $ cache_dir $ ignore $ only $ ignore_path $ mods $ runner $ targets)
 
 
 let init_opts framework =

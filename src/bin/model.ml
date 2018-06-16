@@ -62,7 +62,7 @@ end
 
 
 module TestFramework = struct
-  type t = Alcotest | OUnit
+  type t = Alcotest | OUnit | ExtensionApi of { runner : string }
 
   let of_string = function
     | "alcotest" -> Alcotest
@@ -72,8 +72,10 @@ module TestFramework = struct
   let to_string = function
     | Alcotest -> "alcotest"
     | OUnit -> "ounit"
+    | ExtensionApi { runner } -> runner
 
   let package = function
     | Alcotest -> "alcotest"
     | OUnit -> "oUnit"
+    | ExtensionApi _ -> ""
 end
