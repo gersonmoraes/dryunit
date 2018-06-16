@@ -63,7 +63,6 @@ end
 
 module Terminal = struct
 
-
   let run_cmd cmd : string =
     let ic = Unix.open_process_in cmd in
     let all_input = ref [] in
@@ -121,10 +120,6 @@ let process test =
         | _ -> failwith "this callback type is not available yet"
       )
 
-  (* Random.bool () *)
-  (* true *)
-  (* false *)
-
 
 
 let print_loc suite test =
@@ -134,9 +129,11 @@ let print_loc suite test =
   eprintf  {|File "%s", line %d, characters %d-%d:
 |}
   suite.suite_path
-  line (start+1) (start+len+1)
-  let print_error ((module Theme):Theme.t) suite test e =
+  line start (start+len)
 
+
+(* XXX: this code is completely static at this point *)
+let print_error ((module Theme):Theme.t) suite test e =
   let open Theme.Colors in
   let long_assertion () =
     let exp = "A message that should not be put in a long sentence" in
@@ -145,7 +142,6 @@ let print_loc suite test =
       "%s"
     but got:
       "%s".
-
 |} exp
    "World"
    in
@@ -156,12 +152,9 @@ let print_loc suite test =
 |} "Short" "Things"
   in
   if Random.bool () then
-  (* if true then *)
     short_assertion ()
   else
     long_assertion ()
-  (* let fqdn = test.fqdn () in *)
-  (* eprintf "%s\n%s\n" fqdn @@ red (String.(make (length @@ suite.path) '-')) *)
 
 let run ?(colors=true) ?(name="Main") suites =
   let no_colors_env =
@@ -207,8 +200,9 @@ let run ?(colors=true) ?(name="Main") suites =
           ( List.iter
               ( fun (test, e) ->
                 print_loc suite test;
-                eprintf "%s %s %s\n"
-                  ("Assertion failed on [") test.test_name ("]");
+                (* XXX: Not everything is about assertions *)
+                eprintf "Assertion failed in `%s`\n"
+                  test.test_name;
                 print_error theme suite test e;
               )
               !failed;

@@ -26,4 +26,4 @@ let parse_loc loc =
   let length =
     let _ = next (), next () in
     next () - start in
-  line, start, length
+  line, start+1, length

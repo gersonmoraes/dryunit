@@ -12,6 +12,17 @@ module Assert_errors = struct
   exception Failure of error
 
   let fail e = raise (Failure e)
+
+  let title e =
+    ( match e with
+      | Not_some         -> "Assertion on constructor failed"
+      | Not_none         -> "Assertion on constructor failed"
+      | Not_ok           -> "Assertion on constructor failed"
+      | Not_error        -> "Assertion on constructor failed"
+      | Not_empty_list   -> "Non-empty list"
+      | Not_list_length  -> "Assertion for list length failed"
+      | Not_array_length -> "Assertion for array length failed"
+    )
 end
 
 open Assert_errors
