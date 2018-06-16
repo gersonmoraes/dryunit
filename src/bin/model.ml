@@ -43,6 +43,12 @@ module Modifiers = struct
     | Long_mod
     | Result_mod
 
+  type activated =
+    { async  : bool
+    ; long   : bool
+    ; result : bool
+    }
+
   let of_string = function
     | "async"  -> Some Async_mod
     | "lwt"    -> Some Async_mod

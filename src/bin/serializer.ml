@@ -61,24 +61,29 @@ flush oc
 
 
 
-let boot_generic ~context ~runner oc suites : unit =
+(**
+  Extension api serializer
+
+  The runner parameter should be the name of a module compliant with the
+  "Dryunit.Extension_api.Runner" signature
+*)
+let boot_generic ~context ~runner ~mods oc suites : unit =
+  let runner = String.capitalize_ascii runner in
   fprintf oc "let () = \nlet module T = %s in\n" runner;
   fprintf oc "  let module T = %s in\n" runner;
   fprintf oc "  T.run [\n";
   List.iter
     ( fun suite ->
       fprintf oc
-{|
-  let ctx =
-    T.suite_ctx ~name:"%s" ~title:"%s" ~path:"%s" in
-  T.suite ~ctx ~tests:[
+{|  ( let ctx =
+      T.suite_ctx ~name:"%s" ~title:"%s" ~path:"%s" in
+    T.suite ~ctx ~tests:[
 |}
       suite.suite_name suite.suite_title suite.suite_path;
       List.iter
         ( fun test ->
           fprintf oc
-{|
-  T.test "%s" ~ctx
+{| T.test "%s" ~ctx
     ~name:"%s"
     ~f:(T.wrap_%s %s)
     ~loc:"%s";
@@ -90,7 +95,7 @@ let boot_generic ~context ~runner oc suites : unit =
             test.test_loc;
         )
         suite.tests;
-        fprintf oc "  ])\n";
+        fprintf oc "  ]);\n";
     )
     suites;
   fprintf oc "  ]\n";
