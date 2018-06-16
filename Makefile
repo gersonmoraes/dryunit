@@ -15,6 +15,7 @@ clean:
 	@jbuilder clean
 
 test:
+	@#NOCOLORS=1 jbuilder runtest
 	@jbuilder runtest
 
 

@@ -51,7 +51,7 @@ module TestRunner = struct
     ; fqdn = Printf.sprintf "%s.%s" ctx.suite_name test_name
     }
 
-  let run ~(suites: suite list) =
+  let run (suites: suite list) =
     ()
 
 

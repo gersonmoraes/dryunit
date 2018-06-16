@@ -84,7 +84,7 @@ let boot_generic ~context ~runner ~mods:activated_mods oc suites : unit =
   let runner = String.capitalize_ascii runner in
   fprintf oc "let () = \n";
   fprintf oc "  let module T = %s in\n" runner;
-  fprintf oc "  T.run ~suites:[\n";
+  fprintf oc "  T.run [\n";
   List.iter
     ( fun suite ->
       fprintf oc
