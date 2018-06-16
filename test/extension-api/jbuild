@@ -10,6 +10,7 @@
     ;; --filter "space separated list"
     ;; --ignore "space separated list"
     ;; --ignore-path "space separated list"
+    --mods "async result long"
   )))))
 
 (alias

@@ -60,6 +60,15 @@ fprintf oc "  )\n";
 flush oc
 
 
+let wrapper_from ~activated_mods test =
+  let open Model.Modifiers in
+  let mods = Model.TestDescription.active_mods ~activated_mods test in
+  match mods.async, mods.result with
+  | false, false -> "fun"
+  | false, true  -> "res"
+  | true,  false -> "async"
+  | true,  true  -> "async_res"
+
 
 (**
   Extension api serializer
@@ -67,7 +76,7 @@ flush oc
   The runner parameter should be the name of a module compliant with the
   "Dryunit.Extension_api.Runner" signature
 *)
-let boot_generic ~context ~runner ~mods oc suites : unit =
+let boot_generic ~context ~runner ~activated_mods oc suites : unit =
   let runner = String.capitalize_ascii runner in
   fprintf oc "let () = \nlet module T = %s in\n" runner;
   fprintf oc "  let module T = %s in\n" runner;
@@ -89,7 +98,7 @@ let boot_generic ~context ~runner ~mods oc suites : unit =
     ~loc:"%s";
 |}
             test.test_title
-            "fun"
+            (wrapper_from ~activated_mods test)
             test.test_name
             (resolv ~context ~suite ~test)
             test.test_loc;

@@ -1,10 +1,10 @@
 open Model
-open Mod_parser
+
 
 
 let expected_mods ?(msg="") ~path expected =
   let len =
-    Mods.list_of_path path
+    Mod_parser.list_of_path path
     |> List.length in
   Alcotest.(check int) msg expected len
 

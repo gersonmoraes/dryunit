@@ -22,3 +22,8 @@
   ((targets (model.ml))
   (deps ((file ../../src/bin/model.ml)))
   (action (copy# ../../src/bin/model.ml model.ml))))
+
+(rule
+  ((targets (mod_parser.ml))
+  (deps ((file ../../src/bin/mod_parser.ml)))
+  (action (copy# ../../src/bin/mod_parser.ml mod_parser.ml))))

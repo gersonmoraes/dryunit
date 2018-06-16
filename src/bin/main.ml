@@ -13,8 +13,20 @@ let help_secs = [
 ]
 
 
-let gen_opts context sort nocache framework cache_dir ignore only ignore_path targets =
-  Action.({ context; sort; nocache; framework; cache_dir; ignore; only; ignore_path; targets; })
+let gen_opts context sort nocache framework cache_dir ignore only ignore_path mods targets =
+  let mods =
+    Util.map_opt mods ~f:
+      ( fun mods ->
+        Mod_parser.Parser_utils.split ~sep:" " mods |>
+        List.map
+          ( fun s ->
+            match Model.Modifiers.of_string s with
+            | None ->  invalid_arg ("Not a valid modifier: " ^ s)
+            | Some m -> m
+          ) |>
+        Mod_parser.of_list
+      ) in
+  Action.({ context; sort; nocache; framework; cache_dir; ignore; only; ignore_path; mods; targets; })
 
 module My_doc = struct
   let context     = "Define dryunit test context using environment variables."
@@ -26,6 +38,7 @@ module My_doc = struct
   let only        = "Space separated list of words used to filter tests."
   let ignore      = "Space separated list of words used to ignore tests."
   let ignore_path = "Space separated list of words used to ignore files."
+  let mods        = "Space separated list with active mods (available: async, result and long)."
 end
 
 
@@ -40,8 +53,9 @@ let gen_opts_t =
   let only = value & opt (some string) None & info ["only"] ~docs ~doc:My_doc.only in
   let ignore = value & opt (some string) None & info ["ignore"] ~docs ~doc:My_doc.ignore in
   let ignore_path = value & opt (some string) None & info ["ignore-path"] ~docs ~doc:My_doc.ignore_path in
+  let mods = value & opt (some string) None & info ["mods"] ~docs ~doc:My_doc.mods in
   let targets = value & pos_all string [] & info [] ~docv:"TARGET" in
-  Term.(const gen_opts $ context $ sort $ nocache $ framework $ cache_dir $ ignore $ only $ ignore_path $ targets)
+  Term.(const gen_opts $ context $ sort $ nocache $ framework $ cache_dir $ ignore $ only $ ignore_path $ mods $ targets)
 
 
 let init_opts framework =

@@ -16,6 +16,11 @@ let find_opt f l =
   | Not_found -> None
 
 
+let map_opt ~f = function
+  | None -> None
+  | Some v -> Some (f v)
+
+
 let split pattern value =
   Str.split (Str.regexp pattern) value
 

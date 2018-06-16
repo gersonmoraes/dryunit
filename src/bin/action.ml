@@ -29,6 +29,7 @@ type gen_opts =
   ; ignore     : string option
   ; ignore_path: string option
   ; targets    : string list
+  ; mods       : Model.Modifiers.activated option
   }
 
 
