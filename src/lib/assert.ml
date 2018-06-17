@@ -15,14 +15,15 @@ module Assert_errors = struct
 
   let to_string e =
     ( match e with
-      | Not_some         -> "I was expecting the constructor Some"
-      | Not_none         -> "I was expecting the constructor None"
-      | Not_ok           -> "I was expecting the constructor Ok"
-      | Not_error        -> "I was expecting the constructor Error"
-      | Not_empty_list   -> "The list is not empty"
-      | Not_list_length { exp; value }
+      | Not_some       -> "I was expecting a value built with the constructor Some"
+      | Not_none       -> "I was expecting a value built with the constructor None"
+      | Not_ok         -> "I was expecting a value built with the constructor Ok"
+      | Not_error      -> "I was expecting a value built with the constructor Error"
+      | Not_empty_list -> "I was expecting an empty list"
+      | Not_list_length { exp; value } ->
+          Printf.sprintf "I was expecting a list with length %d, but got %d" exp value
       | Not_array_length { exp; value } ->
-          Printf.sprintf "I was expected length %d, but got %d" exp value
+          Printf.sprintf "I was expecting an array with length %d, but got %d" exp value
     )
 end
 
