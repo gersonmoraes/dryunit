@@ -13,15 +13,16 @@ module Assert_errors = struct
 
   let fail e = raise (Failure e)
 
-  let title e =
+  let to_string e =
     ( match e with
-      | Not_some         -> "Assertion on constructor failed"
-      | Not_none         -> "Assertion on constructor failed"
-      | Not_ok           -> "Assertion on constructor failed"
-      | Not_error        -> "Assertion on constructor failed"
-      | Not_empty_list   -> "Non-empty list"
-      | Not_list_length  -> "Assertion for list length failed"
-      | Not_array_length -> "Assertion for array length failed"
+      | Not_some         -> "I was expecting the constructor Some"
+      | Not_none         -> "I was expecting the constructor None"
+      | Not_ok           -> "I was expecting the constructor Ok"
+      | Not_error        -> "I was expecting the constructor Error"
+      | Not_empty_list   -> "The list is not empty"
+      | Not_list_length { exp; value }
+      | Not_array_length { exp; value } ->
+          Printf.sprintf "I was expected length %d, but got %d" exp value
     )
 end
 
