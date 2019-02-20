@@ -1,0 +1,44 @@
+(executable
+ (name main)
+ (libraries alcotest str))
+
+(rule
+ (targets main.ml)
+ (deps
+  (glob_files tests.ml)
+  (glob_files *tests.ml)
+  (glob_files *Tests.ml))
+ (action
+  (with-stdout-to
+   %{targets}
+   (run
+    dryunit
+    gen
+    --framework
+    alcotest
+    --sort
+    ;; --filter "space separated list"
+    ;; --ignore "space separated list"
+    ;; --ignore-path "space separated list"
+    ))))
+
+(alias
+ (name runtest)
+ (deps
+  (:< main.exe))
+ (action
+  (run %{<})))
+
+(rule
+ (targets model.ml)
+ (deps
+  (file ../../src/bin/model.ml))
+ (action
+  (copy# ../../src/bin/model.ml model.ml)))
+
+(rule
+ (targets mods_parser.ml)
+ (deps
+  (file ../../src/bin/mods_parser.ml))
+ (action
+  (copy# ../../src/bin/mods_parser.ml mods_parser.ml)))

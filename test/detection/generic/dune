@@ -1,0 +1,20 @@
+(executable
+ (name main)
+ (libraries alcotest))
+
+(rule
+ (targets main.ml)
+ (deps
+  (glob_files {tests.ml,*tests.ml}))
+ (action
+  (with-stdout-to
+   %{targets}
+   (run ../../../src/bin/main.exe gen --framework alcotest --sort))))
+
+(alias
+ (name runtest)
+ (deps
+  main.exe
+  (file main.expected))
+ (action
+  (run diff -u main.expected main.ml)))

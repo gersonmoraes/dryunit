@@ -1,0 +1,31 @@
+(executable
+ (name main)
+ (libraries alcotest dryunit))
+
+(rule
+ (targets main.ml)
+ (deps
+  (glob_files tests.ml)
+  (glob_files *tests.ml)
+  (glob_files *Tests.ml))
+ (action
+  (with-stdout-to
+   %{targets}
+   (run
+    dryunit
+    gen
+    --framework
+    alcotest
+    --sort
+    ;; --filter "space separated list"
+    ;; --ignore "space separated list"
+    ;; --ignore-path "space separated list"
+    --mods
+    "async result long"))))
+
+(alias
+ (name runtest)
+ (deps
+  (:< main.exe))
+ (action
+  (run %{<})))

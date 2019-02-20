@@ -1,6 +1,0 @@
-(executable
- ((name main)
-  (package dryunit)
-  (public_name dryunit)
-  (flags (-safe-string))
-  (libraries (cmdliner str unix))))

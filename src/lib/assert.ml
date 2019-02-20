@@ -29,7 +29,7 @@ end
 
 open Assert_errors
 
-let is_some v = function
+let is_some = function
   | Some _ -> ()
   | None -> fail Not_some
 

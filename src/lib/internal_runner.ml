@@ -37,7 +37,7 @@ type suite =
   }
 
 (* Creating a new test *)
-let test ~loc ~fqdn
+(* let test ~loc ~fqdn
     ~(f:callback) test_name
     : test
   =
@@ -46,14 +46,14 @@ let test ~loc ~fqdn
   ; test_fqdn = fqdn
   ; test_callback = f
   ; test_long = false
-  }
+  } *)
 
-let suite ~tests ~path suite_name : suite =
+(* let suite ~tests ~path suite_name : suite =
   { suite_name
   ; suite_path = path
   ; tests = tests
   ; has_errors = false
-  }
+  } *)
 
 let suite_ctx ~name ~title ~path =
   { ctx_name  = name
@@ -99,5 +99,5 @@ let test
   ; test_fqdn     = (Printf.sprintf "%s.%s" ctx.ctx_name test_name)
   }
 
-let run (suites: suite list) =
+let run (_suites: suite list) =
   failwith "DRYUNIT FRAMEWORK IS NOT READY TO RUN"
